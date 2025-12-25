@@ -3,11 +3,11 @@ import { SlideData } from "@/types/slides";
 export const slides: SlideData[] = [
   {
     id: "cover",
-    title: "Multimodal AI Integration Platform",
-    subtitle: "Architecting Next-Gen AI Solutions with DeepSeek, OpenRouter & Python",
+    title: "Multimodal AI SDK Integration",
+    subtitle: "Complete Guide to Anthropic, DeepSeek, xAI & OpenRouter",
     bullets: [
-      "Technical Deep Dive",
-      "Implementation Strategies",
+      "Interactive SDK Demos",
+      "Production Deployment",
       "Scalable Architecture"
     ]
   },
@@ -16,6 +16,7 @@ export const slides: SlideData[] = [
     title: "Agenda",
     bullets: [
       "Platform Overview: DeepSeek & OpenRouter",
+      "AI Provider SDKs: Anthropic, DeepSeek, xAI (Interactive)",
       "OpenRouter TypeScript SDK Integration (Interactive)",
       "Model Endpoints Catalog (13+ Models)",
       "Embedding Models & Configuration",
@@ -83,6 +84,42 @@ const openRouterConfig = {
     "X-Title": "Multimodal Platform"
   }
 };`
+  },
+  {
+    id: "anthropic-sdk",
+    title: "Anthropic Claude SDK",
+    subtitle: "Interactive Demo with Claude 3.5 Models",
+    interactive: true,
+    bullets: [
+      "Official SDK: @anthropic-ai/sdk with full TypeScript support and streaming",
+      "Claude 3.5 Sonnet: 200K context, vision capabilities, best-in-class coding and analysis",
+      "Claude 3.5 Haiku: Fast and cost-effective for high-throughput applications",
+      "Vision API: Analyze images with detailed descriptions, OCR, and visual reasoning"
+    ]
+  },
+  {
+    id: "deepseek-sdk",
+    title: "DeepSeek API Integration",
+    subtitle: "Mixture-of-Experts with Advanced Reasoning",
+    interactive: true,
+    bullets: [
+      "DeepSeek-Chat: 671B parameters (37B active) - Fast general-purpose model with code expertise",
+      "DeepSeek-Reasoner (R1): Chain-of-thought reasoning with <think> tags for complex problems",
+      "OpenAI-Compatible: Drop-in replacement using OpenAI SDK with custom baseURL",
+      "Cost-Effective: Significantly cheaper than GPT-4 while maintaining competitive performance"
+    ]
+  },
+  {
+    id: "xai-sdk",
+    title: "xAI Grok API",
+    subtitle: "Real-Time Web Search Integration",
+    interactive: true,
+    bullets: [
+      "Grok Beta: 131K context with built-in real-time web search capabilities",
+      "Grok Vision: Multimodal understanding for image analysis and visual reasoning",
+      "Unique Features: Access to X/Twitter data, current events, witty personality",
+      "OpenAI-Compatible: Use standard OpenAI SDK with api.x.ai baseURL"
+    ]
   },
   {
     id: "openrouter-sdk",
@@ -213,10 +250,10 @@ query_embedding = get_embeddings("What is quantum computing?")
     subtitle: "Secure Configuration for All AI Providers",
     interactive: true,
     bullets: [
-      "Essential API Keys: OPENROUTER_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, NVIDIA_NIM_API_KEY, OPENAI_API_KEY",
+      "Essential API Keys: ANTHROPIC_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, OPENROUTER_API_KEY, NVIDIA_NIM_API_KEY, OPENAI_API_KEY",
       "Platform-Specific: Configure based on deployment environment (Vercel, Replit, Docker, AWS)",
       "Security Best Practices: Use secrets managers, never commit .env to version control, rotate keys regularly",
-      "Validation: Test all keys with /api/config endpoint before production deployment"
+      "Validation: Test all keys with the API Key Validator before production deployment"
     ]
   },
   {
@@ -224,45 +261,107 @@ query_embedding = get_embeddings("What is quantum computing?")
     title: "Python Integration with LiteLLM",
     subtitle: "Unified Interface Across All Providers",
     bullets: [
-      "Environment Setup: Store API keys in environment variables (OPENROUTER_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, NVIDIA_NIM_API_KEY)",
+      "Environment Setup: OPENROUTER_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, NVIDIA_NIM_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY",
       "LiteLLM Benefits: Single completion() interface for 100+ models, automatic retry logic, cost tracking, and fallback handling",
-      "Provider Routing: Use prefixes (deepseek/, openrouter/, xai/) to specify providers explicitly",
+      "Provider Routing: Use prefixes (anthropic/, deepseek/, xai/, openrouter/) to specify providers explicitly",
       "Security: Never hardcode credentials—use secrets management (AWS Secrets Manager, Replit Secrets, dotenv)"
     ],
     code: `import os
-from litellm import completion
+from litellm import completion, RetryPolicy
 
 # Keys loaded from environment
-# Set via: export OPENROUTER_API_KEY="sk-or-..."
+# export ANTHROPIC_API_KEY="sk-ant-..."
+# export DEEPSEEK_API_KEY="sk-..."
+# export XAI_API_KEY="xai-..."
 
 def run_multimodal_inference(provider: str, prompt: str, temperature: float = 0.7):
     """
-    Universal inference function supporting multiple providers.
+    Universal inference function supporting all major AI providers.
     """
     model_map = {
-        "deepseek": "deepseek/deepseek-chat",
-        "deepseek-r1": "deepseek/deepseek-r1",
+        # Anthropic Claude models
+        "claude-sonnet": "anthropic/claude-3-5-sonnet-20241022",
+        "claude-haiku": "anthropic/claude-3-5-haiku-20241022",
+        "claude-opus": "anthropic/claude-3-opus-20240229",
+        
+        # DeepSeek models
+        "deepseek-chat": "deepseek/deepseek-chat",
+        "deepseek-reasoner": "deepseek/deepseek-reasoner",
+        "deepseek-coder": "deepseek/deepseek-coder",
+        
+        # xAI Grok models
+        "grok": "xai/grok-beta",
+        "grok-vision": "xai/grok-vision-beta",
+        
+        # OpenRouter (multi-provider gateway)
         "openrouter": "openrouter/anthropic/claude-3-opus",
-        "xai": "xai/grok-4-fast",
+        
+        # NVIDIA and others
         "nvidia": "nvidia/nemotron-nano-9b-v2"
     }
     
     response = completion(
         model=model_map[provider],
         messages=[{"role": "user", "content": prompt}],
-        temperature=temperature
+        temperature=temperature,
+        max_tokens=2048
     )
     
     return response.choices[0].message.content
 
-# Example with error handling and retries
-from litellm import RetryPolicy
+# Example with error handling and multi-provider fallback
+def robust_inference(prompt: str):
+    """
+    Try multiple providers with automatic fallback.
+    """
+    providers = [
+        "claude-sonnet",      # Try Anthropic first (best quality)
+        "deepseek-chat",      # Fallback to DeepSeek (cost-effective)
+        "grok",               # Fallback to xAI (web search capable)
+        "openrouter"          # Final fallback through OpenRouter
+    ]
+    
+    for provider in providers:
+        try:
+            response = completion(
+                model=model_map[provider],
+                messages=[{"role": "user", "content": prompt}],
+                retry_policy=RetryPolicy(max_retries=2, exponential_backoff=True),
+                timeout=30
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"Provider {provider} failed: {e}")
+            continue
+    
+    raise Exception("All providers failed")
 
-response = completion(
-    model="deepseek/deepseek-r1",
-    messages=[{"role": "user", "content": "Solve: x^2 + 5x + 6 = 0"}],
-    retry_policy=RetryPolicy(max_retries=3, exponential_backoff=True)
-)`
+# Advanced: Provider-specific features
+def use_provider_features():
+    # Anthropic Claude with vision
+    vision_response = completion(
+        model="anthropic/claude-3-5-sonnet-20241022",
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,..."}},
+                {"type": "text", "text": "Describe this image"}
+            ]
+        }]
+    )
+    
+    # DeepSeek Reasoner with chain-of-thought
+    reasoning_response = completion(
+        model="deepseek/deepseek-reasoner",
+        messages=[{"role": "user", "content": "Solve this complex math problem..."}],
+        temperature=1.0  # Required for reasoning models
+    )
+    
+    # xAI Grok with web search (automatic)
+    web_response = completion(
+        model="xai/grok-beta",
+        messages=[{"role": "user", "content": "What are today's tech news?"}]
+    )`
   },
   {
     id: "best-practices",
@@ -306,14 +405,14 @@ response = completion(
     title: "Resources & Links",
     subtitle: "Core Infrastructure Repositories",
     bullets: [
-      "OpenRouterTeam/typescript-sdk - Official TypeScript SDK with Vercel AI integration (Featured)",
-      "BerriAI/litellm - Python LLM abstraction for 100+ models",
-      "veniceai/api-docs - Privacy-focused inference API",
-      "xai-org/xai-cookbook - Advanced Grok usage patterns",
-      "OpenRouterTeam/ai-sdk-provider - Legacy AI SDK provider (use typescript-sdk)",
-      "huggingface/dataset-viewer - Dataset inspection tools",
-      "deepseek-ai/DeepSeek-Math-V2 - Math reasoning models",
-      "deepseek-ai/3FS - High-performance storage for AI training"
+      "anthropics/anthropic-sdk-typescript - Official Anthropic Claude SDK with streaming and vision",
+      "OpenRouterTeam/typescript-sdk - Official OpenRouter TypeScript SDK with Vercel AI integration",
+      "deepseek-ai/DeepSeek-V3 - DeepSeek-V3 671B MoE model with research papers",
+      "xai-org/grok-1 - Open-source Grok-1 314B parameter model",
+      "BerriAI/litellm - Python LLM abstraction for 100+ models with unified interface",
+      "vercel/ai - AI SDK for building AI-powered applications with streaming",
+      "huggingface/transformers - State-of-the-art ML models for PyTorch and TensorFlow",
+      "deepseek-ai/DeepSeek-Math-V2 - Math reasoning models and benchmarks"
     ]
   },
   {

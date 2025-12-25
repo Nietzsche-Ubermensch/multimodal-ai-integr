@@ -37,6 +37,33 @@ interface Repository {
 
 const repositories: Repository[] = [
   {
+    name: "anthropic-sdk-typescript",
+    owner: "anthropics",
+    description: "Official Anthropic TypeScript SDK for Claude with streaming, vision, and tool use capabilities",
+    stars: "1.6k",
+    category: "⭐ Featured",
+    url: "https://github.com/anthropics/anthropic-sdk-typescript",
+    highlights: [
+      "Official Anthropic SDK with full type safety",
+      "Claude 3.5 Sonnet, Haiku, and Opus support",
+      "Vision API for image understanding",
+      "Tool use and function calling support"
+    ],
+    quickStart: `npm install @anthropic-ai/sdk
+
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+const message = await anthropic.messages.create({
+  model: 'claude-3-5-sonnet-20241022',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: 'Explain AI' }],
+});`
+  },
+  {
     name: "typescript-sdk",
     owner: "OpenRouterTeam",
     description: "Official OpenRouter TypeScript SDK with Vercel AI integration - stream responses from 100+ LLMs",
@@ -62,6 +89,33 @@ const openrouter = createOpenRouter({
 const { textStream } = await streamText({
   model: openrouter('anthropic/claude-3-5-sonnet'),
   messages: [{ role: 'user', content: 'Hello!' }]
+});`
+  },
+  {
+    name: "DeepSeek-V3",
+    owner: "deepseek-ai",
+    description: "DeepSeek-V3 671B MoE model - powerful open-source reasoning and chat model",
+    stars: "5.8k",
+    category: "⭐ Featured",
+    url: "https://github.com/deepseek-ai/DeepSeek-V3",
+    highlights: [
+      "671B total parameters (37B active per token)",
+      "Mixture-of-Experts architecture for efficiency",
+      "Competitive with GPT-4 on many benchmarks",
+      "OpenAI-compatible API endpoint"
+    ],
+    quickStart: `npm install openai
+
+import OpenAI from 'openai';
+
+const deepseek = new OpenAI({
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: 'https://api.deepseek.com/v1',
+});
+
+const completion = await deepseek.chat.completions.create({
+  model: 'deepseek-chat',
+  messages: [{ role: 'user', content: 'Solve this...' }],
 });`
   },
   {
@@ -143,7 +197,7 @@ outputs = model.generate(**inputs, max_new_tokens=2048)`
   {
     name: "xai-cookbook",
     owner: "xai-org",
-    description: "Example code and guides for using Grok models via the xAI API",
+    description: "Example code and guides for using Grok models via the xAI API with web search capabilities",
     stars: "892",
     category: "Documentation",
     url: "https://github.com/xai-org/xai-cookbook",
@@ -151,20 +205,21 @@ outputs = model.generate(**inputs, max_new_tokens=2048)`
       "Advanced prompting techniques for Grok",
       "Web search integration examples",
       "Multimodal (vision) usage patterns",
-      "Rate limiting and optimization strategies"
+      "Real-time data access demonstrations"
     ],
-    quickStart: `import anthropic
+    quickStart: `npm install openai
 
-client = anthropic.Anthropic(
-    base_url="https://api.x.ai/v1",
-    api_key="xai-..."
-)
+import OpenAI from 'openai';
 
-response = client.messages.create(
-    model="grok-4-fast",
-    max_tokens=1024,
-    messages=[{"role": "user", "content": "Analyze this image"}]
-)`
+const xai = new OpenAI({
+  apiKey: process.env.XAI_API_KEY,
+  baseURL: 'https://api.x.ai/v1',
+});
+
+const completion = await xai.chat.completions.create({
+  model: 'grok-beta',
+  messages: [{ role: 'user', content: 'Latest tech news?' }],
+});`
   },
   {
     name: "api-docs",

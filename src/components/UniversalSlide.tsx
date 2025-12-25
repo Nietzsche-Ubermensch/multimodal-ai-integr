@@ -10,6 +10,9 @@ import { EnvSetup } from "@/components/EnvSetup";
 import { ApiKeyValidator } from "@/components/ApiKeyValidator";
 import { EmbeddingTester } from "@/components/EmbeddingTester";
 import { OpenRouterSDKDemo } from "@/components/OpenRouterSDKDemo";
+import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
+import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
+import { XAISDKDemo } from "@/components/XAISDKDemo";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -211,6 +214,12 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <EmbeddingTester />
               ) : slide.id === "openrouter-sdk" ? (
                 <OpenRouterSDKDemo />
+              ) : slide.id === "anthropic-sdk" ? (
+                <AnthropicSDKDemo />
+              ) : slide.id === "deepseek-sdk" ? (
+                <DeepSeekSDKDemo />
+              ) : slide.id === "xai-sdk" ? (
+                <XAISDKDemo />
               ) : null}
             </div>
           </>

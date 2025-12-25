@@ -1,24 +1,31 @@
 # Planning Guide
 
-A comprehensive technical presentation platform for exploring multimodal AI integration architectures, API configurations, and implementation patterns across DeepSeek, OpenRouter, xAI, NVIDIA, Microsoft, Google, and other leading AI platforms. Features detailed model endpoint specifications for 13+ models including embeddings, with interactive API testing and complete documentation.
+A comprehensive technical presentation platform for exploring AI SDK integration with Anthropic Claude, DeepSeek, xAI Grok, and OpenRouter. Features interactive demos for each provider, complete code examples, and production deployment guides with 13+ model endpoints and embedding configurations.
 
 **Experience Qualities**: 
-1. **Technical & Authoritative**: Documentation-grade accuracy with detailed specifications for 13+ AI models, embedding configurations, and production-ready code examples
-2. **Interactive & Explorable**: Live API testing with 10+ provider examples, dynamic parameter controls, and multi-language code snippets (Python, cURL, JavaScript)
-3. **Comprehensive & Reference-Grade**: Complete coverage of platform capabilities, model endpoints, embeddings, integration best practices, and security patterns
+1. **Interactive & Hands-On**: Live SDK demos with real API testing for Anthropic, DeepSeek, and xAI, interactive parameter controls, and instant code generation
+2. **Production-Ready**: Complete TypeScript/Python examples, deployment guides for Vercel/Replit/Docker/AWS, and security best practices
+3. **Comprehensive & Reference-Grade**: Full documentation for 13+ models, embedding APIs, API key validation, and multi-provider fallback strategies
 
 **Complexity Level**: Complex Application (advanced functionality with multiple views)
 
-This is a production-ready technical reference platform providing exhaustive documentation for AI integration specialists. Includes platform overviews (DeepSeek MoE architecture, OpenRouter unified gateway), detailed model catalogs (Grok, Nemotron, Phi-4, WizardLM, DeepSeek-R1), embedding model configurations (Gemini, OpenAI text-embedding), interactive API testing, Python/LiteLLM integration patterns, and enterprise best practices.
+This is an interactive SDK integration platform providing hands-on demos for Anthropic Claude (3.5 Sonnet/Haiku/Opus), DeepSeek (Chat/Reasoner/Coder), xAI Grok (Beta/Vision), and OpenRouter. Includes live API testing, code generation, model comparisons, environment setup guides, and GitHub repository integration with quick-start examples.
 
 ## Essential Features
 
+### AI Provider SDK Demos (Anthropic, DeepSeek, xAI)
+- **Functionality**: Three interactive SDK demo components with live API testing, model selection, real-time response generation, and comprehensive code examples
+- **Purpose**: Allow developers to test each provider's SDK with real or simulated API calls, compare model capabilities, and get production-ready code
+- **Trigger**: Navigate to Anthropic SDK, DeepSeek SDK, or xAI SDK slides
+- **Progression**: Select model → Enter prompt → Toggle real/simulated API → Click test → View response → Copy code examples → Switch between installation/basic/advanced tabs
+- **Success criteria**: Working demos for all three providers, accurate model information, TypeScript/Python code examples, streaming examples, vision API examples
+
 ### Platform Architecture Overview
-- **Functionality**: In-depth coverage of DeepSeek (MoE architecture, 650B parameters) and OpenRouter (unified API gateway for 100+ models)
-- **Purpose**: Understand core capabilities, multimodal processing, architectural differences, and strategic use cases
+- **Functionality**: In-depth coverage of DeepSeek (671B MoE), Anthropic Claude (200K context), xAI Grok (web search), and OpenRouter (100+ models gateway)
+- **Purpose**: Understand core capabilities, architectural differences, unique features, and strategic use cases for each provider
 - **Trigger**: Navigate to platform overview slides
-- **Progression**: View platform comparison → Explore DeepSeek MoE details → Review OpenRouter routing logic → Understand integration patterns
-- **Success criteria**: Clear explanation of technical architecture, parameter counts, context windows, and multimodal capabilities
+- **Progression**: View platform comparison → Explore provider-specific features → Review model architectures → Understand integration patterns
+- **Success criteria**: Clear explanation of technical architecture, parameter counts, context windows, and unique capabilities (reasoning, vision, web search)
 
 ### Model Endpoints Catalog (13+ Models)
 - **Functionality**: Comprehensive database covering xAI (Grok-4, Grok-Code-Fast), DeepSeek (V3, R1, Chat), NVIDIA (Nemotron Nano), Microsoft (Phi-4, WizardLM-2), Google, OpenAI, and community models
