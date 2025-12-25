@@ -6,6 +6,7 @@ import { ApiTester } from "@/components/ApiTester";
 import { ApiDocumentation } from "@/components/ApiDocumentation";
 import { GitHubIntegration } from "@/components/GitHubIntegration";
 import { DeploymentGuide } from "@/components/DeploymentGuide";
+import { EnvSetup } from "@/components/EnvSetup";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -199,6 +200,8 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <GitHubIntegration />
               ) : slide.id === "deployment-guides" ? (
                 <DeploymentGuide />
+              ) : slide.id === "env-setup" ? (
+                <EnvSetup />
               ) : null}
             </div>
           </>

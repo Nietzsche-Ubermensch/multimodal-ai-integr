@@ -48,6 +48,13 @@ This is a production-ready technical reference platform providing exhaustive doc
 - **Progression**: Select endpoint → View parameters with type/required badges → Switch between cURL/Python/Success/Error tabs → Copy code examples
 - **Success criteria**: All parameters documented with types, both cURL and Python examples for each endpoint, success and error response examples, one-click copy
 
+### Environment Variable Setup (Interactive)
+- **Functionality**: Comprehensive configuration guide for all 6 AI providers (OpenRouter, DeepSeek, xAI, NVIDIA, OpenAI, Anthropic) with platform-specific instructions for Vercel, Replit, Docker, AWS Lambda, and local development
+- **Purpose**: Enable secure and correct environment variable configuration across all deployment platforms with copy-ready templates
+- **Trigger**: Navigate to Environment Variable Setup slide
+- **Progression**: View required API keys with descriptions → Select deployment platform (Vercel/Replit/Docker/AWS/Local) → Follow numbered setup steps → Copy CLI commands or config files → Review security best practices → Validate with test commands
+- **Success criteria**: Complete setup guides for 5 platforms, security warnings displayed prominently, copy functionality for .env template and platform-specific configs, validation endpoint examples
+
 ### Python Integration Patterns
 - **Functionality**: LiteLLM integration with unified completion() interface, environment variable management, retry policies, and fallback handling
 - **Purpose**: Provide production-ready Python code for multi-provider AI integration

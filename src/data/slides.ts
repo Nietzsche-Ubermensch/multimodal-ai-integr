@@ -20,6 +20,7 @@ export const slides: SlideData[] = [
       "Embedding Models & Configuration",
       "Live API Testing (Interactive)",
       "API Reference Documentation (Interactive)",
+      "Environment Variable Setup (Interactive)",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
       "GitHub Repository Integration (Interactive)",
@@ -165,6 +166,18 @@ query_embedding = get_embeddings("What is quantum computing?")
       "Standard OpenAI-compatible response formats",
       "Authentication and error handling patterns",
       "Health monitoring and configuration endpoints"
+    ]
+  },
+  {
+    id: "env-setup",
+    title: "Environment Variable Setup",
+    subtitle: "Secure Configuration for All AI Providers",
+    interactive: true,
+    bullets: [
+      "Essential API Keys: OPENROUTER_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, NVIDIA_NIM_API_KEY, OPENAI_API_KEY",
+      "Platform-Specific: Configure based on deployment environment (Vercel, Replit, Docker, AWS)",
+      "Security Best Practices: Use secrets managers, never commit .env to version control, rotate keys regularly",
+      "Validation: Test all keys with /api/config endpoint before production deployment"
     ]
   },
   {
