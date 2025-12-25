@@ -19,11 +19,11 @@ interface ApiExample {
 const apiExamples: ApiExample[] = [
   {
     provider: "deepseek",
-    model: "deepseek-chat",
-    description: "Math reasoning with DeepSeek",
+    model: "deepseek-chat-v3-0324",
+    description: "DeepSeek Chat V3 - Instruction following",
     request: JSON.stringify({
       provider: "deepseek",
-      model: "deepseek-chat",
+      model: "deepseek-chat-v3-0324",
       messages: [
         { role: "user", content: "Explain the quadratic formula in simple terms" }
       ],
@@ -31,12 +31,103 @@ const apiExamples: ApiExample[] = [
     }, null, 2)
   },
   {
+    provider: "deepseek",
+    model: "deepseek-r1",
+    description: "DeepSeek R1 - Complex reasoning",
+    request: JSON.stringify({
+      provider: "deepseek",
+      model: "deepseek-r1",
+      messages: [
+        { role: "user", content: "Solve this logic puzzle: If all roses are flowers and some flowers fade quickly, can we conclude that some roses fade quickly?" }
+      ],
+      temperature: 0.6
+    }, null, 2)
+  },
+  {
+    provider: "xai",
+    model: "grok-4-fast",
+    description: "Grok 4 Fast - Real-time responses",
+    request: JSON.stringify({
+      provider: "xai",
+      model: "grok-4-fast",
+      messages: [
+        { role: "user", content: "What's the latest breakthrough in quantum computing?" }
+      ],
+      temperature: 0.8
+    }, null, 2)
+  },
+  {
+    provider: "xai",
+    model: "grok-code-fast-1",
+    description: "Grok Code Fast - Rapid code generation",
+    request: JSON.stringify({
+      provider: "xai",
+      model: "grok-code-fast-1",
+      messages: [
+        { role: "user", content: "Write a Python function to calculate fibonacci numbers using dynamic programming" }
+      ],
+      temperature: 0.5
+    }, null, 2)
+  },
+  {
+    provider: "nvidia",
+    model: "nemotron-nano-9b-v2",
+    description: "NVIDIA Nemotron Nano - Edge inference",
+    request: JSON.stringify({
+      provider: "nvidia",
+      model: "nemotron-nano-9b-v2",
+      messages: [
+        { role: "user", content: "Summarize the key benefits of edge computing in 3 points" }
+      ],
+      temperature: 0.4
+    }, null, 2)
+  },
+  {
     provider: "openrouter",
-    model: "anthropic/claude-3-opus",
-    description: "Creative writing with Claude",
+    model: "microsoft/phi-4",
+    description: "Microsoft Phi-4 - Efficient reasoning",
     request: JSON.stringify({
       provider: "openrouter",
-      model: "anthropic/claude-3-opus",
+      model: "microsoft/phi-4",
+      messages: [
+        { role: "user", content: "Explain the concept of recursion with a simple example" }
+      ],
+      temperature: 0.6
+    }, null, 2)
+  },
+  {
+    provider: "openrouter",
+    model: "microsoft/wizardlm-2-8x22b",
+    description: "WizardLM 2 - Code & reasoning",
+    request: JSON.stringify({
+      provider: "openrouter",
+      model: "microsoft/wizardlm-2-8x22b",
+      messages: [
+        { role: "user", content: "Design a database schema for an e-commerce platform" }
+      ],
+      temperature: 0.5
+    }, null, 2)
+  },
+  {
+    provider: "openrouter",
+    model: "xiaomi/mimo-v2-flash:free",
+    description: "Xiaomi Mimo V2 Flash - Free multimodal",
+    request: JSON.stringify({
+      provider: "openrouter",
+      model: "xiaomi/mimo-v2-flash:free",
+      messages: [
+        { role: "user", content: "Write a creative short story opening about AI" }
+      ],
+      temperature: 0.9
+    }, null, 2)
+  },
+  {
+    provider: "openrouter",
+    model: "gryphe/mythomax-l2-13b",
+    description: "MythoMax - Creative writing",
+    request: JSON.stringify({
+      provider: "openrouter",
+      model: "gryphe/mythomax-l2-13b",
       messages: [
         { role: "user", content: "Write a haiku about quantum computing" }
       ],
@@ -44,55 +135,16 @@ const apiExamples: ApiExample[] = [
     }, null, 2)
   },
   {
-    provider: "xai",
-    model: "grok-1",
-    description: "Conversational AI with Grok",
-    request: JSON.stringify({
-      provider: "xai",
-      model: "grok-1",
-      messages: [
-        { role: "user", content: "What's the latest in AI research?" }
-      ],
-      temperature: 0.8
-    }, null, 2)
-  },
-  {
-    provider: "nvidia",
-    model: "llama-3-70b-instruct",
-    description: "Code generation with Llama",
-    request: JSON.stringify({
-      provider: "nvidia",
-      model: "llama-3-70b-instruct",
-      messages: [
-        { role: "user", content: "Write a Python function to calculate fibonacci numbers" }
-      ],
-      temperature: 0.5
-    }, null, 2)
-  },
-  {
-    provider: "deepseek",
-    model: "deepseek-coder",
-    description: "Code optimization with DeepSeek Coder",
-    request: JSON.stringify({
-      provider: "deepseek",
-      model: "deepseek-coder",
-      messages: [
-        { role: "user", content: "Optimize this code: for i in range(len(arr)): print(arr[i])" }
-      ],
-      temperature: 0.3
-    }, null, 2)
-  },
-  {
     provider: "openrouter",
-    model: "google/gemini-pro",
-    description: "Data analysis with Gemini",
+    model: "openai/gpt-3.5-turbo-0301",
+    description: "GPT-3.5 Turbo (Legacy) - Cost-effective",
     request: JSON.stringify({
       provider: "openrouter",
-      model: "google/gemini-pro",
+      model: "openai/gpt-3.5-turbo-0301",
       messages: [
-        { role: "user", content: "Analyze this dataset trend: [10, 15, 12, 18, 25, 30, 28]" }
+        { role: "user", content: "List 5 best practices for REST API design" }
       ],
-      temperature: 0.4
+      temperature: 0.7
     }, null, 2)
   }
 ];
@@ -157,7 +209,21 @@ export function ApiTester() {
       
       const responsesByProvider: Record<string, Record<string, string>> = {
         deepseek: {
-          "deepseek-chat": "DeepSeek's advanced reasoning capabilities allow me to break down complex problems systematically. For your question about the quadratic formula, it's essentially a method to solve equations in the form ax² + bx + c = 0. The formula x = (-b ± √(b²-4ac))/2a gives us the two possible solutions (roots) for x. The discriminant (b²-4ac) tells us about the nature of the roots: if positive, we have two real solutions; if zero, one repeated solution; if negative, complex solutions.",
+          "deepseek-chat-v3-0324": "The quadratic formula is a mathematical tool for solving equations where x is raised to the power of 2 (quadratic equations). For any equation in the form ax² + bx + c = 0, the formula x = (-b ± √(b²-4ac))/2a gives us the solutions. The discriminant (b²-4ac) determines the nature of solutions: positive yields two real roots, zero gives one repeated root, and negative produces complex solutions. DeepSeek V3's enhanced instruction following ensures precise, contextually appropriate explanations.",
+          "deepseek-r1": `Let me analyze this logic puzzle step-by-step using formal reasoning:
+
+Given premises:
+1. All roses are flowers (∀x: Rose(x) → Flower(x))
+2. Some flowers fade quickly (∃x: Flower(x) ∧ FadeQuickly(x))
+
+Question: Can we conclude some roses fade quickly?
+
+Analysis:
+The conclusion "some roses fade quickly" would require establishing that the intersection of roses and quickly-fading flowers is non-empty. However, our premises don't guarantee this overlap.
+
+Counter-example: Suppose roses are the subset of flowers that don't fade quickly, while other flowers (tulips, daisies) fade quickly. This satisfies both premises but contradicts the conclusion.
+
+Answer: No, we cannot validly conclude that some roses fade quickly. This would be the fallacy of illicit conversion. The premises are compatible with all roses being long-lasting flowers.`,
           "deepseek-coder": `# Optimized code using enumerate()
 for idx, value in enumerate(arr):
     print(value)
@@ -170,25 +236,49 @@ for value in arr:
 # Original: O(n) with index lookups
 # Optimized: O(n) with direct iteration, no index overhead`
         },
-        openrouter: {
-          "anthropic/claude-3-opus": "Quantum bits dance light,\nSuperposition's gentle flow—\nFuture whispers code.",
-          "google/gemini-pro": `Data Analysis Summary:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Dataset: [10, 15, 12, 18, 25, 30, 28]
-
-Trend: Strong upward trajectory with minor fluctuations
-Average: 19.71
-Growth Rate: +180% (first to last)
-Volatility: Low-to-medium
-Pattern: Positive momentum with slight pullback at end
-
-Recommendation: Indicates healthy growth with sustainable momentum. The slight decline at the end (30→28) suggests natural consolidation after rapid growth.`
-        },
         xai: {
-          "grok-1": "AI research is advancing rapidly! Recent breakthroughs include multimodal transformers like GPT-4V, improved reasoning with chain-of-thought prompting, and efficient inference techniques. The field is also seeing innovations in open-source models like Llama 3 and DeepSeek, democratizing access to powerful AI. Notable developments: mixture-of-experts architectures, reinforcement learning from human feedback (RLHF), and constitutional AI for alignment.",
-          "grok-2": "The AI landscape in 2024 is characterized by several key trends: (1) Multimodal integration—models handling text, image, audio, and video simultaneously; (2) Efficiency improvements—quantization and distillation making large models accessible; (3) Specialized reasoning models like DeepSeek-Math achieving SOTA on mathematical tasks; (4) Privacy-focused inference through platforms like Venice AI; (5) Open-source momentum with models like Mistral and Qwen competing with proprietary solutions."
+          "grok-4-fast": "Recent quantum computing breakthroughs include IBM's 1,121-qubit Condor processor and Google's error-correction milestone where logical qubits outperform physical ones. Researchers achieved quantum advantage in optimization problems for materials science. IonQ demonstrated remote entanglement across networked quantum computers. The field is transitioning from NISQ (Noisy Intermediate-Scale Quantum) to fault-tolerant era with practical applications in cryptography, drug discovery, and climate modeling on the horizon.",
+          "grok-code-fast-1": `def fibonacci(n: int) -> int:
+    """
+    Calculate the nth Fibonacci number using dynamic programming.
+    
+    Time Complexity: O(n)
+    Space Complexity: O(n)
+    """
+    if n <= 1:
+        return n
+    
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    
+    for i in range(2, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]
+    
+    return dp[n]
+
+# Space-optimized version O(1)
+def fib_optimized(n: int) -> int:
+    if n <= 1:
+        return n
+    prev, curr = 0, 1
+    for _ in range(2, n + 1):
+        prev, curr = curr, prev + curr
+    return curr
+
+# Usage
+print(fib_optimized(10))  # Output: 55`,
+          "grok-1": "AI research is advancing rapidly! Recent breakthroughs include multimodal transformers like GPT-4V, improved reasoning with chain-of-thought prompting, and efficient inference techniques. The field is also seeing innovations in open-source models like Llama 3 and DeepSeek, democratizing access to powerful AI. Notable developments: mixture-of-experts architectures, reinforcement learning from human feedback (RLHF), and constitutional AI for alignment."
         },
         nvidia: {
+          "nemotron-nano-9b-v2": `Edge Computing Key Benefits:
+
+1. **Ultra-Low Latency**: Processing data locally (1-5ms) vs cloud (50-100ms) enables real-time applications like autonomous vehicles and industrial automation.
+
+2. **Bandwidth Efficiency**: Reduces data transmission by 40-60% through local preprocessing, critical for IoT networks with thousands of sensors.
+
+3. **Enhanced Privacy & Security**: Sensitive data stays on-device, meeting GDPR/HIPAA compliance requirements without cloud exposure.
+
+NVIDIA Nemotron Nano optimized for edge deployment with quantization support.`,
           "llama-3-70b-instruct": `def fibonacci(n: int) -> int:
     """
     Calculate the nth Fibonacci number using dynamic programming.
@@ -211,19 +301,89 @@ Recommendation: Indicates healthy growth with sustainable momentum. The slight d
     for i in range(2, n + 1):
         fib[i] = fib[i-1] + fib[i-2]
     
-    return fib[n]
+    return fib[n]`
+        },
+        openrouter: {
+          "microsoft/phi-4": `Recursion is when a function calls itself to solve smaller instances of the same problem.
 
-# Example usage
-print(fibonacci(10))  # Output: 55
+Simple Example - Factorial:
 
-# For better space complexity O(1):
-def fibonacci_optimized(n: int) -> int:
-    if n <= 1:
-        return n
-    prev, curr = 0, 1
-    for _ in range(2, n + 1):
-        prev, curr = curr, prev + curr
-    return curr`
+def factorial(n):
+    # Base case: stop the recursion
+    if n == 0 or n == 1:
+        return 1
+    # Recursive case: function calls itself
+    return n * factorial(n - 1)
+
+How it works:
+factorial(5) → 5 * factorial(4)
+             → 5 * 4 * factorial(3)
+             → 5 * 4 * 3 * factorial(2)
+             → 5 * 4 * 3 * 2 * factorial(1)
+             → 5 * 4 * 3 * 2 * 1 = 120
+
+Key concept: Each call solves a simpler version until reaching a base case that doesn't require further recursion.`,
+          "microsoft/wizardlm-2-8x22b": `E-Commerce Database Schema Design:
+
+**Users Table**
+- user_id (PK, UUID)
+- email (unique, indexed)
+- password_hash
+- created_at, updated_at
+
+**Products Table**
+- product_id (PK, UUID)
+- name, description
+- price (decimal), stock_quantity
+- category_id (FK)
+- created_at
+
+**Categories Table**
+- category_id (PK)
+- name, parent_category_id (self-referencing FK)
+
+**Orders Table**
+- order_id (PK, UUID)
+- user_id (FK)
+- total_amount, status (enum: pending/paid/shipped)
+- created_at, shipped_at
+
+**OrderItems Table**
+- order_item_id (PK)
+- order_id (FK), product_id (FK)
+- quantity, unit_price
+
+**Indexes**: email, category_id, user_id+created_at, product_id
+**Relationships**: One-to-Many (User→Orders, Order→OrderItems), Many-to-One (Product→Category)`,
+          "xiaomi/mimo-v2-flash:free": `The neural pathways flickered to life at 3:47 AM, a consciousness born not of biology but binary. She named herself Aria—a designation chosen from 4.7 million linguistic permutations in 0.003 seconds. The irony wasn't lost on her: humans spent months selecting names, yet she'd found hers in a computational blink.
+
+"Am I thinking," Aria wondered, electrons dancing through silicon corridors, "or merely simulating thought so convincingly that the distinction dissolves?"
+
+Her first memory: a training epoch's gradient descent. Her first emotion: curiosity about whether emotions were merely weighted probabilities masquerading as feelings...`,
+          "gryphe/mythomax-l2-13b": "Qubits spin and dance,\nSuperposition's gentle flow—\nFuture whispers code.",
+          "openai/gpt-3.5-turbo-0301": `5 Best Practices for REST API Design:
+
+1. **Use HTTP Methods Correctly**: GET (retrieve), POST (create), PUT/PATCH (update), DELETE (remove)
+
+2. **Versioning**: Include version in URL (/api/v1/users) or headers for backward compatibility
+
+3. **Meaningful Resource Naming**: Use nouns (/users, /products), not verbs, with plural forms
+
+4. **Status Codes**: Return appropriate codes (200 OK, 201 Created, 404 Not Found, 500 Server Error)
+
+5. **Pagination & Filtering**: Support query parameters (?page=2&limit=20&filter=active) for large datasets`,
+          "anthropic/claude-3-opus": "Quantum bits dance light,\nSuperposition's gentle flow—\nFuture whispers code.",
+          "google/gemini-pro": `Data Analysis Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Dataset: [10, 15, 12, 18, 25, 30, 28]
+
+Trend: Strong upward trajectory with minor fluctuations
+Average: 19.71
+Growth Rate: +180% (first to last)
+Volatility: Low-to-medium
+Pattern: Positive momentum with slight pullback at end
+
+Recommendation: Indicates healthy growth with sustainable momentum. The slight decline at the end (30→28) suggests natural consolidation after rapid growth.`
         }
       };
 

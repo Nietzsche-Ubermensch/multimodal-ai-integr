@@ -1,66 +1,66 @@
 # Planning Guide
 
-A comprehensive technical presentation platform for exploring multimodal AI integration architectures, API configurations, and implementation patterns across Deepseek, OpenRouter, xAI, NVIDIA, and other leading AI platforms. Built with a robust data-driven architecture separating content from presentation logic.
+A comprehensive technical presentation platform for exploring multimodal AI integration architectures, API configurations, and implementation patterns across DeepSeek, OpenRouter, xAI, NVIDIA, Microsoft, Google, and other leading AI platforms. Features detailed model endpoint specifications for 13+ models including embeddings, with interactive API testing and complete documentation.
 
 **Experience Qualities**: 
-1. **Technical & Authoritative**: Documentation-grade accuracy with detailed technical specifications, code examples, and architecture diagrams
-2. **Interactive & Explorable**: Dynamic navigation allowing developers to dive deep into specific integration patterns and API configurations
-3. **Visually Sophisticated**: Code-focused design aesthetic with syntax highlighting, technical diagrams, and professional presentation styling
+1. **Technical & Authoritative**: Documentation-grade accuracy with detailed specifications for 13+ AI models, embedding configurations, and production-ready code examples
+2. **Interactive & Explorable**: Live API testing with 10+ provider examples, dynamic parameter controls, and multi-language code snippets (Python, cURL, JavaScript)
+3. **Comprehensive & Reference-Grade**: Complete coverage of platform capabilities, model endpoints, embeddings, integration best practices, and security patterns
 
 **Complexity Level**: Complex Application (advanced functionality with multiple views)
 
-This is a comprehensive technical reference platform with a data-driven architecture enabling rapid content updates. Features include multiple interconnected slides, code execution examples, API specifications, and interactive documentation for developer audiences.
+This is a production-ready technical reference platform providing exhaustive documentation for AI integration specialists. Includes platform overviews (DeepSeek MoE architecture, OpenRouter unified gateway), detailed model catalogs (Grok, Nemotron, Phi-4, WizardLM, DeepSeek-R1), embedding model configurations (Gemini, OpenAI text-embedding), interactive API testing, Python/LiteLLM integration patterns, and enterprise best practices.
 
 ## Essential Features
 
-### Slide Navigation System
-- **Functionality**: Full-screen slide-based presentation with keyboard and click navigation, powered by centralized slide data
-- **Purpose**: Allow developers to move through technical content sequentially or jump to specific sections
-- **Trigger**: Arrow keys, click navigation, or section menu
-- **Progression**: Load app → Display cover slide → Navigate via keyboard/clicks → Jump to sections via menu → View code examples
-- **Success criteria**: Smooth transitions between slides, preserved scroll position, responsive navigation
-
-### Data-Driven Architecture
-- **Functionality**: Centralized SlideData interface with content stored separately from presentation logic
-- **Purpose**: Enable rapid content updates without modifying React components
-- **Trigger**: Adding new slide objects to data array
-- **Progression**: Define slide data → Universal component renders → Automatic layout selection → Syntax highlighting applied
-- **Success criteria**: New slides render correctly, type safety enforced, consistent styling maintained
-
 ### Platform Architecture Overview
-- **Functionality**: Detailed breakdown of Deepseek, OpenRouter, xAI platforms with technical specifications
-- **Purpose**: Understand core capabilities, MoE architecture, multimodal processing, and platform differences
-- **Trigger**: Navigate to architecture section slides
-- **Progression**: Select platform → View architecture diagram → Explore technical specs → Review performance metrics
-- **Success criteria**: Clear visual presentation of system architecture, readable metrics, comprehensive technical details
+- **Functionality**: In-depth coverage of DeepSeek (MoE architecture, 650B parameters) and OpenRouter (unified API gateway for 100+ models)
+- **Purpose**: Understand core capabilities, multimodal processing, architectural differences, and strategic use cases
+- **Trigger**: Navigate to platform overview slides
+- **Progression**: View platform comparison → Explore DeepSeek MoE details → Review OpenRouter routing logic → Understand integration patterns
+- **Success criteria**: Clear explanation of technical architecture, parameter counts, context windows, and multimodal capabilities
 
-### Model Endpoints Catalog
-- **Functionality**: Comprehensive database of 13+ AI models with endpoints, specifications, and use cases
-- **Purpose**: Reference guide for model selection and API integration
-- **Trigger**: Navigate to model endpoints section
-- **Progression**: Browse model list → View specifications → Copy endpoint URLs → Review capabilities
-- **Success criteria**: Complete model information, searchable/filterable, copy-to-clipboard functionality
+### Model Endpoints Catalog (13+ Models)
+- **Functionality**: Comprehensive database covering xAI (Grok-4, Grok-Code-Fast), DeepSeek (V3, R1, Chat), NVIDIA (Nemotron Nano), Microsoft (Phi-4, WizardLM-2), Google, OpenAI, and community models
+- **Purpose**: Reference guide for model selection with specifications (context length, parameters, use cases, pricing)
+- **Trigger**: Navigate through model endpoint slides (Part 1, 2, 3)
+- **Progression**: Browse categorized models → View specifications → Understand optimal use cases → Compare capabilities
+- **Success criteria**: Complete model information including context windows, parameter counts, specialized capabilities, and provider routing
 
-### Code Examples Library
-- **Functionality**: Syntax-highlighted code snippets for Python, TypeScript, cURL with copy functionality
-- **Purpose**: Provide production-ready integration code for immediate use
-- **Trigger**: Navigate to implementation examples
-- **Progression**: Select use case → View code → Copy snippet → Customize for project
-- **Success criteria**: Accurate syntax highlighting, working code examples, multi-language support
+### Embedding Models Configuration
+- **Functionality**: Detailed coverage of google/gemini-embedding-001 (768-dim), openai/text-embedding-3-large (3072-dim), operational mechanics, and optimization strategies
+- **Purpose**: Enable semantic search, RAG applications, and clustering with proper embedding configuration
+- **Trigger**: Navigate to embeddings slide
+- **Progression**: Learn embedding concepts → View configuration code → Understand dimensionality tradeoffs → Implement similarity search
+- **Success criteria**: Working code examples for embedding generation, cosine similarity calculation, and vector search integration
 
-### API Specifications Reference
-- **Functionality**: Detailed parameter definitions, response schemas, error examples, and authentication methods with interactive testing across multiple languages
-- **Purpose**: Technical reference for API implementation with live request/response examples in cURL and Python
-- **Trigger**: Navigate to API specs section or interactive testing slides
-- **Progression**: Select endpoint → View parameters with type/required info → Review response format → Switch between cURL/Python/Success/Error tabs → Copy code examples
-- **Success criteria**: Complete parameter documentation with type definitions and requirement badges, multi-language examples (cURL, Python), success and error response examples, one-click copy for all code snippets
+### Interactive API Testing (10+ Examples)
+- **Functionality**: Live request/response testing with 10 provider examples covering all major models, temperature controls, editable JSON, and simulated responses
+- **Purpose**: Allow developers to experiment with API payloads, adjust parameters, and see model-specific responses
+- **Trigger**: Navigate to Live API Testing slide
+- **Progression**: Select provider/model → Adjust temperature slider → Edit request JSON → Send request → View formatted response with latency/tokens → Copy JSON or cURL
+- **Success criteria**: Accurate model-specific responses, dynamic parameter controls, token counting, latency simulation, copy functionality
 
-### Interactive API Testing
-- **Functionality**: Live API request/response testing with 6+ provider examples, temperature controls, and real-time formatting with cURL generation
-- **Purpose**: Allow developers to experiment with API payloads, adjust parameters, and see expected responses across different models
-- **Trigger**: Navigate to Live API Testing or API Reference slides
-- **Progression**: Select provider/model → Adjust temperature slider → Edit request JSON → Send request → View formatted response with latency/tokens → Copy JSON or cURL command
-- **Success criteria**: Editable request fields, dynamic parameter controls, simulated responses with model-specific content, accurate latency simulation, token counting, copy functionality for requests/responses/cURL
+### API Reference Documentation (5 Endpoints)
+- **Functionality**: Complete endpoint documentation including /api/chat, /api/embeddings, /api/models, /api/config, /api/health with parameter specs, multi-language examples (cURL, Python), success/error responses
+- **Purpose**: Technical reference for API implementation with production-ready code snippets
+- **Trigger**: Navigate to API Reference slide
+- **Progression**: Select endpoint → View parameters with type/required badges → Switch between cURL/Python/Success/Error tabs → Copy code examples
+- **Success criteria**: All parameters documented with types, both cURL and Python examples for each endpoint, success and error response examples, one-click copy
+
+### Python Integration Patterns
+- **Functionality**: LiteLLM integration with unified completion() interface, environment variable management, retry policies, and fallback handling
+- **Purpose**: Provide production-ready Python code for multi-provider AI integration
+- **Trigger**: Navigate to Python Integration slide
+- **Progression**: Learn LiteLLM setup → Review model routing → Implement error handling → Configure retries and fallbacks
+- **Success criteria**: Working code examples with proper secret management, retry logic, and multi-provider support
+
+### Integration Best Practices
+- **Functionality**: Enterprise-grade patterns for security (API proxy), performance (caching), scalability (async queues), monitoring (metrics), cost optimization, and failover strategies
+- **Purpose**: Guide production deployment with 99.9% uptime and cost efficiency
+- **Trigger**: Navigate to Best Practices slide
+- **Progression**: Review security patterns → Implement caching strategies → Configure monitoring → Design failover chains
+- **Success criteria**: Clear recommendations for proxy patterns, Redis caching, async processing, metrics tracking, and multi-model fallback
 
 ## Edge Case Handling
 

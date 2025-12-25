@@ -35,12 +35,11 @@ const endpoints: EndpointDoc[] = [
       { name: "temperature", type: "number", required: false, description: "Sampling temperature (0-1). Default: 0.7" },
       { name: "max_tokens", type: "number", required: false, description: "Maximum tokens to generate" }
     ],
-    curlExample: `curl -X POST https://api.example.com/api/chat \\
+    curlExample: `curl -X POST https://openrouter.ai/api/v1/chat/completions \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \\
   -d '{
-    "provider": "deepseek",
-    "model": "deepseek-chat",
+    "model": "deepseek/deepseek-chat-v3-0324",
     "messages": [
       {
         "role": "user",
@@ -49,29 +48,24 @@ const endpoints: EndpointDoc[] = [
     ],
     "temperature": 0.7
   }'`,
-    pythonExample: `import requests
+    pythonExample: `import os
+from litellm import completion
 
-url = "https://api.example.com/api/chat"
-headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_API_KEY"
-}
-payload = {
-    "provider": "deepseek",
-    "model": "deepseek-chat",
-    "messages": [
+response = completion(
+    model="deepseek/deepseek-chat-v3-0324",
+    messages=[
         {"role": "user", "content": "Explain machine learning"}
     ],
-    "temperature": 0.7
-}
+    temperature=0.7,
+    api_key=os.environ["OPENROUTER_API_KEY"]
+)
 
-response = requests.post(url, json=payload, headers=headers)
-print(response.json())`,
+print(response.choices[0].message.content)`,
     responseExample: `{
   "id": "chatcmpl-abc123",
   "object": "chat.completion",
   "created": 1677652288,
-  "model": "deepseek-chat",
+  "model": "deepseek-chat-v3-0324",
   "choices": [
     {
       "index": 0,
@@ -97,6 +91,126 @@ print(response.json())`,
 }`
   },
   {
+    method: "POST",
+    path: "/api/embeddings",
+    description: "Generate vector embeddings for text using specialized embedding models",
+    parameters: [
+      { name: "model", type: "string", required: true, description: "Embedding model: google/gemini-embedding-001, openai/text-embedding-3-large" },
+      { name: "input", type: "string | array", required: true, description: "Text string or array of strings to embed" },
+      { name: "dimensions", type: "number", required: false, description: "Output dimensions (model-specific, e.g., 768 for Gemini)" }
+    ],
+    curlExample: `curl -X POST https://openrouter.ai/api/v1/embeddings \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \\
+  -d '{
+    "model": "google/gemini-embedding-001",
+    "input": "What is quantum computing?"
+  }'`,
+    pythonExample: `import os
+import requests
+import numpy as np
+
+def get_embeddings(texts: list[str], model: str = "google/gemini-embedding-001"):
+    response = requests.post(
+        "https://openrouter.ai/api/v1/embeddings",
+        headers={
+            "Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
+            "Content-Type": "application/json"
+        },
+        json={"model": model, "input": texts}
+    )
+    return [item["embedding"] for item in response.json()["data"]]
+
+# Generate embeddings
+embeddings = get_embeddings(["What is AI?", "Machine learning basics"])
+
+# Calculate cosine similarity for semantic search
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+similarity = cosine_similarity(embeddings[0], embeddings[1])
+print(f"Similarity: {similarity:.4f}")`,
+    responseExample: `{
+  "object": "list",
+  "data": [
+    {
+      "object": "embedding",
+      "index": 0,
+      "embedding": [
+        -0.006929283495992422,
+        -0.005336422007530928,
+        0.014355673082172871,
+        ...  // 768 dimensions total for Gemini
+      ]
+    }
+  ],
+  "model": "google/gemini-embedding-001",
+  "usage": {
+    "prompt_tokens": 8,
+    "total_tokens": 8
+  }
+}`,
+    errorExample: `{
+  "error": {
+    "message": "Model not found or not available",
+    "type": "invalid_request_error",
+    "code": "model_not_found"
+  }
+}`
+  },
+  {
+    method: "GET",
+    path: "/api/models",
+    description: "List all available models across providers with capabilities and pricing",
+    parameters: [],
+    curlExample: `curl -X GET https://openrouter.ai/api/v1/models \\
+  -H "Authorization: Bearer $OPENROUTER_API_KEY"`,
+    pythonExample: `import requests
+import os
+
+response = requests.get(
+    "https://openrouter.ai/api/v1/models",
+    headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}"}
+)
+
+models = response.json()["data"]
+
+# Filter for specific capabilities
+reasoning_models = [
+    m for m in models 
+    if "deepseek" in m["id"] or "grok" in m["id"]
+]
+
+for model in reasoning_models[:5]:
+    print(f"{model['id']}: {model['context_length']} tokens")`,
+    responseExample: `{
+  "data": [
+    {
+      "id": "deepseek/deepseek-chat-v3-0324",
+      "name": "DeepSeek Chat V3",
+      "created": 1710979200,
+      "context_length": 65536,
+      "pricing": {
+        "prompt": "0.00000027",
+        "completion": "0.0000011"
+      },
+      "top_provider": {
+        "max_completion_tokens": 4096
+      }
+    },
+    {
+      "id": "x-ai/grok-4-fast",
+      "name": "Grok 4 Fast",
+      "context_length": 65536,
+      "pricing": {
+        "prompt": "0.000005",
+        "completion": "0.000015"
+      }
+    }
+  ]
+}`
+  },
+  {
     method: "GET",
     path: "/api/config",
     description: "Retrieve available providers and their active status",
@@ -115,19 +229,19 @@ print(f"Available providers: {list(config['providers'].keys())}")`,
   "providers": {
     "deepseek": {
       "available": true,
-      "models": ["deepseek-chat", "deepseek-coder"]
+      "models": ["deepseek-chat-v3-0324", "deepseek-r1", "deepseek-coder"]
     },
     "openrouter": {
       "available": true,
-      "models": ["anthropic/claude-3-opus", "google/gemini-pro"]
+      "models": ["microsoft/phi-4", "microsoft/wizardlm-2-8x22b"]
     },
     "xai": {
       "available": true,
-      "models": ["grok-1", "grok-2"]
+      "models": ["grok-4-fast", "grok-code-fast-1"]
     },
     "nvidia": {
       "available": true,
-      "models": ["llama-3-70b-instruct"]
+      "models": ["nemotron-nano-9b-v2"]
     }
   },
   "timestamp": 1677652288
@@ -239,7 +353,7 @@ export function ApiDocumentation() {
             </div>
 
             <Tabs defaultValue="curl" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className={`grid w-full ${endpoint.pythonExample && endpoint.errorExample ? 'grid-cols-4' : endpoint.pythonExample || endpoint.errorExample ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 <TabsTrigger value="curl" className="gap-2">
                   <Terminal size={16} />
                   cURL
