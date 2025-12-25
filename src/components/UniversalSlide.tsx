@@ -15,6 +15,7 @@ import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
 import { XAISDKDemo } from "@/components/XAISDKDemo";
 import { LiteLLMIntegrationDemo } from "@/components/LiteLLMIntegrationDemo";
 import { RealApiTester } from "@/components/RealApiTester";
+import { StreamingApiTester } from "@/components/StreamingApiTester";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -226,6 +227,8 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <LiteLLMIntegrationDemo />
               ) : slide.id === "real-api-testing" ? (
                 <RealApiTester />
+              ) : slide.id === "streaming-api" ? (
+                <StreamingApiTester />
               ) : null}
             </div>
           </>

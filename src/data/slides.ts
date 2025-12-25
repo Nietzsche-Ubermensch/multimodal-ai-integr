@@ -26,7 +26,8 @@ export const slides: SlideData[] = [
       "API Reference Documentation (Interactive)",
       "Environment Variable Setup (Interactive)",
       "LiteLLM Backend Integration (Interactive)",
-      "Real API Testing - LiteLLM Backend (Interactive) ⭐ NEW",
+      "Real API Testing - LiteLLM Backend (Interactive) ⭐",
+      "Streaming Responses with Token Display (Interactive) ⭐ NEW",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
       "GitHub Repository Integration (Interactive)",
@@ -282,6 +283,20 @@ query_embedding = get_embeddings("What is quantum computing?")
       "HuggingFace: 500K+ models including CodeBERT embeddings and BGE reranker for semantic search applications",
       "Interactive Testing: Real/simulated API toggle, live latency metrics, token counting, Python/cURL/JavaScript code examples",
       "Security: Backend proxy pattern prevents API key exposure, environment variable management, rate limiting implementation"
+    ]
+  },
+  {
+    id: "streaming-api",
+    title: "Streaming Responses with Token Display",
+    subtitle: "Real-Time Token-by-Token Streaming Analytics",
+    interactive: true,
+    bullets: [
+      "Live Token Streaming: Watch responses generate word-by-word with real-time visual feedback and performance metrics",
+      "Performance Analytics: Tokens/second throughput, elapsed time tracking, ETA calculation, and progress visualization",
+      "Model Support: Test streaming across Perplexity, OpenRouter (Claude/GPT-4), NVIDIA NIM, xAI Grok, and HuggingFace DeepSeek-R1",
+      "Interactive Controls: Adjustable temperature (0-1), max tokens (100-4000), start/stop streaming, copy response to clipboard",
+      "Metrics Dashboard: Real-time token count, generation speed, model info, completion status with visual progress bars",
+      "Simulation Mode: Demo streaming with authentic-feeling responses or toggle to real API calls with backend integration"
     ]
   },
   {
