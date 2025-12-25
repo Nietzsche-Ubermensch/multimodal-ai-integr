@@ -35,11 +35,25 @@ This is a production-ready technical reference platform providing exhaustive doc
 - **Success criteria**: Working code examples for embedding generation, cosine similarity calculation, and vector search integration
 
 ### Interactive API Testing (10+ Examples)
-- **Functionality**: Live request/response testing with 10 provider examples covering all major models, temperature controls, editable JSON, and simulated responses
-- **Purpose**: Allow developers to experiment with API payloads, adjust parameters, and see model-specific responses
+- **Functionality**: Live request/response testing with 10 provider examples covering all major models, temperature controls, editable JSON, real API call toggle, and both simulated and live responses
+- **Purpose**: Allow developers to experiment with API payloads, adjust parameters, test with real API keys, and see model-specific responses
 - **Trigger**: Navigate to Live API Testing slide
-- **Progression**: Select provider/model → Adjust temperature slider → Edit request JSON → Send request → View formatted response with latency/tokens → Copy JSON or cURL
-- **Success criteria**: Accurate model-specific responses, dynamic parameter controls, token counting, latency simulation, copy functionality
+- **Progression**: Select provider/model → Adjust temperature slider → Toggle real/simulated API → Edit request JSON → Send request → View formatted response with latency/tokens → Copy JSON or cURL
+- **Success criteria**: Accurate model-specific responses (both simulated and real), dynamic parameter controls, token counting, latency measurement, real API integration with error handling, copy functionality
+
+### API Key Validation (6 Providers)
+- **Functionality**: Real-time API key validation for OpenRouter, DeepSeek, xAI, NVIDIA, OpenAI, and Anthropic with live endpoint testing, format validation, and availability checks
+- **Purpose**: Allow users to validate API keys before using them, with real latency metrics and model availability information
+- **Trigger**: Navigate to API Key Validation slide
+- **Progression**: Enter API key → Automatic format validation → Click test → View validation result with latency and model count → See success/error feedback
+- **Success criteria**: Real API endpoint testing, accurate format validation with regex patterns, model availability counts, latency metrics, secure local storage with privacy warnings
+
+### Embedding Generation Testing
+- **Functionality**: Interactive embedding generation with support for Google Gemini and OpenAI models, real/simulated API toggle, vector statistics display (magnitude, mean, std dev, range), and export functionality
+- **Purpose**: Enable testing of embedding models for semantic search and RAG applications with real vector output
+- **Trigger**: Navigate to Embedding Generation slide  
+- **Progression**: Select embedding model → Enter input text → Toggle real/simulated → Generate embedding → View vector statistics → Export embedding JSON
+- **Success criteria**: Support for 4+ embedding models, real API integration, accurate vector statistics calculation, dimensional display, export functionality
 
 ### API Reference Documentation (5 Endpoints)
 - **Functionality**: Complete endpoint documentation including /api/chat, /api/embeddings, /api/models, /api/config, /api/health with parameter specs, multi-language examples (cURL, Python), success/error responses

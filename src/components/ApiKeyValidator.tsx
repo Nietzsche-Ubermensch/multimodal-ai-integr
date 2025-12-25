@@ -17,6 +17,7 @@ import {
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { useKV } from "@github/spark/hooks";
+import { validateApiKey } from "@/lib/api-service";
 
 interface ApiKeyConfig {
   name: string;
@@ -158,46 +159,44 @@ export function ApiKeyValidator() {
       }
     }));
 
-    const startTime = Date.now();
-
     try {
-      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
-      
-      const isValid = Math.random() > 0.2;
-      const latency = Date.now() - startTime;
+      const providerKey = config.provider.toLowerCase().replace(/\s+/g, "");
+      const result = await validateApiKey(providerKey, key);
 
-      if (isValid) {
+      if (result.success) {
+        const modelInfo = result.details?.modelCount 
+          ? ` (${result.details.modelCount} models available)` 
+          : "";
+        
         setValidations((current) => ({
           ...current,
           [config.name]: {
             status: "valid",
             message: "Key validated successfully",
-            latency,
-            details: "Connection established, ready for inference"
+            latency: result.latency,
+            details: `Connection established, ready for inference${modelInfo}`
           }
         }));
-        toast.success(`${config.provider}: Key validated (${latency}ms)`);
+        toast.success(`${config.provider}: Key validated (${result.latency}ms)`);
       } else {
         setValidations((current) => ({
           ...current,
           [config.name]: {
             status: "error",
-            message: "Authentication failed",
-            latency,
-            details: "Invalid API key or insufficient permissions"
+            message: result.message,
+            latency: result.latency,
+            details: result.details?.error || "Authentication failed"
           }
         }));
-        toast.error(`${config.provider}: Authentication failed`);
+        toast.error(`${config.provider}: ${result.message}`);
       }
     } catch (error) {
-      const latency = Date.now() - startTime;
       setValidations((current) => ({
         ...current,
         [config.name]: {
           status: "error",
           message: "Connection failed",
-          latency,
-          details: "Network error or service unavailable"
+          details: error instanceof Error ? error.message : "Unknown error"
         }
       }));
       toast.error(`${config.provider}: Connection error`);
@@ -435,9 +434,9 @@ export function ApiKeyValidator() {
       <Alert className="border-primary/30 bg-primary/5">
         <ShieldCheck size={20} className="text-primary" />
         <AlertDescription className="text-sm">
-          <strong>Privacy Note:</strong> API keys are stored locally in your browser and never sent to external servers. 
-          The validation performs simulated testing for demonstration purposes. In production, implement server-side validation 
-          without exposing keys to the client.
+          <strong>Real API Testing:</strong> This validator makes actual API calls to verify your keys. 
+          Keys are stored locally in your browser and never sent to third parties. Due to CORS restrictions, 
+          some providers may require a backend proxy for validation. For production, implement server-side validation.
         </AlertDescription>
       </Alert>
     </div>

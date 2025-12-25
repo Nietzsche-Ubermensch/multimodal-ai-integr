@@ -7,6 +7,8 @@ import { ApiDocumentation } from "@/components/ApiDocumentation";
 import { GitHubIntegration } from "@/components/GitHubIntegration";
 import { DeploymentGuide } from "@/components/DeploymentGuide";
 import { EnvSetup } from "@/components/EnvSetup";
+import { ApiKeyValidator } from "@/components/ApiKeyValidator";
+import { EmbeddingTester } from "@/components/EmbeddingTester";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -202,6 +204,10 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <DeploymentGuide />
               ) : slide.id === "env-setup" ? (
                 <EnvSetup />
+              ) : slide.id === "api-key-validator" ? (
+                <ApiKeyValidator />
+              ) : slide.id === "embedding-tester" ? (
+                <EmbeddingTester />
               ) : null}
             </div>
           </>

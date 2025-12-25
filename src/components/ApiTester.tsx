@@ -6,8 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Play, Copy, Check, Lightning, ArrowsClockwise } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import { testChatCompletion, ChatCompletionRequest } from "@/lib/api-service";
+import { useKV } from "@github/spark/hooks";
 
 interface ApiExample {
   provider: string;
@@ -159,6 +162,8 @@ export function ApiTester() {
   const [curlCopied, setCurlCopied] = useState(false);
   const [latency, setLatency] = useState<number | null>(null);
   const [temperature, setTemperature] = useState(0.7);
+  const [useRealApi, setUseRealApi] = useState(false);
+  const [apiKeys] = useKV<Record<string, string>>("api-keys-temp", {});
 
   const handleExampleChange = (value: string) => {
     const index = parseInt(value);
@@ -207,6 +212,54 @@ export function ApiTester() {
     try {
       const requestData = JSON.parse(request);
       
+      if (useRealApi) {
+        const providerKeyMap: Record<string, string> = {
+          "deepseek": "DEEPSEEK_API_KEY",
+          "xai": "XAI_API_KEY",
+          "nvidia": "NVIDIA_NIM_API_KEY",
+          "openrouter": "OPENROUTER_API_KEY",
+          "openai": "OPENAI_API_KEY",
+          "anthropic": "ANTHROPIC_API_KEY"
+        };
+
+        const keyName = providerKeyMap[requestData.provider];
+        const apiKey = apiKeys?.[keyName];
+
+        if (!apiKey) {
+          toast.error(`No API key configured for ${requestData.provider}. Please configure it in the API Key Validator.`);
+          setResponse(JSON.stringify({
+            error: {
+              message: `API key not found for provider: ${requestData.provider}`,
+              type: "authentication_error",
+              code: "missing_api_key"
+            }
+          }, null, 2));
+          setIsLoading(false);
+          return;
+        }
+
+        const result = await testChatCompletion(requestData, apiKey);
+        
+        setLatency(result.latency);
+        
+        if (result.success && result.data) {
+          setResponse(JSON.stringify(result.data, null, 2));
+          toast.success(`Request completed in ${(result.latency / 1000).toFixed(2)}s`);
+        } else {
+          setResponse(JSON.stringify({
+            error: {
+              message: result.error || "Request failed",
+              type: "api_error",
+              code: "request_failed"
+            }
+          }, null, 2));
+          toast.error(result.error || "Request failed");
+        }
+        
+        setIsLoading(false);
+        return;
+      }
+
       const responsesByProvider: Record<string, Record<string, string>> = {
         deepseek: {
           "deepseek-chat-v3-0324": "The quadratic formula is a mathematical tool for solving equations where x is raised to the power of 2 (quadratic equations). For any equation in the form ax² + bx + c = 0, the formula x = (-b ± √(b²-4ac))/2a gives us the solutions. The discriminant (b²-4ac) determines the nature of solutions: positive yields two real roots, zero gives one repeated root, and negative produces complex solutions. DeepSeek V3's enhanced instruction following ensures precise, contextually appropriate explanations.",
@@ -466,6 +519,21 @@ Recommendation: Indicates healthy growth with sustainable momentum. The slight d
 
         <Card className="p-4 bg-muted/30 border-accent/20">
           <div className="space-y-3">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium">Use Real API</Label>
+                <p className="text-xs text-muted-foreground">
+                  {useRealApi 
+                    ? "Making actual API calls with your configured keys" 
+                    : "Using simulated responses for demonstration"}
+                </p>
+              </div>
+              <Switch
+                checked={useRealApi}
+                onCheckedChange={setUseRealApi}
+              />
+            </div>
+            
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Temperature: {temperature.toFixed(2)}</Label>
               <Badge variant="outline" className="text-xs font-mono">
@@ -544,6 +612,16 @@ Recommendation: Indicates healthy growth with sustainable momentum. The slight d
           <Badge variant="outline" className="font-mono text-xs">
             {isLoading ? "Processing..." : response ? "200 OK" : "Waiting..."}
           </Badge>
+          {useRealApi && (
+            <Badge className="font-mono text-xs bg-green-500">
+              LIVE API
+            </Badge>
+          )}
+          {!useRealApi && (
+            <Badge variant="secondary" className="font-mono text-xs">
+              SIMULATED
+            </Badge>
+          )}
           {latency && (
             <Badge variant="outline" className="font-mono text-xs text-accent">
               {(latency / 1000).toFixed(2)}s

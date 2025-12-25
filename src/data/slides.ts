@@ -18,7 +18,9 @@ export const slides: SlideData[] = [
       "Platform Overview: DeepSeek & OpenRouter",
       "Model Endpoints Catalog (13+ Models)",
       "Embedding Models & Configuration",
+      "API Key Validation (Interactive)",
       "Live API Testing (Interactive)",
+      "Embedding Generation (Interactive)",
       "API Reference Documentation (Interactive)",
       "Environment Variable Setup (Interactive)",
       "Python Integration Patterns (LiteLLM)",
@@ -145,6 +147,18 @@ query_embedding = get_embeddings("What is quantum computing?")
 # Compare with document embeddings using cosine similarity`
   },
   {
+    id: "api-key-validator",
+    title: "API Key Validation",
+    subtitle: "Real-Time Key Testing & Verification",
+    interactive: true,
+    bullets: [
+      "Validate API keys for all 6 providers with live endpoint testing",
+      "Automatic format validation and pattern matching",
+      "Real latency metrics and model availability checks",
+      "Secure local storage - keys never leave your browser"
+    ]
+  },
+  {
     id: "endpoints",
     title: "Live API Testing",
     subtitle: "Interactive Request/Response Examples",
@@ -152,8 +166,20 @@ query_embedding = get_embeddings("What is quantum computing?")
     bullets: [
       "Try live API requests with different providers",
       "POST /api/chat - Secure server-side proxy for OpenAI-compatible inference",
-      "Simulated responses show expected format",
+      "Toggle between simulated and real API calls",
       "Supports: DeepSeek, OpenRouter, xAI, NVIDIA NIM"
+    ]
+  },
+  {
+    id: "embedding-tester",
+    title: "Embedding Generation",
+    subtitle: "Interactive Vector Testing",
+    interactive: true,
+    bullets: [
+      "Generate embeddings with real API calls or simulations",
+      "Test multiple embedding models (Gemini, OpenAI)",
+      "View vector statistics: magnitude, mean, standard deviation",
+      "Export embeddings for semantic search and RAG applications"
     ]
   },
   {
