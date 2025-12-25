@@ -25,6 +25,7 @@ export const slides: SlideData[] = [
       "Embedding Generation (Interactive)",
       "API Reference Documentation (Interactive)",
       "Environment Variable Setup (Interactive)",
+      "LiteLLM Backend Integration (Interactive) ⭐ NEW",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
       "GitHub Repository Integration (Interactive)",
@@ -254,6 +255,18 @@ query_embedding = get_embeddings("What is quantum computing?")
       "Platform-Specific: Configure based on deployment environment (Vercel, Replit, Docker, AWS)",
       "Security Best Practices: Use secrets managers, never commit .env to version control, rotate keys regularly",
       "Validation: Test all keys with the API Key Validator before production deployment"
+    ]
+  },
+  {
+    id: "litellm-integration",
+    title: "LiteLLM Backend Integration",
+    subtitle: "Complete Repository Setup & OpenRouter Connectivity",
+    interactive: true,
+    bullets: [
+      "Repository: BerriAI/litellm - Unified Python interface for 100+ LLM providers with automatic fallback",
+      "Architecture: Request router → LiteLLM core → Caching layer (Redis) → Provider selection (OpenRouter, DeepSeek, xAI)",
+      "OpenRouter Integration: Single API gateway for multi-model access with transparent pricing and intelligent routing",
+      "Production Features: Automatic retries, latency-based routing, Redis caching (80%+ hit rate), health monitoring, rate limiting"
     ]
   },
   {

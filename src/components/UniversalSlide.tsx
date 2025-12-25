@@ -13,6 +13,7 @@ import { OpenRouterSDKDemo } from "@/components/OpenRouterSDKDemo";
 import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
 import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
 import { XAISDKDemo } from "@/components/XAISDKDemo";
+import { LiteLLMIntegrationDemo } from "@/components/LiteLLMIntegrationDemo";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -220,6 +221,8 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <DeepSeekSDKDemo />
               ) : slide.id === "xai-sdk" ? (
                 <XAISDKDemo />
+              ) : slide.id === "litellm-integration" ? (
+                <LiteLLMIntegrationDemo />
               ) : null}
             </div>
           </>
