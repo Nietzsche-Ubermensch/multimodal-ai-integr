@@ -35,11 +35,18 @@ This is an interactive AI inference provider guide and SDK integration platform 
 - **Success criteria**: Complete coverage of all 4 models with feature comparison matrix, context window specs (256K-2M tokens), pricing optimization strategies, reasoning vs non-reasoning tradeoffs, multimodal support details (vision/audio), and intelligent model selection decision tree
 
 ### Firecrawl API Integration
-- **Functionality**: Complete guide to Firecrawl web scraping API covering 5 core features (Scrape, Crawl, Map, Search, Extract) with LLM-ready output formats (Markdown, JSON, HTML)
-- **Purpose**: Enable developers to build RAG applications, competitive analysis tools, and AI search with clean web data extraction
-- **Trigger**: Navigate to Firecrawl overview and features slides
-- **Progression**: Learn Firecrawl capabilities → Understand API key requirements → Explore 5 core features → View code examples for each feature → Implement structured data extraction
-- **Success criteria**: Working examples for single-page scraping, recursive crawling, URL discovery, web search with content, and JSON schema-based extraction; API key setup instructions; LLM-ready Markdown output demonstration
+- **Functionality**: Complete guide to Firecrawl web scraping API covering 5 core features (Scrape, Crawl, Map, Search, Extract) with LLM-ready output formats (Markdown, JSON, HTML) PLUS live interactive API tester
+- **Purpose**: Enable developers to build RAG applications, competitive analysis tools, and AI search with clean web data extraction through hands-on testing
+- **Trigger**: Navigate to Firecrawl overview, features, and live tester slides
+- **Progression**: Learn Firecrawl capabilities → Understand API key requirements → Explore 5 core features → **Test live API with interactive demo** → View code examples for each feature → Implement structured data extraction
+- **Success criteria**: Working examples for single-page scraping, recursive crawling, URL discovery, web search with content, and JSON schema-based extraction; API key setup instructions; LLM-ready Markdown output demonstration; **Interactive tester with real-time URL scraping, search demo, and auto-generated Python code**
+
+### Live Firecrawl API Tester (Interactive)
+- **Functionality**: Real-time web scraping demo with URL input, endpoint selection (Scrape/Map/Search), toggle between demo and live API modes, instant Markdown/HTML preview, and automatic Python code generation
+- **Purpose**: Allow developers to test Firecrawl API endpoints immediately without writing code, understand response formats, and get production-ready implementation examples
+- **Trigger**: Navigate to "Live Firecrawl API Tester" slide
+- **Progression**: Select endpoint (Scrape/Map/Search) → Enter URL or search query → Configure options (include HTML, main content only) → Toggle real API mode → Execute request → View formatted response → Copy JSON or Python code → Test different URLs and endpoints
+- **Success criteria**: Working scrape endpoint with real/simulated responses, map endpoint showing URL discovery, search endpoint with query testing, clean Markdown preview, JSON response viewer, auto-generated Python code examples, real API support with key input, loading states, error handling, toast notifications for all actions
 
 ### Perplexity-Like Search Implementation
 - **Functionality**: Complete architecture guide for building AI-powered search using Firecrawl Search API + LLM synthesis with source citations

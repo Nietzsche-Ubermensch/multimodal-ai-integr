@@ -21,6 +21,7 @@ export const slides: SlideData[] = [
       "xAI Grok 4.1 Models - Comprehensive Analysis ⭐ NEW",
       "Grok 4.1 Technical Specifications & Use Cases ⭐ NEW",
       "Firecrawl API - LLM-Ready Web Scraping ⭐ NEW",
+      "Live Firecrawl API Tester (Interactive) 🔥 NEW",
       "Firecrawl + LLM Integration (Perplexity-Like) ⭐ NEW",
       "Model Endpoints Catalog (13+ Models)",
       "Embedding Models & Configuration",
@@ -370,6 +371,19 @@ extract = app.extract({
     }
 })
 # Returns: {'products': [{'name': '...', 'price': 99.99}, ...]}`
+  },
+  {
+    id: "firecrawl-live-tester",
+    title: "Live Firecrawl API Tester",
+    subtitle: "Real-Time Web Scraping Demo",
+    interactive: true,
+    bullets: [
+      "Interactive Testing: Test Scrape, Map, and Search endpoints with real or simulated API calls",
+      "URL Input: Enter any URL and get clean Markdown/HTML output instantly",
+      "Search Demo: Perform web searches with automatic content extraction in one API call",
+      "Real API Support: Toggle between demo mode and live Firecrawl API testing",
+      "Code Generation: Auto-generated Python code examples for every request configuration"
+    ]
   },
   {
     id: "firecrawl-perplexity",
