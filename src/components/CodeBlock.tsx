@@ -20,7 +20,24 @@ export function CodeBlock({ code, language = "typescript", title }: CodeBlockPro
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const highlightCode = (code: string) => {
+  const highlightCode = (code: string, lang: string) => {
+    if (lang === 'python') {
+      const keywords = /\b(import|from|def|class|return|if|else|elif|for|while|try|except|finally|with|as|in|is|not|and|or|lambda|yield|async|await)\b/g;
+      const strings = /(["'])(.*?)\1/g;
+      const comments = /(#.*$)/gm;
+      const functions = /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g;
+      const decorators = /(@[a-zA-Z_][a-zA-Z0-9_]*)/g;
+      
+      let highlighted = code;
+      highlighted = highlighted.replace(comments, '<span class="text-[var(--code-comment)]">$1</span>');
+      highlighted = highlighted.replace(strings, '<span class="text-[var(--code-green)]">$1$2$1</span>');
+      highlighted = highlighted.replace(decorators, '<span class="text-[var(--code-orange)]">$1</span>');
+      highlighted = highlighted.replace(keywords, '<span class="text-[var(--code-cyan)]">$1</span>');
+      highlighted = highlighted.replace(functions, '<span class="text-[var(--code-purple)]">$1</span>(');
+      
+      return highlighted;
+    }
+    
     const keywords = /\b(import|from|const|let|var|function|class|export|default|async|await|return|if|else|for|while|try|catch|new|this|typeof|interface|type)\b/g;
     const strings = /(["'`])(.*?)\1/g;
     const comments = /(\/\/.*$|\/\*[\s\S]*?\*\/)/gm;
@@ -62,7 +79,7 @@ export function CodeBlock({ code, language = "typescript", title }: CodeBlockPro
         
         <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed">
           <code
-            dangerouslySetInnerHTML={{ __html: highlightCode(code) }}
+            dangerouslySetInnerHTML={{ __html: highlightCode(code, language) }}
           />
         </pre>
       </div>

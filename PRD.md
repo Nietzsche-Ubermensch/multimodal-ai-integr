@@ -1,6 +1,6 @@
 # Planning Guide
 
-A comprehensive technical presentation platform for exploring multimodal AI integration architectures, API configurations, and implementation patterns across Deepseek, OpenRouter, xAI, NVIDIA, and other leading AI platforms.
+A comprehensive technical presentation platform for exploring multimodal AI integration architectures, API configurations, and implementation patterns across Deepseek, OpenRouter, xAI, NVIDIA, and other leading AI platforms. Built with a robust data-driven architecture separating content from presentation logic.
 
 **Experience Qualities**: 
 1. **Technical & Authoritative**: Documentation-grade accuracy with detailed technical specifications, code examples, and architecture diagrams
@@ -9,16 +9,23 @@ A comprehensive technical presentation platform for exploring multimodal AI inte
 
 **Complexity Level**: Complex Application (advanced functionality with multiple views)
 
-This is a comprehensive technical reference platform requiring multiple interconnected views, code execution examples, API specifications, and interactive documentation features for developer audiences.
+This is a comprehensive technical reference platform with a data-driven architecture enabling rapid content updates. Features include multiple interconnected slides, code execution examples, API specifications, and interactive documentation for developer audiences.
 
 ## Essential Features
 
 ### Slide Navigation System
-- **Functionality**: Full-screen slide-based presentation with keyboard and click navigation
+- **Functionality**: Full-screen slide-based presentation with keyboard and click navigation, powered by centralized slide data
 - **Purpose**: Allow developers to move through technical content sequentially or jump to specific sections
 - **Trigger**: Arrow keys, click navigation, or section menu
 - **Progression**: Load app → Display cover slide → Navigate via keyboard/clicks → Jump to sections via menu → View code examples
 - **Success criteria**: Smooth transitions between slides, preserved scroll position, responsive navigation
+
+### Data-Driven Architecture
+- **Functionality**: Centralized SlideData interface with content stored separately from presentation logic
+- **Purpose**: Enable rapid content updates without modifying React components
+- **Trigger**: Adding new slide objects to data array
+- **Progression**: Define slide data → Universal component renders → Automatic layout selection → Syntax highlighting applied
+- **Success criteria**: New slides render correctly, type safety enforced, consistent styling maintained
 
 ### Platform Architecture Overview
 - **Functionality**: Detailed breakdown of Deepseek, OpenRouter, xAI platforms with technical specifications

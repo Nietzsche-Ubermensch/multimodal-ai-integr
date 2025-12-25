@@ -2,28 +2,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, List } from "@phosphor-icons/react";
-import { CoverSlide } from "@/components/slides/CoverSlide";
-import { TableOfContentsSlide } from "@/components/slides/TableOfContentsSlide";
-import { DeepseekPlatformSlide } from "@/components/slides/DeepseekPlatformSlide";
-import { OpenRouterSlide } from "@/components/slides/OpenRouterSlide";
-import { ModelEndpointsSlide } from "@/components/slides/ModelEndpointsSlide";
-import { PythonIntegrationSlide } from "@/components/slides/PythonIntegrationSlide";
-import { BestPracticesSlide } from "@/components/slides/BestPracticesSlide";
-import { ResourcesSlide } from "@/components/slides/ResourcesSlide";
-import { FinalSlide } from "@/components/slides/FinalSlide";
+import { UniversalSlide } from "@/components/UniversalSlide";
+import { slides } from "@/data/slides";
 import { cn } from "@/lib/utils";
-
-const slides = [
-  { id: "cover", component: CoverSlide, title: "Cover" },
-  { id: "toc", component: TableOfContentsSlide, title: "Table of Contents" },
-  { id: "deepseek", component: DeepseekPlatformSlide, title: "Deepseek Platform" },
-  { id: "openrouter", component: OpenRouterSlide, title: "OpenRouter Platform" },
-  { id: "models", component: ModelEndpointsSlide, title: "Model Endpoints" },
-  { id: "python", component: PythonIntegrationSlide, title: "Python Integration" },
-  { id: "best-practices", component: BestPracticesSlide, title: "Best Practices" },
-  { id: "resources", component: ResourcesSlide, title: "Resources & Links" },
-  { id: "final", component: FinalSlide, title: "Final" },
-];
 
 function App() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -59,7 +40,7 @@ function App() {
     setShowMenu(false);
   };
 
-  const CurrentSlideComponent = slides[currentSlide].component;
+  const currentSlideData = slides[currentSlide];
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -123,7 +104,11 @@ function App() {
 
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-7xl aspect-[16/9] bg-card rounded-xl shadow-2xl overflow-hidden border border-border">
-          <CurrentSlideComponent />
+          <UniversalSlide 
+            slide={currentSlideData} 
+            slideNumber={currentSlide + 1}
+            totalSlides={slides.length}
+          />
         </div>
       </div>
 
