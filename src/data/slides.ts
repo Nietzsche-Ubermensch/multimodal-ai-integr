@@ -18,6 +18,10 @@ export const slides: SlideData[] = [
       "Platform Overview: DeepSeek & OpenRouter",
       "AI Provider SDKs: Anthropic, DeepSeek, xAI (Interactive)",
       "OpenRouter TypeScript SDK Integration (Interactive)",
+      "xAI Grok 4.1 Models - Comprehensive Analysis ⭐ NEW",
+      "Grok 4.1 Technical Specifications & Use Cases ⭐ NEW",
+      "Firecrawl API - LLM-Ready Web Scraping ⭐ NEW",
+      "Firecrawl + LLM Integration (Perplexity-Like) ⭐ NEW",
       "Model Endpoints Catalog (13+ Models)",
       "Embedding Models & Configuration",
       "API Key Validation (Interactive)",
@@ -26,8 +30,8 @@ export const slides: SlideData[] = [
       "API Reference Documentation (Interactive)",
       "Environment Variable Setup (Interactive)",
       "LiteLLM Backend Integration (Interactive)",
-      "Real API Testing - LiteLLM Backend (Interactive) ⭐",
-      "Streaming Responses with Token Display (Interactive) ⭐ NEW",
+      "Real API Testing - LiteLLM Backend (Interactive)",
+      "Streaming Responses with Token Display (Interactive)",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
       "GitHub Repository Integration (Interactive)",
@@ -135,6 +139,287 @@ const openRouterConfig = {
       "Features: Streaming responses, multi-model routing, error handling, automatic retries",
       "Interactive Demo: Test the SDK with real API calls or simulated responses"
     ]
+  },
+  {
+    id: "grok-4-1-overview",
+    title: "xAI Grok 4.1 Models - Overview",
+    subtitle: "Latest High-Performance Reasoning & Non-Reasoning Variants",
+    bullets: [
+      "Latest Release: Grok 4.1 Fast optimized for agentic tool calling with 2M token context window",
+      "Key Variants: grok-4-1-fast-reasoning (with chain-of-thought) vs grok-4-1-fast-non-reasoning (faster, lower cost)",
+      "Shared Features: Function calling, vision (image understanding), audio input, web search, prompt caching for cost savings",
+      "Use Cases: Reasoning model for complex analysis/planning, non-reasoning for simple queries and high-throughput applications",
+      "Context: Massive 2M token window enables entire codebases, long documents, and extended conversations"
+    ],
+    code: `# Grok 4.1 Fast Reasoning vs Non-Reasoning
+from litellm import completion
+
+# Reasoning model - for complex problems
+reasoning_response = completion(
+    model="xai/grok-4-1-fast-reasoning",
+    messages=[{
+        "role": "user",
+        "content": "Analyze this multi-step business problem step-by-step..."
+    }]
+)
+
+# Non-reasoning model - for simple, fast responses
+non_reasoning_response = completion(
+    model="xai/grok-4-1-fast-non-reasoning",
+    messages=[{
+        "role": "user",
+        "content": "What is 2+2?"
+    }]
+)
+
+# Use reasoning when: complex analysis, planning, multi-step reasoning
+# Use non-reasoning when: simple queries, faster responses needed, cost optimization`
+  },
+  {
+    id: "grok-models-comparison",
+    title: "Grok Models - Comprehensive Comparison",
+    subtitle: "Modalities, Capabilities, Context, Rate Limits & Pricing",
+    interactive: true,
+    bullets: [
+      "4 Core Models: grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning, grok-code-fast-1, grok-4-fast-reasoning",
+      "Modality Support: Text (all), Vision (4.1 fast), Audio (4.1 fast), Code generation (code-fast-1)",
+      "Context Windows: 2M tokens (4.1 fast, 4-fast-reasoning), 256K tokens (code-fast-1)",
+      "Key Differentiators: Reasoning capability, caching support, specialized code optimization, web search integration",
+      "Pricing Optimization: Non-reasoning variants 40-60% cheaper, caching reduces repeat costs by 90%"
+    ]
+  },
+  {
+    id: "grok-technical-specs",
+    title: "Grok 4.1 - Technical Specifications",
+    subtitle: "Performance Metrics & API Features",
+    bullets: [
+      "grok-4-1-fast-reasoning: 2M context, reasoning tokens for transparency, function calling, vision/audio, web search, caching",
+      "grok-4-1-fast-non-reasoning: 2M context, no reasoning overhead (faster), function calling, vision/audio, web search, caching",
+      "grok-code-fast-1: 256K context, specialized for code generation, reasoning support, function calling, caching optimized",
+      "grok-4-fast-reasoning: 2M context, reasoning capabilities, function calling, web search, no vision/audio",
+      "API Compatibility: OpenAI SDK compatible, supports streaming, temperature control, top_p sampling, max_tokens limits"
+    ],
+    code: `# Technical specifications in practice
+from litellm import completion
+
+# grok-4-1-fast-reasoning - Full featured with reasoning
+response1 = completion(
+    model="xai/grok-4-1-fast-reasoning",
+    messages=[{"role": "user", "content": "Complex problem..."}],
+    temperature=0.7,
+    max_tokens=4000,
+    stream=True
+)
+# Context: 2M | Reasoning: ✓ | Vision: ✓ | Audio: ✓ | Caching: ✓
+
+# grok-4-1-fast-non-reasoning - Fast responses
+response2 = completion(
+    model="xai/grok-4-1-fast-non-reasoning",
+    messages=[{"role": "user", "content": "Simple query..."}],
+    temperature=0.5,
+    max_tokens=1000
+)
+# Context: 2M | Reasoning: ✗ | Vision: ✓ | Audio: ✓ | Caching: ✓
+
+# grok-code-fast-1 - Code specialization
+response3 = completion(
+    model="xai/grok-code-fast-1",
+    messages=[{"role": "user", "content": "Write a Python function..."}],
+    temperature=0.2
+)
+# Context: 256K | Reasoning: ✓ | Code: ✓ | Caching: ✓`
+  },
+  {
+    id: "grok-use-cases",
+    title: "Grok Models - Optimal Use Cases",
+    subtitle: "Model Selection Based on Strengths & Limitations",
+    bullets: [
+      "grok-4-1-fast-reasoning: Complex analysis, strategic planning, multi-step math, research synthesis, legal document review",
+      "grok-4-1-fast-non-reasoning: Customer support chatbots, quick Q&A, content moderation, simple classification, high-volume APIs",
+      "grok-code-fast-1: Code generation, debugging assistance, technical documentation, algorithm design, code review automation",
+      "grok-4-fast-reasoning: Extended conversations requiring reasoning without audio/vision (cost-effective alternative to 4.1)",
+      "Selection Strategy: Reasoning for accuracy-critical tasks, non-reasoning for speed/cost optimization, code-fast for development workflows"
+    ],
+    code: `# Model selection decision tree
+def select_grok_model(task_type: str, requires_reasoning: bool, 
+                      multimodal: bool, cost_sensitive: bool):
+    """
+    Intelligent model selection based on requirements.
+    """
+    
+    # Code-related tasks
+    if task_type == "code":
+        return "xai/grok-code-fast-1"
+    
+    # Complex reasoning required
+    if requires_reasoning:
+        if multimodal:  # Need vision/audio
+            return "xai/grok-4-1-fast-reasoning"
+        else:
+            return "xai/grok-4-fast-reasoning"  # Cheaper alternative
+    
+    # Simple tasks - optimize for speed/cost
+    if cost_sensitive or task_type in ["qa", "classification", "support"]:
+        return "xai/grok-4-1-fast-non-reasoning"
+    
+    # Default: balanced reasoning model
+    return "xai/grok-4-1-fast-reasoning"
+
+# Usage examples
+model = select_grok_model("analysis", requires_reasoning=True, 
+                         multimodal=False, cost_sensitive=True)
+# Returns: "xai/grok-4-fast-reasoning"
+
+model = select_grok_model("code", requires_reasoning=False,
+                         multimodal=False, cost_sensitive=False)
+# Returns: "xai/grok-code-fast-1"`
+  },
+  {
+    id: "firecrawl-overview",
+    title: "Firecrawl API - LLM-Ready Web Data",
+    subtitle: "Advanced Web Scraping for AI Applications",
+    bullets: [
+      "Firecrawl: Enterprise web scraping API that converts websites into clean, LLM-ready formats (Markdown, JSON, HTML)",
+      "Key Features: Scrape (single page), Crawl (entire site), Map (discover URLs), Search (web search), Extract (structured data)",
+      "API Key Required: Sign up at firecrawl.dev to get FIRECRAWL_API_KEY - free tier available",
+      "LLM Integration: Automatic content cleaning, JavaScript rendering, anti-bot bypass, rate limit handling",
+      "Use Cases: RAG data preparation, competitive analysis, content aggregation, market research, training data collection"
+    ],
+    code: `# Firecrawl API Setup
+# Installation
+pip install firecrawl-py
+
+# Environment setup
+import os
+os.environ['FIRECRAWL_API_KEY'] = 'fc-...'  # Get from firecrawl.dev
+
+# Basic usage
+from firecrawl import FirecrawlApp
+
+app = FirecrawlApp()
+
+# Scrape single page - returns LLM-ready Markdown
+result = app.scrape_url(
+    "https://example.com",
+    params={
+        'formats': ['markdown', 'html'],
+        'onlyMainContent': True
+    }
+)
+
+print(result['markdown'])  # Clean, formatted content`
+  },
+  {
+    id: "firecrawl-features",
+    title: "Firecrawl - Core Features Deep Dive",
+    subtitle: "Scrape, Crawl, Map, Search & Extract",
+    interactive: true,
+    bullets: [
+      "Scrape: Extract single page content as Markdown/JSON/HTML with automatic cleaning and structure preservation",
+      "Crawl: Recursive site crawling with configurable depth, URL filtering, concurrent requests, automatic sitemap detection",
+      "Map: Discover all URLs on a domain with categorization (pages, images, PDFs) - perfect for site analysis",
+      "Search: Web search with scraping - like Perplexity AI, returns search results WITH full page content in one call",
+      "Extract: Structured data extraction using JSON schema - define fields, get validated JSON output for databases"
+    ],
+    code: `from firecrawl import FirecrawlApp
+app = FirecrawlApp()
+
+# 1. SCRAPE - Single page to Markdown
+scrape = app.scrape_url("https://docs.example.com", params={
+    'formats': ['markdown'],
+    'onlyMainContent': True,
+    'waitFor': 2000  # Wait for JS to load
+})
+
+# 2. CRAWL - Entire site
+crawl = app.crawl_url("https://blog.example.com", params={
+    'limit': 50,  # Max 50 pages
+    'scrapeOptions': {'formats': ['markdown']},
+    'exclude': ['/admin/', '/login/']
+})
+
+# 3. MAP - Discover all URLs
+map_result = app.map_url("https://example.com")
+# Returns: {'links': ['/', '/about', '/products', ...]}
+
+# 4. SEARCH - Web search + scraping
+search = app.search({
+    'query': 'latest AI models 2024',
+    'limit': 5,
+    'scrapeOptions': {'formats': ['markdown']}
+})
+# Returns search results WITH scraped content
+
+# 5. EXTRACT - Structured data
+extract = app.extract({
+    'url': 'https://products.example.com',
+    'schema': {
+        'type': 'object',
+        'properties': {
+            'products': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'name': {'type': 'string'},
+                        'price': {'type': 'number'}
+                    }
+                }
+            }
+        }
+    }
+})
+# Returns: {'products': [{'name': '...', 'price': 99.99}, ...]}`
+  },
+  {
+    id: "firecrawl-perplexity",
+    title: "Firecrawl + LLM - Perplexity-Like Search",
+    subtitle: "Building AI Search with Real-Time Web Data",
+    interactive: true,
+    bullets: [
+      "Architecture: User query → Firecrawl Search (gets URLs + content) → Aggregate context → LLM synthesis → Cited answer",
+      "Firecrawl Advantage: Search API returns both URLs AND scraped content in one call - no separate scraping needed",
+      "LLM Integration: Use GPT-4/Claude with large context to synthesize answer from multiple sources with citations",
+      "Cost Optimization: Use gpt-4o-mini for synthesis (10x cheaper), cache Firecrawl results for repeated queries",
+      "Production Pattern: Async task queue for searches (can take 5-15s), WebSocket for streaming results to frontend"
+    ],
+    code: `# Perplexity-like search with Firecrawl + OpenAI
+import os
+from firecrawl import FirecrawlApp
+from openai import OpenAI
+
+firecrawl = FirecrawlApp()
+openai_client = OpenAI()
+
+def perplexity_search(query: str):
+    # Step 1: Firecrawl Search - get URLs + content in one call
+    search_results = firecrawl.search({
+        'query': query,
+        'limit': 5,
+        'sources': ['web'],
+        'scrapeOptions': {'formats': ['markdown'], 'onlyMainContent': True}
+    })
+    
+    # Step 2: Aggregate context from scraped content
+    context = ""
+    for i, result in enumerate(search_results['data']):
+        if result.get('content'):
+            context += f"\\n\\n[Source {i+1}] {result['title']} ({result['sourceUrl']})\\n{result['content']}"
+    
+    # Step 3: Synthesize with LLM
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "Synthesize answer with [Source X] citations."},
+            {"role": "user", "content": f"Question: {query}\\n\\nContext:{context}"}
+        ]
+    )
+    
+    return response.choices[0].message.content
+
+# Usage
+answer = perplexity_search("What are xAI Grok 4.1 capabilities?")
+# Returns: "Grok 4.1 has 2M token context [Source 1], supports vision/audio [Source 2]..."`
   },
   {
     id: "model-endpoints-1",

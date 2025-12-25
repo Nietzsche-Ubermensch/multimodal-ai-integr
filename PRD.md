@@ -1,15 +1,15 @@
 # Planning Guide
 
-A comprehensive AI inference provider guide and technical presentation platform covering Anthropic Claude, DeepSeek, xAI Grok, and OpenRouter. This application serves as a complete reference for developers building AI applications, featuring interactive demos, detailed documentation on pricing/billing, security protocols, hub integration, structured outputs, function calling, and production deployment strategies across 19+ topics with 13+ model endpoints.
+A comprehensive AI inference provider guide and technical presentation platform covering Anthropic Claude, DeepSeek, xAI Grok (including detailed Grok 4.1 analysis), Firecrawl API, and OpenRouter. This application serves as a complete reference for developers building AI applications, featuring interactive demos, detailed documentation on pricing/billing, security protocols, hub integration, structured outputs, function calling, web scraping for LLM data, and production deployment strategies across 23+ topics with 13+ model endpoints.
 
 **Experience Qualities**: 
-1. **Interactive & Educational**: Live SDK demos with real API testing, interactive parameter controls, hands-on embedding generation, and comprehensive learning path from basics to advanced topics (pricing models, security, function calling, structured outputs)
-2. **Production-Ready & Enterprise-Grade**: Complete TypeScript/Python examples, deployment guides for Vercel/Replit/Docker/AWS, security best practices (API proxy patterns, rate limiting, input validation), GitHub Actions automation examples, and model evaluation frameworks
-3. **Comprehensive & Reference-Grade**: Full documentation for 19+ AI topics including inference providers overview, pricing/billing models, hub integration, security considerations, structured outputs with LLMs, function calling, inference tasks (chat/embeddings/text-to-image/text-to-video), building AI image editors, code review automation, model evaluation, Hub API provider registration, and transformers.js browser-based ML
+1. **Interactive & Educational**: Live SDK demos with real API testing, interactive parameter controls, hands-on embedding generation, comprehensive xAI Grok 4.1 model comparison, Firecrawl web scraping demos, and complete learning path from basics to advanced topics (pricing models, security, function calling, structured outputs, LLM-ready web data extraction)
+2. **Production-Ready & Enterprise-Grade**: Complete TypeScript/Python examples, Firecrawl integration patterns for Perplexity-like search, deployment guides for Vercel/Replit/Docker/AWS, security best practices (API proxy patterns, rate limiting, input validation), GitHub Actions automation examples, and model evaluation frameworks
+3. **Comprehensive & Reference-Grade**: Full documentation for 23+ AI topics including xAI Grok 4.1 detailed analysis (reasoning vs non-reasoning variants, technical specifications, use cases), Firecrawl API features (Scrape, Crawl, Map, Search, Extract), inference providers overview, pricing/billing models, hub integration, security considerations, structured outputs with LLMs, function calling, inference tasks (chat/embeddings/text-to-image/text-to-video), building AI image editors, code review automation, model evaluation, Hub API provider registration, and transformers.js browser-based ML
 
 **Complexity Level**: Complex Application (advanced functionality with multiple views and comprehensive educational content)
 
-This is an interactive AI inference provider guide and SDK integration platform providing in-depth coverage of: (1) Overview of inference providers and their significance, (2) Pricing/billing models with cost calculation examples, (3) Hub integration (HuggingFace, OpenRouter) with transformers.js, (4) Security protocols (API key protection, rate limiting, data privacy), (5) Structured outputs with JSON schema enforcement, (6) Function calling for extending LLM capabilities, (7) Inference task types (chat completion, embeddings, text-to-image, text-to-video), (8) Building AI applications (image editors with DALL-E + Claude Vision), (9) Automating code review with GitHub Actions, (10) Model evaluation with Inspect AI and PromptFoo, (11) Hub API and becoming an inference provider, (12) Complete guides for Anthropic Claude (3.5 Sonnet/Haiku/Opus), DeepSeek (Chat/Reasoner/Coder), xAI Grok (Beta/Vision), and OpenRouter TypeScript SDK. Includes live API testing, code generation, model comparisons, environment setup guides, and GitHub repository integration (huggingface/transformers.js, BerriAI/litellm, OpenRouterTeam/typescript-sdk, and 7+ other essential repos).
+This is an interactive AI inference provider guide and SDK integration platform providing in-depth coverage of: (1) Overview of inference providers and their significance, (2) Pricing/billing models with cost calculation examples, (3) Hub integration (HuggingFace, OpenRouter) with transformers.js, (4) Security protocols (API key protection, rate limiting, data privacy), (5) Structured outputs with JSON schema enforcement, (6) Function calling for extending LLM capabilities, (7) Inference task types (chat completion, embeddings, text-to-image, text-to-video), (8) Building AI applications (image editors with DALL-E + Claude Vision), (9) Automating code review with GitHub Actions, (10) Model evaluation with Inspect AI and PromptFoo, (11) Hub API and becoming an inference provider, (12) xAI Grok 4.1 comprehensive analysis (4 model variants, modalities comparison, technical specifications, rate limits, pricing, optimal use cases), (13) Firecrawl API integration (Scrape, Crawl, Map, Search, Extract features with LLM-ready formats), (14) Perplexity-like search implementation with Firecrawl + LLM synthesis, (15) Complete guides for Anthropic Claude (3.5 Sonnet/Haiku/Opus), DeepSeek (Chat/Reasoner/Coder), xAI Grok (Beta/Vision/4.1 Fast variants), and OpenRouter TypeScript SDK. Includes live API testing, code generation, model comparisons, environment setup guides, and GitHub repository integration (huggingface/transformers.js, BerriAI/litellm, OpenRouterTeam/typescript-sdk, and 7+ other essential repos).
 
 ## Essential Features
 
@@ -26,6 +26,27 @@ This is an interactive AI inference provider guide and SDK integration platform 
 - **Trigger**: Navigate to platform overview slides
 - **Progression**: View platform comparison → Explore provider-specific features → Review model architectures → Understand integration patterns
 - **Success criteria**: Clear explanation of technical architecture, parameter counts, context windows, and unique capabilities (reasoning, vision, web search)
+
+### xAI Grok 4.1 Comprehensive Analysis
+- **Functionality**: Detailed comparison of 4 Grok model variants (grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning, grok-code-fast-1, grok-4-fast-reasoning) with modalities, capabilities, context windows, rate limits, and pricing
+- **Purpose**: Enable informed model selection based on use case requirements (reasoning vs speed, multimodal needs, code specialization)
+- **Trigger**: Navigate to Grok 4.1 overview, comparison, technical specs, and use cases slides
+- **Progression**: Review model overview → Compare capabilities across variants → Examine technical specifications → Understand optimal use cases → View code examples for model selection logic
+- **Success criteria**: Complete coverage of all 4 models with feature comparison matrix, context window specs (256K-2M tokens), pricing optimization strategies, reasoning vs non-reasoning tradeoffs, multimodal support details (vision/audio), and intelligent model selection decision tree
+
+### Firecrawl API Integration
+- **Functionality**: Complete guide to Firecrawl web scraping API covering 5 core features (Scrape, Crawl, Map, Search, Extract) with LLM-ready output formats (Markdown, JSON, HTML)
+- **Purpose**: Enable developers to build RAG applications, competitive analysis tools, and AI search with clean web data extraction
+- **Trigger**: Navigate to Firecrawl overview and features slides
+- **Progression**: Learn Firecrawl capabilities → Understand API key requirements → Explore 5 core features → View code examples for each feature → Implement structured data extraction
+- **Success criteria**: Working examples for single-page scraping, recursive crawling, URL discovery, web search with content, and JSON schema-based extraction; API key setup instructions; LLM-ready Markdown output demonstration
+
+### Perplexity-Like Search Implementation
+- **Functionality**: Complete architecture guide for building AI-powered search using Firecrawl Search API + LLM synthesis with source citations
+- **Purpose**: Teach developers to build Perplexity-style answer engines that search the web, scrape content, and synthesize answers with citations
+- **Trigger**: Navigate to Firecrawl + LLM integration slide
+- **Progression**: Understand architecture (query → search → scrape → aggregate → synthesize) → Review Firecrawl Search advantage (URLs + content in one call) → Implement LLM synthesis with citations → Optimize for cost → Production patterns (async queues, caching)
+- **Success criteria**: Complete Python implementation with Firecrawl + OpenAI, citation system using [Source X] tags, cost optimization strategies (gpt-4o-mini for synthesis), production-ready patterns for 5-15s searches, working example with xAI Grok 4.1 query
 
 ### Model Endpoints Catalog (13+ Models)
 - **Functionality**: Comprehensive database covering xAI (Grok-4, Grok-Code-Fast), DeepSeek (V3, R1, Chat), NVIDIA (Nemotron Nano), Microsoft (Phi-4, WizardLM-2), Google, OpenAI, and community models
