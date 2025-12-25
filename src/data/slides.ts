@@ -442,8 +442,8 @@ def calculate_cost(input_tokens, output_tokens, model="gpt-4"):
     return cost
 
 # Example: 100K token conversation
-print(f"GPT-4: \\${calculate_cost(50000, 50000, 'gpt-4')}")  # $4.50
-print(f"DeepSeek: \\${calculate_cost(50000, 50000, 'deepseek-chat')}")  # $0.021`
+print(f"GPT-4: \${calculate_cost(50000, 50000, 'gpt-4')}")  # $4.50
+print(f"DeepSeek: \${calculate_cost(50000, 50000, 'deepseek-chat')}")  # $0.021`
   },
   {
     id: "hub-integration",
@@ -933,7 +933,7 @@ results = eval(
 # Compare results
 for model, result in results.items():
     print(f"{model}: Accuracy = {result.metrics['accuracy']:.2%}")
-    print(f"  Avg cost per question: \\${result.metrics['total_cost']/100:.4f}")
+    print(f"  Avg cost per question: \${result.metrics['total_cost']/100:.4f}")
 
 # Output:
 # openai/gpt-4: Accuracy = 87.5%, Cost = $0.0420/question
