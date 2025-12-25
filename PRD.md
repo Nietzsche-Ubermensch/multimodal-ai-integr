@@ -1,15 +1,15 @@
 # Planning Guide
 
-A comprehensive technical presentation platform for exploring AI SDK integration with Anthropic Claude, DeepSeek, xAI Grok, and OpenRouter. Features interactive demos for each provider, complete code examples, and production deployment guides with 13+ model endpoints and embedding configurations.
+A comprehensive AI inference provider guide and technical presentation platform covering Anthropic Claude, DeepSeek, xAI Grok, and OpenRouter. This application serves as a complete reference for developers building AI applications, featuring interactive demos, detailed documentation on pricing/billing, security protocols, hub integration, structured outputs, function calling, and production deployment strategies across 19+ topics with 13+ model endpoints.
 
 **Experience Qualities**: 
-1. **Interactive & Hands-On**: Live SDK demos with real API testing for Anthropic, DeepSeek, and xAI, interactive parameter controls, and instant code generation
-2. **Production-Ready**: Complete TypeScript/Python examples, deployment guides for Vercel/Replit/Docker/AWS, and security best practices
-3. **Comprehensive & Reference-Grade**: Full documentation for 13+ models, embedding APIs, API key validation, and multi-provider fallback strategies
+1. **Interactive & Educational**: Live SDK demos with real API testing, interactive parameter controls, hands-on embedding generation, and comprehensive learning path from basics to advanced topics (pricing models, security, function calling, structured outputs)
+2. **Production-Ready & Enterprise-Grade**: Complete TypeScript/Python examples, deployment guides for Vercel/Replit/Docker/AWS, security best practices (API proxy patterns, rate limiting, input validation), GitHub Actions automation examples, and model evaluation frameworks
+3. **Comprehensive & Reference-Grade**: Full documentation for 19+ AI topics including inference providers overview, pricing/billing models, hub integration, security considerations, structured outputs with LLMs, function calling, inference tasks (chat/embeddings/text-to-image/text-to-video), building AI image editors, code review automation, model evaluation, Hub API provider registration, and transformers.js browser-based ML
 
-**Complexity Level**: Complex Application (advanced functionality with multiple views)
+**Complexity Level**: Complex Application (advanced functionality with multiple views and comprehensive educational content)
 
-This is an interactive SDK integration platform providing hands-on demos for Anthropic Claude (3.5 Sonnet/Haiku/Opus), DeepSeek (Chat/Reasoner/Coder), xAI Grok (Beta/Vision), and OpenRouter. Includes live API testing, code generation, model comparisons, environment setup guides, and GitHub repository integration with quick-start examples.
+This is an interactive AI inference provider guide and SDK integration platform providing in-depth coverage of: (1) Overview of inference providers and their significance, (2) Pricing/billing models with cost calculation examples, (3) Hub integration (HuggingFace, OpenRouter) with transformers.js, (4) Security protocols (API key protection, rate limiting, data privacy), (5) Structured outputs with JSON schema enforcement, (6) Function calling for extending LLM capabilities, (7) Inference task types (chat completion, embeddings, text-to-image, text-to-video), (8) Building AI applications (image editors with DALL-E + Claude Vision), (9) Automating code review with GitHub Actions, (10) Model evaluation with Inspect AI and PromptFoo, (11) Hub API and becoming an inference provider, (12) Complete guides for Anthropic Claude (3.5 Sonnet/Haiku/Opus), DeepSeek (Chat/Reasoner/Coder), xAI Grok (Beta/Vision), and OpenRouter TypeScript SDK. Includes live API testing, code generation, model comparisons, environment setup guides, and GitHub repository integration (huggingface/transformers.js, BerriAI/litellm, OpenRouterTeam/typescript-sdk, and 7+ other essential repos).
 
 ## Essential Features
 
@@ -98,6 +98,90 @@ This is an interactive SDK integration platform providing hands-on demos for Ant
 - **Success criteria**: All 7 repositories displayed with accurate descriptions, working quick-start code snippets, live GitHub links, organized by category (Featured, Orchestration, Integration, Models, Documentation, Tools), plus functional live SDK testing with API key validation, real API calls, response display, and latency metrics
 
 ### Deployment Guides (4 Platforms)
+- **Functionality**: Step-by-step deployment tutorials for Vercel (serverless), Replit (instant dev environment), Docker (containerized), and AWS Lambda (serverless architecture) with environment variable setup, build commands, and production optimizations
+- **Purpose**: Enable rapid deployment to production with platform-specific best practices for API key management, auto-scaling, and cost optimization
+- **Trigger**: Navigate to Deployment Guides slide
+- **Progression**: Select deployment platform → Review prerequisites → Copy configuration files → Run deployment commands → Verify with health check → Configure environment variables → Monitor deployment
+- **Success criteria**: Working deployment guides with copy-ready config files, platform-specific CLI commands, health check endpoints, troubleshooting tips for each platform
+
+### Comprehensive Inference Provider Topics
+
+#### Overview of Inference Providers
+- **Functionality**: Detailed explanation of what inference providers are, their role in AI applications, comparison of hosted vs. self-hosted solutions, provider ecosystems (OpenRouter, HuggingFace, Replicate), and strategic selection criteria
+- **Purpose**: Help developers understand the AI inference landscape and make informed decisions about provider selection based on cost, latency, model availability, and compliance requirements
+- **Trigger**: Navigate to platform overview slides
+- **Progression**: Learn provider definitions → Understand hosted vs self-hosted tradeoffs → Compare provider ecosystems → Evaluate selection criteria → Review use cases
+- **Success criteria**: Clear explanation of inference providers, comparison tables, decision frameworks, and real-world application examples
+
+#### Pricing & Billing Models
+- **Functionality**: Comprehensive breakdown of pricing models (pay-per-token, subscription tiers, enterprise contracts), cost factors (model size, context length, real-time vs batch), hidden fees (rate limits, vision surcharges, fine-tuning storage), and cost optimization strategies (caching, model selection, batch processing)
+- **Purpose**: Enable developers to accurately estimate costs, identify cost-saving opportunities, and avoid unexpected charges in production AI applications
+- **Trigger**: Slides or documentation section on pricing
+- **Progression**: Understand pricing models → Learn cost factors → Identify hidden fees → Calculate example costs → Implement optimization strategies
+- **Success criteria**: Working cost calculation examples, pricing comparison tables for major providers (GPT-4, Claude, DeepSeek), optimization techniques with quantified savings (80%+ cache hit rates)
+
+#### Hub Integration (HuggingFace, OpenRouter)
+- **Functionality**: Complete guides for integrating with HuggingFace Hub (500K+ models) and OpenRouter (100+ models), transformers.js for browser-based ML, step-by-step integration process, authentication, model discovery, and deployment patterns
+- **Purpose**: Enable seamless access to vast model libraries without managing multiple provider accounts, support browser-based inference without backend infrastructure
+- **Trigger**: Hub integration slides and code examples
+- **Progression**: Browse model hubs → Select appropriate models → Install SDKs → Authenticate → Load models → Run inference → Deploy applications
+- **Success criteria**: Working examples for HuggingFace Hub integration, transformers.js browser demos, OpenRouter multi-model routing, and model selection best practices
+
+#### Security Considerations
+- **Functionality**: Critical security protocols including API key protection (server-side proxy pattern), input validation (prompt injection prevention), rate limiting (per-user quotas), data privacy (PII handling, self-hosted options), monitoring (logging, cost alerts, anomaly detection), and compliance requirements (GDPR, HIPAA)
+- **Purpose**: Prevent security vulnerabilities, protect API keys from exposure, avoid cost explosions from abuse, ensure data privacy compliance, and maintain production system integrity
+- **Trigger**: Security slides with code examples and best practices
+- **Progression**: Learn API proxy pattern → Implement input validation → Configure rate limiting → Set up monitoring → Review compliance requirements → Test security measures
+- **Success criteria**: Production-ready security code examples (Next.js API routes, rate limiting with Redis), comprehensive security checklist, vulnerability mitigation strategies, and compliance documentation
+
+#### Structured Outputs with LLMs
+- **Functionality**: In-depth coverage of JSON schema enforcement, Zod/Pydantic schema definitions, response_format configuration, validation strategies, retry logic with error feedback, and use cases (data extraction, form generation, database insertions)
+- **Purpose**: Eliminate parsing errors, ensure type safety, enable reliable structured data extraction, and build robust AI applications with predictable outputs
+- **Trigger**: Structured outputs slides with TypeScript/Python examples
+- **Progression**: Define JSON schemas → Configure response format → Validate outputs → Handle errors → Implement retry logic → Test edge cases
+- **Success criteria**: Working Zod/Pydantic schema examples, OpenAI/Anthropic structured output demos, validation error handling, and production use cases
+
+#### Function Calling
+- **Functionality**: Complete guide to function calling including schema definition, LLM decision logic, function execution patterns, result handling, multi-step agentic workflows, and use cases (weather APIs, database queries, email sending, calendar management, complex calculations)
+- **Purpose**: Extend LLM capabilities beyond text generation, reduce hallucination with real data, enable real-time information access, and create sophisticated agentic AI systems
+- **Trigger**: Function calling slides with detailed examples
+- **Progression**: Define function schemas → LLM decides when to call → Parse function call JSON → Execute function → Return results to LLM → Generate final response → Build multi-step workflows
+- **Success criteria**: Working function calling examples (weather API, database search), multi-function orchestration, error handling, and agentic workflow patterns
+
+#### Inference Task Types
+- **Functionality**: Comprehensive coverage of inference tasks: (1) Chat completion with streaming and multi-turn context, (2) Feature extraction (embeddings) for semantic search and RAG, (3) Text-to-image generation with DALL-E 3 and Stable Diffusion, (4) Text-to-video with emerging providers (Runway, Pika Labs)
+- **Purpose**: Understand different AI capabilities, select appropriate models for specific tasks, implement diverse AI features, and explore cutting-edge multimodal applications
+- **Trigger**: Inference tasks slides with code examples for each type
+- **Progression**: Learn task categories → Understand model selection → Implement chat completion → Generate embeddings → Create images → Explore video generation
+- **Success criteria**: Working examples for all task types, model recommendations, performance optimization techniques, and cost comparisons
+
+#### Building AI Applications
+- **Functionality**: Detailed guides for building real AI applications including: (1) AI Image Editor with Claude Vision + DALL-E (inpainting, outpainting, style transfer, object removal), (2) Code Review Automation with GitHub Actions + GPT-4/DeepSeek, (3) Semantic search with embeddings, (4) RAG applications
+- **Purpose**: Provide end-to-end application examples that developers can adapt for their own projects, demonstrate integration of multiple AI capabilities, and showcase production-ready patterns
+- **Trigger**: Application-specific slides with complete implementations
+- **Progression**: Understand application architecture → Review component breakdown → Study code examples → Implement core features → Test integrations → Deploy to production
+- **Success criteria**: Complete working examples for AI image editor (Canvas API + Claude + DALL-E), GitHub Actions code review automation, semantic search implementation, and RAG application patterns
+
+#### Model Evaluation & Benchmarking
+- **Functionality**: Systematic model evaluation using Inspect AI, PromptFoo A/B testing, LangSmith tracing, metrics (accuracy, F1, perplexity, BLEU, human eval), cost/quality tradeoff analysis, and iterative prompt engineering
+- **Purpose**: Make data-driven model selection decisions, optimize for cost vs quality, identify model strengths/weaknesses, and continuously improve AI application performance
+- **Trigger**: Model evaluation slides with benchmark examples
+- **Progression**: Define evaluation datasets → Configure evaluation frameworks → Run multi-model comparisons → Analyze metrics → Review failure cases → Iterate prompts → Make selection decisions
+- **Success criteria**: Working Inspect AI and PromptFoo examples, metric calculation code, cost/quality comparison tables (GPT-4 vs DeepSeek vs Claude), and evaluation best practices
+
+#### Hub API & Provider Registration
+- **Functionality**: Guide to becoming an inference provider including API endpoint implementation (/v1/chat/completions), health checks, hub registry submission, SLA requirements (99.9% uptime, <2s latency), OpenAI-compatible API design, and billing integration
+- **Purpose**: Enable developers to offer their own models through aggregator platforms, understand provider ecosystem requirements, and potentially monetize AI infrastructure
+- **Trigger**: Hub API provider registration slides with Flask/FastAPI examples
+- **Progression**: Implement OpenAI-compatible endpoint → Add health checks → Submit to registry → Pass latency tests → Configure billing → Get listed on hub
+- **Success criteria**: Minimal working provider API (Flask + HuggingFace Transformers), OpenAI format compliance, health endpoint implementation, and registration checklist
+
+#### Extended Resources & Documentation
+- **Functionality**: Curated list of essential repositories with descriptions, quick-start code, and learning paths: (1) huggingface/transformers.js - browser-based ML, (2) BerriAI/litellm - unified Python interface, (3) OpenRouterTeam/typescript-sdk - official SDK, (4) Inspect AI - evaluation framework, (5) Venice API - privacy-focused inference, plus documentation links and community resources
+- **Purpose**: Provide developers with authoritative resources for deep dives, reference implementations, and community support beyond the presentation
+- **Trigger**: Resources slides and documentation sections
+- **Progression**: Browse repository categories → Review descriptions and key features → Copy quick-start code → Clone repositories → Explore documentation → Join communities
+- **Success criteria**: Accurate repository information with star counts, working quick-start examples, direct GitHub links, categorization (Orchestration, Integration, Models, Tools), and documentation links
 - **Functionality**: Step-by-step deployment instructions for Vercel (serverless with automatic scaling), Replit (instant dev environment with secrets), Docker (containerized with Redis), and AWS Lambda (serverless architecture)
 - **Purpose**: Enable immediate production deployment with platform-specific configurations
 - **Trigger**: Navigate to Deployment Guides slide

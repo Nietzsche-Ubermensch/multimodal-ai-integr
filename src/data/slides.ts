@@ -416,14 +416,676 @@ def use_provider_features():
     ]
   },
   {
+    id: "pricing-billing",
+    title: "Pricing & Billing Models",
+    subtitle: "Understanding AI Inference Costs",
+    bullets: [
+      "Pay-per-token: Most common model charging for input/output tokens separately (e.g., GPT-4: $30/1M input, $60/1M output)",
+      "Subscription tiers: Fixed monthly rate with token quotas (OpenRouter Pro, Claude Pro at $20-200/month)",
+      "Cost factors: Model size/complexity (GPT-4 > GPT-3.5), context length (longer = more expensive), real-time vs batch processing",
+      "Hidden fees: Rate limits causing request throttling, vision API surcharges (images cost 85-1000+ tokens), fine-tuning storage fees",
+      "Cost optimization: Use smaller models for simple tasks, implement aggressive caching (80%+ savings), batch requests when possible"
+    ],
+    code: `# Cost calculation example
+def calculate_cost(input_tokens, output_tokens, model="gpt-4"):
+    pricing = {
+        "gpt-4": {"input": 0.03, "output": 0.06},          # per 1K tokens
+        "gpt-3.5-turbo": {"input": 0.0005, "output": 0.0015},
+        "claude-3-opus": {"input": 0.015, "output": 0.075},
+        "deepseek-chat": {"input": 0.00014, "output": 0.00028}  # 200x cheaper!
+    }
+    
+    rates = pricing[model]
+    cost = (input_tokens / 1000 * rates["input"] + 
+            output_tokens / 1000 * rates["output"])
+    
+    return cost
+
+# Example: 100K token conversation
+print(f"GPT-4: \\${calculate_cost(50000, 50000, 'gpt-4')}")  # $4.50
+print(f"DeepSeek: \\${calculate_cost(50000, 50000, 'deepseek-chat')}")  # $0.021`
+  },
+  {
+    id: "hub-integration",
+    title: "AI Hub Integration",
+    subtitle: "Seamless Model Discovery & Deployment",
+    bullets: [
+      "HuggingFace Hub: 500K+ models—use transformers.js for browser-based inference without backend",
+      "Integration steps: (1) Browse hub.huggingface.co → (2) Select model → (3) Install transformers → (4) Load with AutoModel.from_pretrained() → (5) Run inference locally",
+      "OpenRouter Hub: Access 100+ models through single API—no need to manage multiple provider accounts",
+      "Tools: transformers.js (browser ML), LangChain (orchestration), LiteLLM (unified routing), Hugging Face Inference Endpoints (serverless deployment)"
+    ],
+    code: `# HuggingFace Hub Integration
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+# Load model from HuggingFace Hub
+model_name = "deepseek-ai/deepseek-math-7b-instruct"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+# Run inference locally
+inputs = tokenizer("Solve: x^2 + 5x + 6 = 0", return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=256)
+result = tokenizer.decode(outputs[0])
+
+# Browser-based with transformers.js (no backend!)
+# npm install @xenova/transformers
+import { pipeline } from '@xenova/transformers';
+
+const generator = await pipeline('text-generation', 'Xenova/gpt2');
+const output = await generator('AI will transform');`
+  },
+  {
+    id: "security",
+    title: "Security Considerations",
+    subtitle: "Critical Protocols for AI Inference",
+    bullets: [
+      "API Key Protection: NEVER expose keys in frontend code—use server-side proxy pattern (POST /api/chat) with environment variables only",
+      "Input Validation: Sanitize user prompts to prevent prompt injection attacks, implement max token limits to prevent abuse",
+      "Rate Limiting: Implement per-user quotas (e.g., 100 requests/hour) to prevent cost explosion and DDoS attacks",
+      "Data Privacy: Avoid sending PII/sensitive data to third-party APIs, use self-hosted models (DeepSeek/Llama) for confidential workloads",
+      "Monitoring: Log all API calls with user_id/timestamp, set up cost alerts (>$100/day threshold), detect anomalous usage patterns"
+    ],
+    code: `// Secure API Proxy Pattern (Next.js API Route)
+// pages/api/chat.ts - BACKEND ONLY
+import { OpenAI } from 'openai';
+
+export default async function handler(req, res) {
+  // ✅ API key lives server-side only
+  const openai = new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1'
+  });
+  
+  // ✅ Input validation
+  const { prompt } = req.body;
+  if (!prompt || prompt.length > 4000) {
+    return res.status(400).json({ error: 'Invalid prompt' });
+  }
+  
+  // ✅ Rate limiting (example with Redis)
+  const userKey = \`rate_limit:\${req.ip}\`;
+  const count = await redis.incr(userKey);
+  if (count === 1) await redis.expire(userKey, 3600);
+  if (count > 100) {
+    return res.status(429).json({ error: 'Rate limit exceeded' });
+  }
+  
+  // ✅ Sanitize sensitive data
+  const sanitized = prompt.replace(/\\b\\d{3}-\\d{2}-\\d{4}\\b/g, '[SSN_REDACTED]');
+  
+  const completion = await openai.chat.completions.create({
+    model: 'deepseek/deepseek-chat',
+    messages: [{ role: 'user', content: sanitized }],
+    max_tokens: 1000  // Cost protection
+  });
+  
+  res.json({ response: completion.choices[0].message.content });
+}`
+  },
+  {
+    id: "structured-outputs",
+    title: "Structured Outputs with LLMs",
+    subtitle: "JSON Schema Enforcement for Reliable Parsing",
+    bullets: [
+      "Definition: Force LLMs to return valid JSON matching a predefined schema—eliminates parsing errors and ensures type safety",
+      "Use cases: Extracting structured data (product info, user profiles), form generation, database insertions, API integrations",
+      "Implementation: Use response_format: { type: 'json_object' } with OpenAI SDK, or JSON mode with Anthropic/DeepSeek",
+      "Best practice: Always provide JSON schema in system prompt, validate response with Zod/JSON Schema validator, retry with error feedback"
+    ],
+    code: `// Structured Outputs Example (TypeScript + OpenAI)
+import { z } from 'zod';
+import { zodResponseFormat } from 'openai/helpers/zod';
+
+// Define schema with Zod
+const ProductSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+  category: z.enum(['electronics', 'clothing', 'food']),
+  inStock: z.boolean(),
+  tags: z.array(z.string())
+});
+
+// Force structured output
+const completion = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [{
+    role: 'user',
+    content: 'Extract product info: "Apple MacBook Pro 16\\" - $2499, available now"'
+  }],
+  response_format: zodResponseFormat(ProductSchema, 'product')
+});
+
+const product = JSON.parse(completion.choices[0].message.content);
+// Guaranteed to match schema:
+// { name: "MacBook Pro 16\\"", price: 2499, category: "electronics", inStock: true, tags: ["laptop", "apple"] }
+
+// Python equivalent with Pydantic
+from pydantic import BaseModel
+from openai import OpenAI
+
+class Product(BaseModel):
+    name: str
+    price: float
+    category: str
+    in_stock: bool
+    tags: list[str]
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    response_format={"type": "json_object"},
+    messages=[{"role": "user", "content": "..."}]
+)
+
+product = Product.model_validate_json(response.choices[0].message.content)`
+  },
+  {
+    id: "function-calling",
+    title: "Function Calling in AI Applications",
+    subtitle: "Extend LLM Capabilities with External Tools",
+    bullets: [
+      "Concept: LLMs can invoke predefined functions (API calls, database queries, calculations) by returning structured JSON with function name and arguments",
+      "Flow: Define function schemas → LLM decides when to call → Parse function call JSON → Execute function → Return result to LLM → LLM generates final response",
+      "Use cases: Weather APIs, stock prices, database searches, send emails, create calendar events, complex math (WolframAlpha)",
+      "Benefits: Reduces hallucination (real data), enables real-time info, extends beyond training cutoff, creates agentic workflows"
+    ],
+    code: `// Function Calling Example (OpenAI SDK)
+const tools = [
+  {
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "Get current weather for a location",
+      parameters: {
+        type: "object",
+        properties: {
+          location: { type: "string", description: "City name" },
+          unit: { type: "string", enum: ["celsius", "fahrenheit"] }
+        },
+        required: ["location"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_database",
+      description: "Search product database",
+      parameters: {
+        type: "object",
+        properties: {
+          query: { type: "string" },
+          limit: { type: "number", default: 10 }
+        },
+        required: ["query"]
+      }
+    }
+  }
+];
+
+// Step 1: LLM decides to call function
+const response = await openai.chat.completions.create({
+  model: "gpt-4",
+  messages: [{ role: "user", content: "What's the weather in Tokyo?" }],
+  tools: tools,
+  tool_choice: "auto"
+});
+
+const toolCall = response.choices[0].message.tool_calls?.[0];
+
+// Step 2: Execute the function
+if (toolCall?.function.name === "get_weather") {
+  const args = JSON.parse(toolCall.function.arguments);
+  // { location: "Tokyo", unit: "celsius" }
+  
+  const weatherData = await fetch(\`https://api.weather.com/\${args.location}\`);
+  
+  // Step 3: Return result to LLM
+  const finalResponse = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      { role: "user", content: "What's the weather in Tokyo?" },
+      response.choices[0].message,  // Original assistant message with tool call
+      {
+        role: "tool",
+        tool_call_id: toolCall.id,
+        content: JSON.stringify({ temp: 22, condition: "Sunny" })
+      }
+    ]
+  });
+  
+  console.log(finalResponse.choices[0].message.content);
+  // "It's currently 22°C and sunny in Tokyo."
+}`
+  },
+  {
+    id: "inference-tasks",
+    title: "Inference Task Types",
+    subtitle: "Chat, Embeddings, Text-to-Image, Text-to-Video",
+    bullets: [
+      "Chat Completion: Conversational AI with messages array, supports streaming, multi-turn context (models: GPT-4, Claude, DeepSeek)",
+      "Feature Extraction (Embeddings): Convert text to dense vectors for semantic search, RAG, clustering (models: text-embedding-3-large, gemini-embedding-001)",
+      "Text-to-Image: Generate images from prompts (DALL-E 3, Stable Diffusion XL, Midjourney via APIs), supports style control and inpainting",
+      "Text-to-Video: Emerging task—generate short videos from text (Runway Gen-2, Pika Labs), limited availability and high cost ($0.50-5/video)"
+    ],
+    code: `// Chat Completion with Streaming
+import { OpenAI } from 'openai';
+const openai = new OpenAI();
+
+const stream = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [{ role: 'user', content: 'Explain AI' }],
+  stream: true
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content || '');
+}
+
+// Embeddings for Semantic Search
+const embedding = await openai.embeddings.create({
+  model: 'text-embedding-3-large',
+  input: 'What is quantum computing?'
+});
+
+const vector = embedding.data[0].embedding; // 3072-dimensional vector
+
+// Text-to-Image (DALL-E 3)
+const image = await openai.images.generate({
+  model: 'dall-e-3',
+  prompt: 'A futuristic AI laboratory with holographic displays',
+  size: '1024x1024',
+  quality: 'hd'
+});
+
+console.log(image.data[0].url);
+
+// Text-to-Video (Hypothetical API - emerging)
+const video = await runwayml.generate({
+  prompt: 'A drone flying over a cyberpunk city at night',
+  duration: 4,  // seconds
+  resolution: '1280x720'
+});`
+  },
+  {
+    id: "image-editor",
+    title: "Building an AI Image Editor",
+    subtitle: "Integrating Vision Models & Image Generation",
+    bullets: [
+      "Core components: Canvas element (HTML5), image upload, OpenAI DALL-E API, Claude Vision for analysis, undo/redo stack",
+      "Features: Inpainting (fill masked areas), outpainting (extend images), style transfer, object removal, upscaling (Real-ESRGAN)",
+      "Tech stack: React + Konva.js (canvas manipulation), @anthropic-ai/sdk (vision analysis), openai SDK (DALL-E edits), Fabric.js (advanced editing)",
+      "Workflow: Upload image → Analyze with Claude Vision → User draws mask → Send to DALL-E edit endpoint → Apply result → Save with undo history"
+    ],
+    code: `// AI Image Editor - Core Implementation
+import { fabric } from 'fabric';
+import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// 1. Analyze image with Claude Vision
+async function analyzeImage(imageBase64: string) {
+  const message = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 1024,
+    messages: [{
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 }
+        },
+        { type: 'text', text: 'Describe this image and suggest edit ideas' }
+      ]
+    }]
+  });
+  
+  return message.content[0].text;
+}
+
+// 2. AI-powered inpainting (remove objects)
+async function inpaintImage(
+  originalImage: File,
+  maskImage: File,  // White = keep, Black = regenerate
+  prompt: string
+) {
+  const response = await openai.images.edit({
+    model: 'dall-e-2',
+    image: originalImage,
+    mask: maskImage,
+    prompt: prompt,
+    n: 1,
+    size: '1024x1024'
+  });
+  
+  return response.data[0].url;
+}
+
+// 3. Canvas-based mask drawing (React component)
+function ImageEditorCanvas({ imageUrl }: { imageUrl: string }) {
+  const canvasRef = useRef<fabric.Canvas>();
+  
+  useEffect(() => {
+    const canvas = new fabric.Canvas('canvas', {
+      isDrawingMode: true,
+      width: 1024,
+      height: 1024
+    });
+    
+    fabric.Image.fromURL(imageUrl, (img) => {
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+    });
+    
+    canvas.freeDrawingBrush.color = 'rgba(255, 0, 0, 0.5)';
+    canvas.freeDrawingBrush.width = 20;
+    
+    canvasRef.current = canvas;
+  }, [imageUrl]);
+  
+  const handleInpaint = async () => {
+    const maskDataUrl = canvasRef.current?.toDataURL({ format: 'png' });
+    const result = await inpaintImage(
+      originalImage,
+      dataURLtoFile(maskDataUrl, 'mask.png'),
+      'Remove the marked object naturally'
+    );
+    
+    // Apply result to canvas
+    fabric.Image.fromURL(result, (img) => {
+      canvas.add(img);
+    });
+  };
+  
+  return <canvas id="canvas" />;
+}
+
+// 4. Advanced: Style transfer with img2img
+async function styleTransfer(imageUrl: string, style: string) {
+  const response = await openai.images.createVariation({
+    image: await fetch(imageUrl).then(r => r.blob()),
+    n: 1,
+    size: '1024x1024'
+  });
+  
+  return response.data[0].url;
+}`
+  },
+  {
+    id: "code-review-automation",
+    title: "Automating Code Review with GitHub Actions",
+    subtitle: "AI-Powered PR Analysis & Feedback",
+    bullets: [
+      "Benefits: Catch bugs early (before human review), enforce style guidelines, suggest optimizations, reduce reviewer burden by 40-60%",
+      "Workflow: PR opened → GitHub Action triggers → Extract diff → Send to LLM (GPT-4/DeepSeek) → Generate review comments → Post to PR",
+      "Setup: Create .github/workflows/ai-review.yml → Use actions/checkout + custom script → Call OpenAI API with diff → Comment with octokit",
+      "Best practices: Focus on logic errors (not style), use DeepSeek-Coder for cost efficiency ($0.00014/1K tokens), rate limit to avoid spam"
+    ],
+    code: `# .github/workflows/ai-code-review.yml
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  ai_review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Get PR diff
+        id: diff
+        run: |
+          git diff origin/main..HEAD > diff.txt
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          cat diff.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: AI Review
+        env:
+          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python << 'PYTHON_SCRIPT'
+import os
+import json
+from openai import OpenAI
+from github import Github
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+gh = Github(os.environ["GITHUB_TOKEN"])
+
+# Get PR diff
+diff = os.environ["DIFF"]
+
+# Analyze with AI
+response = client.chat.completions.create(
+    model="gpt-4",  # or deepseek/deepseek-coder for 200x cost savings
+    messages=[{
+        "role": "system",
+        "content": """You are an expert code reviewer. Analyze the diff and provide:
+1. Potential bugs or logic errors
+2. Security vulnerabilities
+3. Performance improvements
+4. Best practice violations
+
+Format as JSON: {"comments": [{"file": "...", "line": 10, "body": "..."}]}"""
+    }, {
+        "role": "user",
+        "content": f"Review this PR diff:\\n{diff}"
+    }],
+    response_format={"type": "json_object"}
+)
+
+review = json.loads(response.choices[0].message.content)
+
+# Post comments to PR
+repo = gh.get_repo(os.environ["GITHUB_REPOSITORY"])
+pr = repo.get_pull(int(os.environ["PR_NUMBER"]))
+
+for comment in review["comments"]:
+    pr.create_review_comment(
+        body=f"🤖 AI Code Review:\\n{comment['body']}",
+        path=comment["file"],
+        line=comment["line"]
+    )
+PYTHON_SCRIPT`
+  },
+  {
+    id: "model-evaluation",
+    title: "Model Evaluation & Benchmarking",
+    subtitle: "Using Inspect for Systematic Testing",
+    bullets: [
+      "Why evaluate: Models vary widely in quality/cost—GPT-4 excels at reasoning but DeepSeek-R1 matches it at 1/200th cost for math",
+      "Metrics: Accuracy (% correct), F1 score (precision + recall), perplexity (language modeling), BLEU (translation), human eval (quality)",
+      "Tools: Inspect AI (structured evals), LangSmith (tracing), PromptFoo (A/B testing), OpenAI Evals (benchmark suite)",
+      "Process: Define test dataset → Run inference on multiple models → Compare metrics → Analyze failure cases → Iterate prompts"
+    ],
+    code: `# Model Evaluation with Inspect AI
+from inspect_ai import Task, eval
+from inspect_ai.dataset import example_dataset
+from inspect_ai.scorer import model_graded_fact
+from inspect_ai.solver import generate, system_message
+
+# Define evaluation task
+@task
+def math_reasoning():
+    return Task(
+        dataset=example_dataset("math_qa"),
+        plan=[
+            system_message("You are a math expert. Solve step-by-step."),
+            generate()
+        ],
+        scorer=model_graded_fact(model="gpt-4")  # Use GPT-4 as judge
+    )
+
+# Run evaluation across multiple models
+results = eval(
+    [math_reasoning()],
+    model=["openai/gpt-4", "deepseek/deepseek-r1", "anthropic/claude-3-opus"],
+    limit=100  # Test on 100 examples
+)
+
+# Compare results
+for model, result in results.items():
+    print(f"{model}: Accuracy = {result.metrics['accuracy']:.2%}")
+    print(f"  Avg cost per question: \\${result.metrics['total_cost']/100:.4f}")
+
+# Output:
+# openai/gpt-4: Accuracy = 87.5%, Cost = $0.0420/question
+# deepseek/deepseek-r1: Accuracy = 86.2%, Cost = $0.0002/question  ← 200x cheaper!
+# anthropic/claude-3-opus: Accuracy = 89.1%, Cost = $0.0375/question
+
+# Advanced: A/B testing with PromptFoo
+# npx promptfoo@latest eval -c promptfooconfig.yaml
+
+# promptfooconfig.yaml
+prompts:
+  - "Solve this math problem: {{problem}}"
+  - "Think step-by-step and solve: {{problem}}"
+  
+providers:
+  - openai:gpt-4
+  - openrouter:deepseek/deepseek-chat
+  
+tests:
+  - vars:
+      problem: "If x^2 = 16, what is x?"
+    assert:
+      - type: contains
+        value: "x = 4 or x = -4"`
+  },
+  {
+    id: "hub-api-provider",
+    title: "Hub API & Provider Registration",
+    subtitle: "Becoming an Inference Provider",
+    bullets: [
+      "Hub API: Central registry for discovering models and inference providers—used by OpenRouter, HuggingFace, Replicate",
+      "Registration process: (1) Create API endpoint with /v1/chat/completions → (2) Implement health checks → (3) Submit to hub registry → (4) Pass latency/uptime tests → (5) Get listed",
+      "Requirements: 99.9% uptime SLA, <2s p95 latency, OpenAI-compatible API, usage-based billing integration, DDoS protection",
+      "Benefits: Exposure to developers, automatic routing from aggregators, pay-per-use revenue, multi-model support"
+    ],
+    code: `# Minimal Inference Provider API (Flask + HuggingFace)
+from flask import Flask, request, jsonify
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+app = Flask(__name__)
+
+# Load model at startup
+model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-chat-7b")
+tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-chat-7b")
+model.to("cuda" if torch.cuda.is_available() else "cpu")
+
+@app.route("/v1/chat/completions", methods=["POST"])
+def chat_completions():
+    """OpenAI-compatible endpoint"""
+    data = request.json
+    messages = data["messages"]
+    
+    # Format prompt
+    prompt = tokenizer.apply_chat_template(messages, tokenize=False)
+    
+    # Generate
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    outputs = model.generate(
+        **inputs,
+        max_new_tokens=data.get("max_tokens", 512),
+        temperature=data.get("temperature", 0.7)
+    )
+    
+    response_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    
+    # Return OpenAI-format response
+    return jsonify({
+        "id": "chatcmpl-123",
+        "object": "chat.completion",
+        "model": "deepseek-chat-7b",
+        "choices": [{
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": response_text
+            },
+            "finish_reason": "stop"
+        }],
+        "usage": {
+            "prompt_tokens": len(inputs.input_ids[0]),
+            "completion_tokens": len(outputs[0]) - len(inputs.input_ids[0]),
+            "total_tokens": len(outputs[0])
+        }
+    })
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "healthy", "model": "deepseek-chat-7b"})
+
+# Register with hub
+# POST https://api.openrouter.ai/api/v1/providers/register
+# {
+#   "name": "My Inference Provider",
+#   "base_url": "https://my-api.com",
+#   "models": ["deepseek-chat-7b"],
+#   "pricing": {"input": 0.0001, "output": 0.0002}
+# }`
+  },
+  {
+    id: "resources-extended",
+    title: "Extended Resources & Documentation",
+    subtitle: "Essential Repositories & Learning Paths",
+    bullets: [
+      "Transformers.js (huggingface/transformers.js): Browser-based ML—run BERT, GPT-2, Whisper without backend (npm install @xenova/transformers)",
+      "LiteLLM (BerriAI/litellm): Python abstraction for 100+ LLMs—unified interface for OpenAI, Anthropic, DeepSeek, etc.",
+      "OpenRouter SDK (OpenRouterTeam/typescript-sdk): Official TypeScript SDK with streaming, retries, Vercel AI integration",
+      "Inspect AI (UKGovernmentBEIS/inspect_ai): Model evaluation framework for systematic benchmarking",
+      "Venice API (veniceai/api-docs): Privacy-focused inference with local deployment options"
+    ],
+    code: `# Quick start: huggingface/transformers.js
+# Clone and explore
+git clone https://github.com/huggingface/transformers.js.git
+cd transformers.js/examples
+
+# Install
+npm install @xenova/transformers
+
+# Browser-based sentiment analysis (no backend!)
+import { pipeline } from '@xenova/transformers';
+
+const classifier = await pipeline('sentiment-analysis');
+const result = await classifier('I love transformers.js!');
+console.log(result);
+// [{ label: 'POSITIVE', score: 0.9998 }]
+
+# Text generation in browser
+const generator = await pipeline('text-generation', 'Xenova/gpt2');
+const output = await generator('The future of AI is', {
+  max_new_tokens: 50
+});
+
+# Image classification
+const imageClassifier = await pipeline('image-classification');
+const predictions = await imageClassifier('https://example.com/cat.jpg');
+// [{ label: 'tabby cat', score: 0.89 }, ...]
+
+# Learn more
+# - Documentation: https://huggingface.co/docs/transformers.js
+# - Models: https://huggingface.co/models?library=transformers.js
+# - Examples: https://github.com/huggingface/transformers.js/tree/main/examples`
+  },
+  {
     id: "summary",
     title: "Summary",
     subtitle: "The Future is Multimodal",
     bullets: [
-      "Leverage OpenRouter for model flexibility",
-      "Utilize DeepSeek for specialized reasoning tasks",
-      "Orchestrate with LiteLLM for stability",
-      "Build with privacy and performance first"
+      "Leverage OpenRouter for model flexibility and cost optimization across 100+ models",
+      "Utilize DeepSeek for specialized reasoning tasks at 1/200th the cost of GPT-4",
+      "Orchestrate with LiteLLM for stability, automatic retries, and multi-provider fallback",
+      "Build with privacy and performance first—use secure API proxies, implement caching, monitor costs",
+      "Explore transformers.js for browser-based ML and hub integration for seamless model discovery"
     ],
     content: "Thank You"
   }
