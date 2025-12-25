@@ -7,4 +7,5 @@ export interface SlideData {
   content?: ReactNode;
   code?: string;
   bullets?: string[];
+  interactive?: boolean;
 }

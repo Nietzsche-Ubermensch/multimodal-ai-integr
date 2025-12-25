@@ -2,6 +2,8 @@ import { SlideData } from "@/types/slides";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CodeBlock } from "@/components/CodeBlock";
+import { ApiTester } from "@/components/ApiTester";
+import { ApiDocumentation } from "@/components/ApiDocumentation";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -77,25 +79,34 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
         </div>
 
         <div className="grid grid-cols-2 gap-6 flex-1">
-          {slide.bullets?.map((bullet, idx) => (
-            <Card
-              key={idx}
-              className="p-6 bg-card/50 border-l-4 border-accent hover:bg-card transition-all cursor-pointer group"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-accent rounded-lg flex items-center justify-center shrink-0">
-                  <span className="text-2xl font-bold text-accent-foreground font-mono">
-                    {String(idx + 1).padStart(2, "0")}
-                  </span>
+          {slide.bullets?.map((bullet, idx) => {
+            const isInteractive = bullet.includes("(Interactive)");
+            return (
+              <Card
+                key={idx}
+                className="p-6 bg-card/50 border-l-4 border-accent hover:bg-card transition-all cursor-pointer group"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-accent rounded-lg flex items-center justify-center shrink-0">
+                    <span className="text-2xl font-bold text-accent-foreground font-mono">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold group-hover:text-accent transition-colors">
+                      {bullet}
+                    </h3>
+                    {isInteractive && (
+                      <Badge variant="secondary" className="mt-2 gap-1">
+                        <Lightning size={12} weight="fill" />
+                        Interactive Demo
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold group-hover:text-accent transition-colors">
-                    {bullet}
-                  </h3>
-                </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       </div>
     );
@@ -159,29 +170,55 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
       </div>
 
       <div className="flex-1 space-y-6 overflow-auto">
-        {slide.bullets && (
-          <Card className="p-6 bg-card/50 border-l-4 border-accent">
-            <div className="space-y-4">
-              {slide.bullets.map((bullet, idx) => (
-                <div key={idx} className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center shrink-0 mt-1">
-                    <div className="w-2 h-2 bg-accent rounded-full" />
-                  </div>
-                  <p className="text-lg text-foreground/90 leading-relaxed flex-1">
-                    {bullet}
-                  </p>
+        {slide.interactive ? (
+          <>
+            {slide.bullets && (
+              <Card className="p-6 bg-card/50 border-l-4 border-accent">
+                <div className="space-y-4">
+                  {slide.bullets.map((bullet, idx) => (
+                    <div key={idx} className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center shrink-0 mt-1">
+                        <div className="w-2 h-2 bg-accent rounded-full" />
+                      </div>
+                      <p className="text-lg text-foreground/90 leading-relaxed flex-1">
+                        {bullet}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </Card>
+            )}
+            <div className="flex-1 min-h-[500px]">
+              {slide.id === "endpoints" ? <ApiTester /> : <ApiDocumentation />}
             </div>
-          </Card>
-        )}
+          </>
+        ) : (
+          <>
+            {slide.bullets && (
+              <Card className="p-6 bg-card/50 border-l-4 border-accent">
+                <div className="space-y-4">
+                  {slide.bullets.map((bullet, idx) => (
+                    <div key={idx} className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center shrink-0 mt-1">
+                        <div className="w-2 h-2 bg-accent rounded-full" />
+                      </div>
+                      <p className="text-lg text-foreground/90 leading-relaxed flex-1">
+                        {bullet}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
 
-        {slide.code && (
-          <CodeBlock 
-            code={slide.code} 
-            language={slide.code.startsWith('#') || slide.code.includes('import os') ? 'python' : 'typescript'}
-            title={`${slide.title} Example`}
-          />
+            {slide.code && (
+              <CodeBlock 
+                code={slide.code} 
+                language={slide.code.startsWith('#') || slide.code.includes('import os') ? 'python' : 'typescript'}
+                title={`${slide.title} Example`}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

@@ -17,7 +17,8 @@ export const slides: SlideData[] = [
     bullets: [
       "DeepSeek Platform Capabilities",
       "OpenRouter Integration Layer",
-      "Model Endpoint Specifications",
+      "Live API Testing (Interactive)",
+      "API Reference Documentation (Interactive)",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
       "Resources & Repositories"
@@ -65,29 +66,27 @@ const openRouterConfig = {
   },
   {
     id: "endpoints",
-    title: "Model Endpoints",
-    subtitle: "Internal API Architecture",
+    title: "Live API Testing",
+    subtitle: "Interactive Request/Response Examples",
+    interactive: true,
     bullets: [
-      "GET /api/config - Discovery endpoint for available providers and active keys",
+      "Try live API requests with different providers",
       "POST /api/chat - Secure server-side proxy for OpenAI-compatible inference",
-      "GET /api/health - Service health and latency monitoring",
+      "Simulated responses show expected format",
       "Supports: DeepSeek, OpenRouter, xAI, NVIDIA NIM"
-    ],
-    code: `// POST /api/chat Request
-{
-  "provider": "deepseek", // or "openrouter", "xai", "nvidia"
-  "model": "deepseek-chat",
-  "messages": [
-    { "role": "user", "content": "Explain quantum entanglement" }
-  ],
-  "temperature": 0.7
-}
-
-// Response (Standard OpenAI Format)
-{
-  "id": "chatcmpl-123...",
-  "choices": [{ "message": { "content": "..." } }]
-}`
+    ]
+  },
+  {
+    id: "api-reference",
+    title: "API Reference",
+    subtitle: "Complete Endpoint Documentation",
+    interactive: true,
+    bullets: [
+      "Copy-ready cURL examples for each endpoint",
+      "Standard OpenAI-compatible response formats",
+      "Authentication and error handling patterns",
+      "Health monitoring and configuration endpoints"
+    ]
   },
   {
     id: "python-integration",

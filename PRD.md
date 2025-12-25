@@ -49,11 +49,18 @@ This is a comprehensive technical reference platform with a data-driven architec
 - **Success criteria**: Accurate syntax highlighting, working code examples, multi-language support
 
 ### API Specifications Reference
-- **Functionality**: Detailed parameter definitions, response schemas, and authentication methods
-- **Purpose**: Technical reference for API implementation
-- **Trigger**: Navigate to API specs section
-- **Progression**: Select endpoint → View parameters → Review response format → Test integration
-- **Success criteria**: Complete parameter documentation, type definitions, example payloads
+- **Functionality**: Detailed parameter definitions, response schemas, and authentication methods with interactive testing
+- **Purpose**: Technical reference for API implementation with live request/response examples
+- **Trigger**: Navigate to API specs section or interactive testing slides
+- **Progression**: Select endpoint → View parameters → Review response format → Test with live examples → Copy cURL commands
+- **Success criteria**: Complete parameter documentation, type definitions, example payloads, interactive request editor
+
+### Interactive API Testing
+- **Functionality**: Live API request/response testing with multiple provider examples and real-time formatting
+- **Purpose**: Allow developers to experiment with API payloads and see expected responses
+- **Trigger**: Navigate to Live API Testing or API Reference slides
+- **Progression**: Select provider → Edit request JSON → Send request → View formatted response → Copy examples
+- **Success criteria**: Editable request fields, simulated responses, accurate latency simulation, copy functionality
 
 ## Edge Case Handling
 
@@ -110,22 +117,27 @@ Animations should enhance the technical presentation experience with subtle, pur
 - **Components**: 
   - `Card` for slide containers with custom dark styling and border accents
   - `Button` for navigation controls with icon support (phosphor-icons)
-  - `Tabs` for switching between code examples in different languages
+  - `Tabs` for switching between code examples and cURL/response views
   - `Badge` for model types, API versions, and feature tags
   - `Dialog` for expanded code views and detailed specifications
   - `Separator` for section divisions within slides
   - `ScrollArea` for long code blocks and content overflow
+  - `Textarea` for editable API request payloads in interactive testing
+  - `Select` for choosing between API provider examples
 
 - **Customizations**: 
   - Custom syntax highlighter component for code blocks (not using external libraries)
   - Full-screen slide container with fixed aspect ratio for presentation mode
   - Progress indicator showing current slide position
   - Custom keyboard shortcut handler for presentation navigation
+  - Interactive API testing component with live request/response simulation
+  - Copy-to-clipboard functionality with visual feedback throughout
 
 - **States**: 
   - Buttons: Default (semi-transparent), Hover (accent glow), Active (pressed state), Disabled (low opacity)
   - Code Blocks: Default (dark bg), Hover (border highlight), Copied (success flash)
   - Slides: Active (visible), Previous/Next (pre-loaded), Inactive (unmounted)
+  - Interactive Elements: Editing (focused textarea), Loading (processing request), Success (response received)
 
 - **Icon Selection**: 
   - `ArrowLeft/ArrowRight` for slide navigation
@@ -134,6 +146,8 @@ Animations should enhance the technical presentation experience with subtle, pur
   - `GitBranch` for repository references
   - `Rocket` for deployment examples
   - `Brain/Cpu` for AI model indicators
+  - `Play/Lightning` for interactive API testing triggers
+  - `List` for slide menu navigation
 
 - **Spacing**: Consistent 8px base unit - cards (24px padding), sections (32px gap), slides (40px margins)
 
