@@ -7,12 +7,60 @@ A comprehensive technical presentation platform for exploring multimodal AI inte
 - **Platform Overview**: In-depth coverage of DeepSeek and OpenRouter capabilities
 - **Model Catalog**: 13+ AI models with detailed specifications
 - **Live API Testing**: Interactive request/response testing for 10+ providers
+- **OpenRouter SDK Integration**: Live testing of the official TypeScript SDK
 - **API Documentation**: Complete endpoint reference with cURL and Python examples
 - **Environment Setup**: Platform-specific configuration guides (Vercel, Replit, Docker, AWS, Local)
 - **Python Integration**: LiteLLM patterns with error handling and retries
-- **GitHub Integration**: 7 production-ready repositories with quick-start code
+- **GitHub Integration**: 7 production-ready repositories with quick-start code and live SDK testing
 - **Deployment Guides**: Step-by-step instructions for 4 platforms
 - **Best Practices**: Security, performance, and scalability patterns
+
+## ⭐ Featured: OpenRouter TypeScript SDK
+
+This platform now includes **live integration testing** for the official OpenRouter TypeScript SDK!
+
+### Quick Start with the SDK
+
+```bash
+# Install the SDK
+npm install @openrouter/ai-sdk-provider ai openai
+```
+
+```typescript
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { generateText, streamText } from 'ai';
+
+// Initialize OpenRouter client
+const openrouter = createOpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY
+});
+
+// Generate text
+const { text } = await generateText({
+  model: openrouter('anthropic/claude-3-5-sonnet'),
+  messages: [{ role: 'user', content: 'Explain quantum entanglement' }]
+});
+
+// Stream responses
+const { textStream } = await streamText({
+  model: openrouter('deepseek/deepseek-chat-v3'),
+  messages: [{ role: 'user', content: 'Write a story' }]
+});
+
+for await (const chunk of textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Test the SDK Live
+
+Navigate to the "GitHub Repository Integration" slide in the presentation to:
+- Test the OpenRouter TypeScript SDK with your API key
+- View live response times and outputs
+- Copy installation commands
+- Access complete deployment guides
+
+Repository: `gh repo clone OpenRouterTeam/typescript-sdk`
 
 ## 📋 Quick Start
 

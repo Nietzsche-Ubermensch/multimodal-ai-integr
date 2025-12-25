@@ -293,13 +293,14 @@ response = completion(
     title: "Resources & Links",
     subtitle: "Core Infrastructure Repositories",
     bullets: [
-      "BerriAI/litellm - Python LLM abstraction",
-      "veniceai/api-docs - Privacy-focused inference",
-      "xai-org/xai-cookbook - Advanced usage patterns",
-      "OpenRouterTeam/ai-sdk-provider - Vercel AI SDK provider",
-      "huggingface/dataset-viewer - Data inspection tools",
+      "OpenRouterTeam/typescript-sdk - Official TypeScript SDK with Vercel AI integration (Featured)",
+      "BerriAI/litellm - Python LLM abstraction for 100+ models",
+      "veniceai/api-docs - Privacy-focused inference API",
+      "xai-org/xai-cookbook - Advanced Grok usage patterns",
+      "OpenRouterTeam/ai-sdk-provider - Legacy AI SDK provider (use typescript-sdk)",
+      "huggingface/dataset-viewer - Dataset inspection tools",
       "deepseek-ai/DeepSeek-Math-V2 - Math reasoning models",
-      "deepseek-ai/3FS - High-performance storage"
+      "deepseek-ai/3FS - High-performance storage for AI training"
     ]
   },
   {

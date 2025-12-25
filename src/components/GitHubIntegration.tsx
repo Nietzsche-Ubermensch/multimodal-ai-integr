@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   GithubLogo, 
   GitBranch, 
@@ -10,8 +13,16 @@ import {
   ArrowSquareOut,
   Code,
   FileCode,
-  BookOpen
+  BookOpen,
+  Play,
+  Sparkle,
+  ArrowsClockwise,
+  Copy,
+  Check
 } from "@phosphor-icons/react";
+import { testOpenRouterSDK } from "@/lib/openrouter-sdk";
+import { useKV } from "@github/spark/hooks";
+import { toast } from "sonner";
 
 interface Repository {
   name: string;
@@ -25,6 +36,34 @@ interface Repository {
 }
 
 const repositories: Repository[] = [
+  {
+    name: "typescript-sdk",
+    owner: "OpenRouterTeam",
+    description: "Official OpenRouter TypeScript SDK with Vercel AI integration - stream responses from 100+ LLMs",
+    stars: "2.8k",
+    category: "⭐ Featured",
+    url: "https://github.com/OpenRouterTeam/typescript-sdk",
+    highlights: [
+      "Official TypeScript SDK with full type safety",
+      "Vercel AI SDK integration for streaming",
+      "Drop-in replacement for OpenAI SDK",
+      "Support for all OpenRouter models (GPT-4, Claude, DeepSeek, Grok, etc.)"
+    ],
+    quickStart: `npm install @openrouter/ai-sdk-provider ai openai
+
+// Next.js App Router example
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { streamText } from 'ai';
+
+const openrouter = createOpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY
+});
+
+const { textStream } = await streamText({
+  model: openrouter('anthropic/claude-3-5-sonnet'),
+  messages: [{ role: 'user', content: 'Hello!' }]
+});`
+  },
   {
     name: "litellm",
     owner: "BerriAI",
@@ -200,9 +239,132 @@ for sample in dataset.take(5):
 
 export function GitHubIntegration() {
   const categories = Array.from(new Set(repositories.map(r => r.category)));
+  const [testingSDK, setTestingSDK] = useState(false);
+  const [sdkTestResult, setSDKTestResult] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useKV<string>("openrouter-sdk-test-key", "");
+  const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
+  const [showSDKTest, setShowSDKTest] = useState(false);
+
+  const handleTestSDK = async () => {
+    if (!apiKey || !apiKey.startsWith("sk-or-")) {
+      toast.error("Please enter a valid OpenRouter API key (starts with sk-or-)");
+      return;
+    }
+
+    setTestingSDK(true);
+    setSDKTestResult(null);
+
+    try {
+      const result = await testOpenRouterSDK(apiKey);
+      
+      if (result.success) {
+        setSDKTestResult(`✓ SDK Test Successful!\n\nResponse: ${result.response}\nLatency: ${result.latency}ms`);
+        toast.success("OpenRouter TypeScript SDK working correctly!");
+      } else {
+        setSDKTestResult(`✗ SDK Test Failed\n\nError: ${result.error}\nLatency: ${result.latency}ms`);
+        toast.error("SDK test failed - check your API key");
+      }
+    } catch (error) {
+      setSDKTestResult(`✗ SDK Test Error\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error("Failed to test SDK");
+    } finally {
+      setTestingSDK(false);
+    }
+  };
+
+  const handleCopyCommand = (cmd: string, id: string) => {
+    navigator.clipboard.writeText(cmd);
+    setCopiedCmd(id);
+    toast.success("Copied to clipboard");
+    setTimeout(() => setCopiedCmd(null), 2000);
+  };
 
   return (
     <div className="space-y-6">
+      <Alert className="border-accent bg-accent/10">
+        <Sparkle className="h-5 w-5 text-accent" />
+        <AlertDescription className="ml-2 flex items-center justify-between">
+          <span>
+            <strong>Featured:</strong> Test the OpenRouter TypeScript SDK live with your API key!
+          </span>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setShowSDKTest(!showSDKTest)}
+            className="gap-2 ml-4"
+          >
+            <Play size={14} weight="fill" />
+            {showSDKTest ? "Hide" : "Show"} SDK Test
+          </Button>
+        </AlertDescription>
+      </Alert>
+
+      {showSDKTest && (
+        <Card className="p-6 border-accent bg-accent/5">
+          <div className="flex items-center gap-3 mb-4">
+            <Sparkle size={24} weight="fill" className="text-accent" />
+            <h3 className="text-xl font-bold">OpenRouter TypeScript SDK - Live Test</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <Alert>
+              <AlertDescription>
+                Test the official OpenRouter TypeScript SDK with a real API call. Your API key is stored locally in your browser and never sent to our servers.
+              </AlertDescription>
+            </Alert>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">OpenRouter API Key</label>
+              <Input
+                type="password"
+                placeholder="sk-or-v1-..."
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Get your key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">openrouter.ai/keys</a>
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={handleTestSDK}
+                disabled={!apiKey || testingSDK}
+                className="gap-2"
+              >
+                {testingSDK ? (
+                  <>
+                    <ArrowsClockwise size={16} className="animate-spin" />
+                    Testing SDK...
+                  </>
+                ) : (
+                  <>
+                    <Play size={16} weight="fill" />
+                    Test SDK Integration
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => handleCopyCommand("npm install @openrouter/ai-sdk-provider ai openai", "install")}
+                className="gap-2"
+              >
+                {copiedCmd === "install" ? <Check size={16} /> : <Copy size={16} />}
+                Copy Install Command
+              </Button>
+            </div>
+
+            {sdkTestResult && (
+              <Card className="p-4 bg-muted border-accent">
+                <pre className="text-sm whitespace-pre-wrap font-mono">{sdkTestResult}</pre>
+              </Card>
+            )}
+          </div>
+        </Card>
+      )}
+
       {categories.map(category => (
         <div key={category}>
           <div className="flex items-center gap-3 mb-4">
