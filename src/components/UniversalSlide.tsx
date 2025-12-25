@@ -14,6 +14,7 @@ import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
 import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
 import { XAISDKDemo } from "@/components/XAISDKDemo";
 import { LiteLLMIntegrationDemo } from "@/components/LiteLLMIntegrationDemo";
+import { RealApiTester } from "@/components/RealApiTester";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -223,6 +224,8 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <XAISDKDemo />
               ) : slide.id === "litellm-integration" ? (
                 <LiteLLMIntegrationDemo />
+              ) : slide.id === "real-api-testing" ? (
+                <RealApiTester />
               ) : null}
             </div>
           </>

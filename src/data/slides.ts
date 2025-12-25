@@ -25,7 +25,8 @@ export const slides: SlideData[] = [
       "Embedding Generation (Interactive)",
       "API Reference Documentation (Interactive)",
       "Environment Variable Setup (Interactive)",
-      "LiteLLM Backend Integration (Interactive) ⭐ NEW",
+      "LiteLLM Backend Integration (Interactive)",
+      "Real API Testing - LiteLLM Backend (Interactive) ⭐ NEW",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
       "GitHub Repository Integration (Interactive)",
@@ -267,6 +268,20 @@ query_embedding = get_embeddings("What is quantum computing?")
       "Architecture: Request router → LiteLLM core → Caching layer (Redis) → Provider selection (OpenRouter, DeepSeek, xAI)",
       "OpenRouter Integration: Single API gateway for multi-model access with transparent pricing and intelligent routing",
       "Production Features: Automatic retries, latency-based routing, Redis caching (80%+ hit rate), health monitoring, rate limiting"
+    ]
+  },
+  {
+    id: "real-api-testing",
+    title: "Real API Testing - LiteLLM Backend",
+    subtitle: "Live Integration with Perplexity, OpenRouter, NVIDIA NIM & HuggingFace",
+    interactive: true,
+    bullets: [
+      "Perplexity AI (pplx-api): Real-time web search models (sonar-pro, sonar-reasoning) with citation support and reasoning effort control",
+      "OpenRouter: Unified gateway to Meta Llama 2 70B, Anthropic Claude 2, and 100+ other models with transparent pricing",
+      "NVIDIA NIM: Enterprise-grade inference for Llama 3 70B and Nemotron 4 340B with optimized GPU performance",
+      "HuggingFace: 500K+ models including CodeBERT embeddings and BGE reranker for semantic search applications",
+      "Interactive Testing: Real/simulated API toggle, live latency metrics, token counting, Python/cURL/JavaScript code examples",
+      "Security: Backend proxy pattern prevents API key exposure, environment variable management, rate limiting implementation"
     ]
   },
   {
