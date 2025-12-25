@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Check, Key, ShieldCheck, Terminal } from "@phosphor-icons/react";
+import { Copy, Check, Key, ShieldCheck, Terminal, Lightning } from "@phosphor-icons/react";
 import { CodeBlock } from "@/components/CodeBlock";
+import { ApiKeyValidator } from "@/components/ApiKeyValidator";
 import { toast } from "sonner";
 
 interface EnvVariable {
@@ -203,6 +204,7 @@ load_dotenv()
 export function EnvSetup() {
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
   const [selectedPlatform, setSelectedPlatform] = useState<keyof typeof platformConfigs>("vercel");
+  const [activeTab, setActiveTab] = useState("validator");
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -222,7 +224,41 @@ export function EnvSetup() {
   const platform = platformConfigs[selectedPlatform];
 
   return (
-    <div className="space-y-6">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <TabsList className="grid grid-cols-3">
+        <TabsTrigger value="validator" className="gap-2">
+          <Lightning size={16} weight="fill" />
+          <span className="hidden sm:inline">Interactive Validator</span>
+          <span className="sm:hidden">Validator</span>
+        </TabsTrigger>
+        <TabsTrigger value="reference" className="gap-2">
+          <Key size={16} weight="duotone" />
+          <span className="hidden sm:inline">Key Reference</span>
+          <span className="sm:hidden">Reference</span>
+        </TabsTrigger>
+        <TabsTrigger value="platforms" className="gap-2">
+          <Terminal size={16} weight="duotone" />
+          <span className="hidden sm:inline">Platform Setup</span>
+          <span className="sm:hidden">Platforms</span>
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="validator" className="space-y-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-accent/10 rounded-lg">
+            <Lightning size={24} className="text-accent" weight="duotone" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold">Interactive API Key Validation</h3>
+            <p className="text-sm text-muted-foreground">
+              Test your API keys with real-time validation and connection testing
+            </p>
+          </div>
+        </div>
+        <ApiKeyValidator />
+      </TabsContent>
+
+      <TabsContent value="reference" className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6 bg-card/50 border-border">
           <div className="flex items-center gap-3 mb-4">
@@ -372,7 +408,9 @@ curl -X GET https://your-api.com/api/config \\
           </div>
         </Card>
       </div>
+      </TabsContent>
 
+      <TabsContent value="platforms" className="space-y-6">
       <Card className="p-6 bg-card/50 border-border">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-accent/10 rounded-lg">
@@ -456,6 +494,7 @@ curl -X GET https://your-api.com/api/config \\
           ))}
         </Tabs>
       </Card>
-    </div>
+      </TabsContent>
+    </Tabs>
   );
 }
