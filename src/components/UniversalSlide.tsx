@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ApiTester } from "@/components/ApiTester";
 import { ApiDocumentation } from "@/components/ApiDocumentation";
+import { GitHubIntegration } from "@/components/GitHubIntegration";
+import { DeploymentGuide } from "@/components/DeploymentGuide";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -189,7 +191,15 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
               </Card>
             )}
             <div className="flex-1 min-h-[500px]">
-              {slide.id === "endpoints" ? <ApiTester /> : <ApiDocumentation />}
+              {slide.id === "endpoints" ? (
+                <ApiTester />
+              ) : slide.id === "api-reference" ? (
+                <ApiDocumentation />
+              ) : slide.id === "github-integration" ? (
+                <GitHubIntegration />
+              ) : slide.id === "deployment-guides" ? (
+                <DeploymentGuide />
+              ) : null}
             </div>
           </>
         ) : (

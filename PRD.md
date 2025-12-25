@@ -62,6 +62,20 @@ This is a production-ready technical reference platform providing exhaustive doc
 - **Progression**: Review security patterns → Implement caching strategies → Configure monitoring → Design failover chains
 - **Success criteria**: Clear recommendations for proxy patterns, Redis caching, async processing, metrics tracking, and multi-model fallback
 
+### GitHub Repository Integration (7 Repositories)
+- **Functionality**: Interactive repository catalog featuring BerriAI/litellm, OpenRouterTeam/ai-sdk-provider, deepseek-ai/DeepSeek-Math-V2, xai-org/xai-cookbook, veniceai/api-docs, deepseek-ai/3FS, and huggingface/dataset-viewer with quick-start code, star counts, and key features
+- **Purpose**: Provide direct access to production-ready repositories with actionable integration examples
+- **Trigger**: Navigate to GitHub Integration slide
+- **Progression**: Browse repositories by category → View key features and highlights → Copy quick-start code → Click through to GitHub
+- **Success criteria**: All 7 repositories displayed with accurate descriptions, working quick-start code snippets, live GitHub links, and organized by category (Orchestration, Integration, Models, Documentation, Privacy, Infrastructure, Tools)
+
+### Deployment Guides (4 Platforms)
+- **Functionality**: Step-by-step deployment instructions for Vercel (serverless with automatic scaling), Replit (instant dev environment with secrets), Docker (containerized with Redis), and AWS Lambda (serverless architecture)
+- **Purpose**: Enable immediate production deployment with platform-specific configurations
+- **Trigger**: Navigate to Deployment Guides slide
+- **Progression**: Select deployment platform → Follow numbered steps → Copy configuration files → Deploy to production
+- **Success criteria**: Complete guides for each platform including CLI commands, environment variable setup, configuration files (vercel.json, Dockerfile, docker-compose.yml, serverless.yml), and deployment commands
+
 ## Edge Case Handling
 
 - **Keyboard Navigation Conflicts**: Prevent default browser shortcuts during presentation mode

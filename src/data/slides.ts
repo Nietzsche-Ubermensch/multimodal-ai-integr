@@ -22,6 +22,8 @@ export const slides: SlideData[] = [
       "API Reference Documentation (Interactive)",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
+      "GitHub Repository Integration (Interactive)",
+      "Deployment Guides (Interactive)",
       "Resources & Repositories"
     ]
   },
@@ -221,6 +223,30 @@ response = completion(
       "Monitoring: Track latency, token usage, error rates per model/provider with DataDog or Prometheus",
       "Cost Optimization: Route requests to free-tier models (xiaomi/mimo-v2-flash:free) when appropriate",
       "Failover Strategy: Primary → Secondary → Tertiary model fallback chain for 99.9% uptime"
+    ]
+  },
+  {
+    id: "github-integration",
+    title: "GitHub Repository Integration",
+    subtitle: "Production-Ready Code Examples & Templates",
+    interactive: true,
+    bullets: [
+      "7 essential repositories with live examples",
+      "Copy-ready quick start code for each integration",
+      "Star counts and community activity metrics",
+      "Organized by category: Orchestration, Integration, Models, Tools"
+    ]
+  },
+  {
+    id: "deployment-guides",
+    title: "Deployment Guides",
+    subtitle: "Deploy to Production in Minutes",
+    interactive: true,
+    bullets: [
+      "Vercel: Serverless deployment with automatic scaling",
+      "Replit: Instant development environment with secrets management",
+      "Docker: Containerized deployment with Redis caching",
+      "AWS Lambda: Serverless architecture with minimal cold starts"
     ]
   },
   {

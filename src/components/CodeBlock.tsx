@@ -38,6 +38,63 @@ export function CodeBlock({ code, language = "typescript", title }: CodeBlockPro
       return highlighted;
     }
     
+    if (lang === 'bash' || lang === 'shell') {
+      const keywords = /\b(export|echo|cd|ls|mkdir|rm|cp|mv|cat|grep|sed|awk|npm|pip|python|node|docker|git)\b/g;
+      const strings = /(["'])(.*?)\1/g;
+      const comments = /(#.*$)/gm;
+      const variables = /(\$\{?[a-zA-Z_][a-zA-Z0-9_]*\}?)/g;
+      
+      let highlighted = code;
+      highlighted = highlighted.replace(comments, '<span class="text-[var(--code-comment)]">$1</span>');
+      highlighted = highlighted.replace(strings, '<span class="text-[var(--code-green)]">$1$2$1</span>');
+      highlighted = highlighted.replace(variables, '<span class="text-[var(--code-purple)]">$1</span>');
+      highlighted = highlighted.replace(keywords, '<span class="text-[var(--code-cyan)]">$1</span>');
+      
+      return highlighted;
+    }
+    
+    if (lang === 'docker' || lang === 'dockerfile') {
+      const keywords = /\b(FROM|RUN|CMD|LABEL|EXPOSE|ENV|ADD|COPY|ENTRYPOINT|VOLUME|USER|WORKDIR|ARG|ONBUILD|STOPSIGNAL|HEALTHCHECK|SHELL)\b/g;
+      const strings = /(["'])(.*?)\1/g;
+      const comments = /(#.*$)/gm;
+      
+      let highlighted = code;
+      highlighted = highlighted.replace(comments, '<span class="text-[var(--code-comment)]">$1</span>');
+      highlighted = highlighted.replace(strings, '<span class="text-[var(--code-green)]">$1$2$1</span>');
+      highlighted = highlighted.replace(keywords, '<span class="text-[var(--code-cyan)]">$1</span>');
+      
+      return highlighted;
+    }
+    
+    if (lang === 'yaml' || lang === 'yml') {
+      const keys = /^(\s*)([a-zA-Z_][a-zA-Z0-9_-]*)\s*:/gm;
+      const strings = /(["'])(.*?)\1/g;
+      const comments = /(#.*$)/gm;
+      const values = /:\s*([^"'\n#]+)/g;
+      
+      let highlighted = code;
+      highlighted = highlighted.replace(comments, '<span class="text-[var(--code-comment)]">$1</span>');
+      highlighted = highlighted.replace(strings, '<span class="text-[var(--code-green)]">$1$2$1</span>');
+      highlighted = highlighted.replace(keys, '$1<span class="text-[var(--code-cyan)]">$2</span>:');
+      
+      return highlighted;
+    }
+    
+    if (lang === 'json') {
+      const keys = /"([^"]+)"\s*:/g;
+      const strings = /:\s*"([^"]*)"/g;
+      const numbers = /:\s*(-?\d+\.?\d*)/g;
+      const booleans = /\b(true|false|null)\b/g;
+      
+      let highlighted = code;
+      highlighted = highlighted.replace(keys, '"<span class="text-[var(--code-cyan)]">$1</span>":');
+      highlighted = highlighted.replace(strings, ': "<span class="text-[var(--code-green)]">$1</span>"');
+      highlighted = highlighted.replace(numbers, ': <span class="text-[var(--code-orange)]">$1</span>');
+      highlighted = highlighted.replace(booleans, '<span class="text-[var(--code-purple)]">$1</span>');
+      
+      return highlighted;
+    }
+    
     const keywords = /\b(import|from|const|let|var|function|class|export|default|async|await|return|if|else|for|while|try|catch|new|this|typeof|interface|type)\b/g;
     const strings = /(["'`])(.*?)\1/g;
     const comments = /(\/\/.*$|\/\*[\s\S]*?\*\/)/gm;
