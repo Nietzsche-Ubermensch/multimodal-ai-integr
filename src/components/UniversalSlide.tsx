@@ -9,6 +9,7 @@ import { DeploymentGuide } from "@/components/DeploymentGuide";
 import { EnvSetup } from "@/components/EnvSetup";
 import { ApiKeyValidator } from "@/components/ApiKeyValidator";
 import { EmbeddingTester } from "@/components/EmbeddingTester";
+import { OpenRouterSDKDemo } from "@/components/OpenRouterSDKDemo";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -208,6 +209,8 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <ApiKeyValidator />
               ) : slide.id === "embedding-tester" ? (
                 <EmbeddingTester />
+              ) : slide.id === "openrouter-sdk" ? (
+                <OpenRouterSDKDemo />
               ) : null}
             </div>
           </>

@@ -16,6 +16,7 @@ export const slides: SlideData[] = [
     title: "Agenda",
     bullets: [
       "Platform Overview: DeepSeek & OpenRouter",
+      "OpenRouter TypeScript SDK Integration (Interactive)",
       "Model Endpoints Catalog (13+ Models)",
       "Embedding Models & Configuration",
       "API Key Validation (Interactive)",
@@ -82,6 +83,18 @@ const openRouterConfig = {
     "X-Title": "Multimodal Platform"
   }
 };`
+  },
+  {
+    id: "openrouter-sdk",
+    title: "OpenRouter TypeScript SDK Integration",
+    subtitle: "Clone, Install & Deploy the Official SDK",
+    interactive: true,
+    bullets: [
+      "Repository: github.com/OpenRouterTeam/typescript-sdk - Official TypeScript SDK with full type safety",
+      "Installation: npm install @openrouter/ai-sdk-provider ai - Seamless Vercel AI SDK integration",
+      "Features: Streaming responses, multi-model routing, error handling, automatic retries",
+      "Interactive Demo: Test the SDK with real API calls or simulated responses"
+    ]
   },
   {
     id: "model-endpoints-1",

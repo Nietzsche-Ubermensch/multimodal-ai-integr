@@ -17,13 +17,24 @@ A comprehensive technical presentation platform for exploring multimodal AI inte
 
 ## ⭐ Featured: OpenRouter TypeScript SDK
 
-This platform now includes **live integration testing** for the official OpenRouter TypeScript SDK!
+This platform now includes **full integration and live testing** of the official OpenRouter TypeScript SDK!
+
+### Clone the SDK Repository
+
+```bash
+# Clone the official OpenRouter TypeScript SDK
+git clone https://github.com/OpenRouterTeam/typescript-sdk.git
+cd typescript-sdk
+npm install
+npm run build
+npm test
+```
 
 ### Quick Start with the SDK
 
 ```bash
-# Install the SDK
-npm install @openrouter/ai-sdk-provider ai openai
+# Install the SDK in your project
+npm install @openrouter/ai-sdk-provider ai
 ```
 
 ```typescript
@@ -32,7 +43,11 @@ import { generateText, streamText } from 'ai';
 
 // Initialize OpenRouter client
 const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY
+  apiKey: process.env.OPENROUTER_API_KEY,
+  headers: {
+    'HTTP-Referer': 'https://your-site.com',
+    'X-Title': 'Your App Name'
+  }
 });
 
 // Generate text
@@ -52,15 +67,23 @@ for await (const chunk of textStream) {
 }
 ```
 
-### Test the SDK Live
+### Interactive SDK Demo
 
-Navigate to the "GitHub Repository Integration" slide in the presentation to:
-- Test the OpenRouter TypeScript SDK with your API key
-- View live response times and outputs
-- Copy installation commands
-- Access complete deployment guides
+Navigate to the **"OpenRouter TypeScript SDK Integration"** slide in the presentation to:
+- View complete repository cloning instructions
+- See step-by-step installation guide
+- Test the SDK with your API key (live testing)
+- Explore code examples for:
+  - Basic text generation
+  - Streaming responses
+  - Multi-provider routing
+  - Error handling patterns
+- Try the interactive demo with real or simulated API calls
+- Copy all code snippets with one click
 
-Repository: `gh repo clone OpenRouterTeam/typescript-sdk`
+**Slide Location**: Slide 7 - "OpenRouter TypeScript SDK Integration"
+
+📖 **Full Documentation**: See [OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md) for complete integration guide.
 
 ## 📋 Quick Start
 
@@ -127,6 +150,7 @@ See [ENV_SETUP.md](./ENV_SETUP.md) for complete security best practices.
 
 ## 📚 Documentation
 
+- **[OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md)** - Complete OpenRouter TypeScript SDK integration guide
 - **[ENV_SETUP.md](./ENV_SETUP.md)** - Comprehensive environment variable setup guide
 - **[PRD.md](./PRD.md)** - Product requirements and design specifications
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture documentation
@@ -156,18 +180,26 @@ See [ENV_SETUP.md](./ENV_SETUP.md) for complete security best practices.
 ├── src/
 │   ├── components/
 │   │   ├── ApiDocumentation.tsx    # API reference component
+│   │   ├── ApiKeyValidator.tsx     # API key validation
 │   │   ├── ApiTester.tsx           # Live API testing
 │   │   ├── CodeBlock.tsx           # Syntax-highlighted code
 │   │   ├── DeploymentGuide.tsx     # Platform deployment guides
+│   │   ├── EmbeddingTester.tsx     # Embedding generation testing
 │   │   ├── EnvSetup.tsx            # Environment variable setup
 │   │   ├── GitHubIntegration.tsx   # Repository examples
+│   │   ├── OpenRouterSDKDemo.tsx   # OpenRouter SDK integration demo
 │   │   └── UniversalSlide.tsx      # Main slide renderer
 │   ├── data/
 │   │   └── slides.ts               # Slide content and configuration
+│   ├── lib/
+│   │   ├── api-service.ts          # API integration utilities
+│   │   ├── openrouter-sdk.ts       # OpenRouter SDK wrapper
+│   │   └── utils.ts                # Utility functions
 │   ├── types/
 │   │   └── slides.ts               # TypeScript type definitions
 │   ├── App.tsx                     # Main application component
 │   └── index.css                   # Global styles and theme
+├── OPENROUTER_SDK_INTEGRATION.md   # OpenRouter SDK integration guide
 ├── ENV_SETUP.md                    # Environment setup guide
 ├── PRD.md                          # Product requirements
 └── package.json                    # Dependencies
