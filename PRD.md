@@ -49,18 +49,18 @@ This is a comprehensive technical reference platform with a data-driven architec
 - **Success criteria**: Accurate syntax highlighting, working code examples, multi-language support
 
 ### API Specifications Reference
-- **Functionality**: Detailed parameter definitions, response schemas, and authentication methods with interactive testing
-- **Purpose**: Technical reference for API implementation with live request/response examples
+- **Functionality**: Detailed parameter definitions, response schemas, error examples, and authentication methods with interactive testing across multiple languages
+- **Purpose**: Technical reference for API implementation with live request/response examples in cURL and Python
 - **Trigger**: Navigate to API specs section or interactive testing slides
-- **Progression**: Select endpoint → View parameters → Review response format → Test with live examples → Copy cURL commands
-- **Success criteria**: Complete parameter documentation, type definitions, example payloads, interactive request editor
+- **Progression**: Select endpoint → View parameters with type/required info → Review response format → Switch between cURL/Python/Success/Error tabs → Copy code examples
+- **Success criteria**: Complete parameter documentation with type definitions and requirement badges, multi-language examples (cURL, Python), success and error response examples, one-click copy for all code snippets
 
 ### Interactive API Testing
-- **Functionality**: Live API request/response testing with multiple provider examples and real-time formatting
-- **Purpose**: Allow developers to experiment with API payloads and see expected responses
+- **Functionality**: Live API request/response testing with 6+ provider examples, temperature controls, and real-time formatting with cURL generation
+- **Purpose**: Allow developers to experiment with API payloads, adjust parameters, and see expected responses across different models
 - **Trigger**: Navigate to Live API Testing or API Reference slides
-- **Progression**: Select provider → Edit request JSON → Send request → View formatted response → Copy examples
-- **Success criteria**: Editable request fields, simulated responses, accurate latency simulation, copy functionality
+- **Progression**: Select provider/model → Adjust temperature slider → Edit request JSON → Send request → View formatted response with latency/tokens → Copy JSON or cURL command
+- **Success criteria**: Editable request fields, dynamic parameter controls, simulated responses with model-specific content, accurate latency simulation, token counting, copy functionality for requests/responses/cURL
 
 ## Edge Case Handling
 
