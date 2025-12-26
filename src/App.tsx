@@ -10,7 +10,9 @@ import {
   Shield, 
   Rocket,
   BookOpen,
-  TestTube
+  TestTube,
+  Database,
+  Gauge
 } from "@phosphor-icons/react";
 import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
 import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
@@ -24,6 +26,9 @@ import { ApiDocumentation } from "@/components/ApiDocumentation";
 import { DeploymentGuide } from "@/components/DeploymentGuide";
 import { EnvSetup } from "@/components/EnvSetup";
 import { ApiStatusDashboard } from "@/components/ApiStatusDashboard";
+import { SupabaseMCPIntegration } from "@/components/SupabaseMCPIntegration";
+import { OxylabsAIStudioDemo } from "@/components/OxylabsAIStudioDemo";
+import { LiteLLMGatewayDemo } from "@/components/LiteLLMGatewayDemo";
 
 function App() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -53,7 +58,7 @@ function App() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-9 w-full mb-8">
+          <TabsList className="grid grid-cols-5 lg:grid-cols-12 w-full mb-8">
             <TabsTrigger value="overview" className="gap-2">
               <BookOpen size={16} />
               <span className="hidden sm:inline">Overview</span>
@@ -78,9 +83,21 @@ function App() {
               <Rocket size={16} />
               <span className="hidden sm:inline">LiteLLM</span>
             </TabsTrigger>
+            <TabsTrigger value="gateway" className="gap-2">
+              <Gauge size={16} />
+              <span className="hidden sm:inline">Gateway</span>
+            </TabsTrigger>
             <TabsTrigger value="firecrawl" className="gap-2">
               <TestTube size={16} />
               <span className="hidden sm:inline">Firecrawl</span>
+            </TabsTrigger>
+            <TabsTrigger value="oxylabs" className="gap-2">
+              <Globe size={16} />
+              <span className="hidden sm:inline">Oxylabs</span>
+            </TabsTrigger>
+            <TabsTrigger value="supabase" className="gap-2">
+              <Database size={16} />
+              <span className="hidden sm:inline">Supabase</span>
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2">
               <Shield size={16} />
@@ -135,11 +152,11 @@ function App() {
                   </p>
                 </Card>
 
-                <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("litellm")}>
-                  <Rocket size={32} className="text-accent mb-3" weight="duotone" />
-                  <h3 className="font-bold text-lg mb-2">LiteLLM</h3>
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("gateway")}>
+                  <Gauge size={32} className="text-accent mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">LiteLLM Gateway</h3>
                   <p className="text-sm text-muted-foreground">
-                    Unified Python interface for all LLM providers with failover
+                    Production AI Gateway with load balancing, caching, and guardrails
                   </p>
                 </Card>
 
@@ -148,6 +165,22 @@ function App() {
                   <h3 className="font-bold text-lg mb-2">Firecrawl API</h3>
                   <p className="text-sm text-muted-foreground">
                     Live web scraping demo for LLM-ready data extraction
+                  </p>
+                </Card>
+
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("oxylabs")}>
+                  <Globe size={32} className="text-accent mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">Oxylabs AI Studio</h3>
+                  <p className="text-sm text-muted-foreground">
+                    AI-powered web scraping with natural language prompts
+                  </p>
+                </Card>
+
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("supabase")}>
+                  <Database size={32} className="text-accent mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">Supabase MCP</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Connect AI assistants to Supabase for data persistence and RAG
                   </p>
                 </Card>
               </div>
@@ -177,8 +210,20 @@ function App() {
             <LiteLLMIntegrationDemo />
           </TabsContent>
 
+          <TabsContent value="gateway">
+            <LiteLLMGatewayDemo />
+          </TabsContent>
+
           <TabsContent value="firecrawl">
             <FirecrawlTester />
+          </TabsContent>
+
+          <TabsContent value="oxylabs">
+            <OxylabsAIStudioDemo />
+          </TabsContent>
+
+          <TabsContent value="supabase">
+            <SupabaseMCPIntegration />
           </TabsContent>
 
           <TabsContent value="security">
