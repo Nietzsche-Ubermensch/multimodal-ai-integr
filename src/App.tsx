@@ -19,6 +19,7 @@ import { OpenRouterSDKDemo } from "@/components/OpenRouterSDKDemo";
 import { LiteLLMIntegrationDemo } from "@/components/LiteLLMIntegrationDemo";
 import { FirecrawlTester } from "@/components/FirecrawlTester";
 import { ApiKeyValidator } from "@/components/ApiKeyValidator";
+import { BatchApiKeyTester } from "@/components/BatchApiKeyTester";
 import { ApiDocumentation } from "@/components/ApiDocumentation";
 import { DeploymentGuide } from "@/components/DeploymentGuide";
 import { EnvSetup } from "@/components/EnvSetup";
@@ -189,10 +190,19 @@ function App() {
                 </p>
               </Card>
               <ApiStatusDashboard />
+              
               <Card className="p-6">
-                <h2 className="text-2xl font-bold mb-4">API Key Configuration & Validation</h2>
+                <h2 className="text-2xl font-bold mb-4">Batch API Key Testing</h2>
                 <p className="text-muted-foreground mb-6">
-                  Configure and validate your API keys with real-time testing across all supported providers.
+                  Test multiple API keys simultaneously with parallel validation, real-time progress tracking, and detailed status indicators across all providers.
+                </p>
+              </Card>
+              <BatchApiKeyTester />
+              
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Individual API Key Validation</h2>
+                <p className="text-muted-foreground mb-6">
+                  Configure and validate your API keys individually with real-time testing across all supported providers.
                 </p>
               </Card>
               <ApiKeyValidator />

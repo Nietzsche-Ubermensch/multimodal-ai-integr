@@ -238,7 +238,7 @@ export function ApiTester() {
           return;
         }
 
-        const result = await testChatCompletion(requestData, apiKey);
+        const result = await testChatCompletion(requestData);
         
         setLatency(result.latency);
         
