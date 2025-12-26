@@ -1,52 +1,52 @@
 # Planning Guide
 
-A comprehensive AI inference provider guide and technical presentation platform covering Anthropic Claude, DeepSeek, xAI Grok (including detailed Grok 4.1 analysis), Firecrawl API, and OpenRouter. This application serves as a complete reference for developers building AI applications, featuring interactive demos, detailed documentation on pricing/billing, security protocols, hub integration, structured outputs, function calling, web scraping for LLM data, and production deployment strategies across 23+ topics with 13+ model endpoints.
+A unified AI Integration Platform that consolidates all AI provider SDK demos, interactive API testers, and comprehensive documentation into a single, production-ready application. This platform enables developers to test, validate, and integrate Anthropic Claude, DeepSeek, xAI Grok, OpenRouter, LiteLLM, and Firecrawl APIs through interactive demos with real-time testing, code generation, and deployment guides.
 
 **Experience Qualities**: 
-1. **Interactive & Educational**: Live SDK demos with real API testing, interactive parameter controls, hands-on embedding generation, comprehensive xAI Grok 4.1 model comparison, Firecrawl web scraping demos, and complete learning path from basics to advanced topics (pricing models, security, function calling, structured outputs, LLM-ready web data extraction)
-2. **Production-Ready & Enterprise-Grade**: Complete TypeScript/Python examples, Firecrawl integration patterns for Perplexity-like search, deployment guides for Vercel/Replit/Docker/AWS, security best practices (API proxy patterns, rate limiting, input validation), GitHub Actions automation examples, and model evaluation frameworks
-3. **Comprehensive & Reference-Grade**: Full documentation for 23+ AI topics including xAI Grok 4.1 detailed analysis (reasoning vs non-reasoning variants, technical specifications, use cases), Firecrawl API features (Scrape, Crawl, Map, Search, Extract), inference providers overview, pricing/billing models, hub integration, security considerations, structured outputs with LLMs, function calling, inference tasks (chat/embeddings/text-to-image/text-to-video), building AI image editors, code review automation, model evaluation, Hub API provider registration, and transformers.js browser-based ML
+1. **Unified & Intuitive**: Single dashboard interface with tab-based navigation consolidating all 23+ AI concepts and interactive demos into one cohesive platform - eliminating context switching between presentations and enabling seamless exploration across all providers
+2. **Production-Ready & Interactive**: Live SDK testing for all major providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM, Firecrawl), real-time API validation, automatic code generation in TypeScript/Python, streaming responses, and production deployment patterns
+3. **Comprehensive & Educational**: Complete coverage of AI integration topics including security best practices, environment setup, API key management, model comparison, pricing analysis, deployment guides (Vercel/Docker/AWS), and interactive web scraping demos
 
-**Complexity Level**: Complex Application (advanced functionality with multiple views and comprehensive educational content)
+**Complexity Level**: Complex Application (advanced functionality with multiple interactive views, real-time API testing, and comprehensive educational content)
 
-This is an interactive AI inference provider guide and SDK integration platform providing in-depth coverage of: (1) Overview of inference providers and their significance, (2) Pricing/billing models with cost calculation examples, (3) Hub integration (HuggingFace, OpenRouter) with transformers.js, (4) Security protocols (API key protection, rate limiting, data privacy), (5) Structured outputs with JSON schema enforcement, (6) Function calling for extending LLM capabilities, (7) Inference task types (chat completion, embeddings, text-to-image, text-to-video), (8) Building AI applications (image editors with DALL-E + Claude Vision), (9) Automating code review with GitHub Actions, (10) Model evaluation with Inspect AI and PromptFoo, (11) Hub API and becoming an inference provider, (12) xAI Grok 4.1 comprehensive analysis (4 model variants, modalities comparison, technical specifications, rate limits, pricing, optimal use cases), (13) Firecrawl API integration (Scrape, Crawl, Map, Search, Extract features with LLM-ready formats), (14) Perplexity-like search implementation with Firecrawl + LLM synthesis, (15) Complete guides for Anthropic Claude (3.5 Sonnet/Haiku/Opus), DeepSeek (Chat/Reasoner/Coder), xAI Grok (Beta/Vision/4.1 Fast variants), and OpenRouter TypeScript SDK. Includes live API testing, code generation, model comparisons, environment setup guides, and GitHub repository integration (huggingface/transformers.js, BerriAI/litellm, OpenRouterTeam/typescript-sdk, and 7+ other essential repos).
+This platform transforms 23 separate presentation slides and SDK demos into a unified, production-ready application where developers can instantly test AI APIs, validate integrations, generate production code, and learn best practices - all from a single interface.
 
 ## Essential Features
 
-### AI Provider SDK Demos (Anthropic, DeepSeek, xAI)
-- **Functionality**: Three interactive SDK demo components with live API testing, model selection, real-time response generation, and comprehensive code examples
-- **Purpose**: Allow developers to test each provider's SDK with real or simulated API calls, compare model capabilities, and get production-ready code
-- **Trigger**: Navigate to Anthropic SDK, DeepSeek SDK, or xAI SDK slides
-- **Progression**: Select model → Enter prompt → Toggle real/simulated API → Click test → View response → Copy code examples → Switch between installation/basic/advanced tabs
-- **Success criteria**: Working demos for all three providers, accurate model information, TypeScript/Python code examples, streaming examples, vision API examples
+### Unified Dashboard Interface
+- **Functionality**: Tab-based navigation system consolidating all AI provider demos, API testers, documentation, and deployment guides into a single cohesive interface
+- **Purpose**: Eliminate context switching between separate presentations/tools and enable seamless exploration of all AI integration concepts from one central hub
+- **Trigger**: App loads with overview dashboard showing all available providers and features
+- **Progression**: View overview → Select provider tab (Anthropic/DeepSeek/xAI/OpenRouter/LiteLLM/Firecrawl) → Test APIs → View documentation → Deploy → Return to overview
+- **Success criteria**: Smooth tab navigation, persistent state across tabs, responsive design for all screen sizes, clear visual hierarchy, quick access to all 9 main sections
 
-### Platform Architecture Overview
-- **Functionality**: In-depth coverage of DeepSeek (671B MoE), Anthropic Claude (200K context), xAI Grok (web search), and OpenRouter (100+ models gateway)
-- **Purpose**: Understand core capabilities, architectural differences, unique features, and strategic use cases for each provider
-- **Trigger**: Navigate to platform overview slides
-- **Progression**: View platform comparison → Explore provider-specific features → Review model architectures → Understand integration patterns
-- **Success criteria**: Clear explanation of technical architecture, parameter counts, context windows, and unique capabilities (reasoning, vision, web search)
+### Multi-Provider SDK Testing Suite
+- **Functionality**: Interactive SDK demo components for 5 major AI providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM) with live API testing, model selection, real-time response generation, and production-ready code examples
+- **Purpose**: Enable developers to test each provider's SDK with real or simulated API calls, compare model capabilities side-by-side, and generate production code instantly
+- **Trigger**: Navigate to any provider tab (Anthropic/DeepSeek/xAI/OpenRouter/LiteLLM)
+- **Progression**: Select provider → Choose model → Enter prompt → Toggle real/simulated API → Execute test → View streaming response → Copy TypeScript/Python code → Switch between installation/basic/advanced examples
+- **Success criteria**: Working demos for all 5 providers, accurate model information for 20+ models, streaming support, vision API examples, error handling, toast notifications, syntax-highlighted code blocks
 
-### xAI Grok 4.1 Comprehensive Analysis
-- **Functionality**: Detailed comparison of 4 Grok model variants (grok-4-1-fast-reasoning, grok-4-1-fast-non-reasoning, grok-code-fast-1, grok-4-fast-reasoning) with modalities, capabilities, context windows, rate limits, and pricing
-- **Purpose**: Enable informed model selection based on use case requirements (reasoning vs speed, multimodal needs, code specialization)
-- **Trigger**: Navigate to Grok 4.1 overview, comparison, technical specs, and use cases slides
-- **Progression**: Review model overview → Compare capabilities across variants → Examine technical specifications → Understand optimal use cases → View code examples for model selection logic
-- **Success criteria**: Complete coverage of all 4 models with feature comparison matrix, context window specs (256K-2M tokens), pricing optimization strategies, reasoning vs non-reasoning tradeoffs, multimodal support details (vision/audio), and intelligent model selection decision tree
-
-### Firecrawl API Integration
-- **Functionality**: Complete guide to Firecrawl web scraping API covering 5 core features (Scrape, Crawl, Map, Search, Extract) with LLM-ready output formats (Markdown, JSON, HTML) PLUS live interactive API tester
-- **Purpose**: Enable developers to build RAG applications, competitive analysis tools, and AI search with clean web data extraction through hands-on testing
-- **Trigger**: Navigate to Firecrawl overview, features, and live tester slides
-- **Progression**: Learn Firecrawl capabilities → Understand API key requirements → Explore 5 core features → **Test live API with interactive demo** → View code examples for each feature → Implement structured data extraction
-- **Success criteria**: Working examples for single-page scraping, recursive crawling, URL discovery, web search with content, and JSON schema-based extraction; API key setup instructions; LLM-ready Markdown output demonstration; **Interactive tester with real-time URL scraping, search demo, and auto-generated Python code**
-
-### Live Firecrawl API Tester (Interactive)
+### Firecrawl Live API Tester
 - **Functionality**: Real-time web scraping demo with URL input, endpoint selection (Scrape/Map/Search), toggle between demo and live API modes, instant Markdown/HTML preview, and automatic Python code generation
-- **Purpose**: Allow developers to test Firecrawl API endpoints immediately without writing code, understand response formats, and get production-ready implementation examples
-- **Trigger**: Navigate to "Live Firecrawl API Tester" slide
-- **Progression**: Select endpoint (Scrape/Map/Search) → Enter URL or search query → Configure options (include HTML, main content only) → Toggle real API mode → Execute request → View formatted response → Copy JSON or Python code → Test different URLs and endpoints
-- **Success criteria**: Working scrape endpoint with real/simulated responses, map endpoint showing URL discovery, search endpoint with query testing, clean Markdown preview, JSON response viewer, auto-generated Python code examples, real API support with key input, loading states, error handling, toast notifications for all actions
+- **Purpose**: Allow developers to test Firecrawl API endpoints immediately without writing code, understand LLM-ready response formats, and build RAG applications
+- **Trigger**: Navigate to Firecrawl tab
+- **Progression**: Select endpoint type → Enter URL or search query → Configure options → Toggle real API mode → Execute → View formatted Markdown response → Copy JSON or Python code → Test different URLs
+- **Success criteria**: Working scrape/map/search endpoints, real API integration, clean Markdown preview, JSON response viewer, auto-generated code, loading states, error handling
+
+### Environment Setup & API Key Management
+- **Functionality**: Comprehensive guide for setting up API keys securely across all providers with validation, security best practices, and example .env configurations
+- **Purpose**: Help developers configure their development environment correctly and securely manage API credentials
+- **Trigger**: Navigate to Security tab or view EnvSetup component on overview
+- **Progression**: View provider list → Copy API key template → Set environment variables → Validate keys → Review security practices → Implement proxy patterns
+- **Success criteria**: Clear instructions for all 6+ providers, .env templates, security warnings, proxy pattern examples, validation tools
+
+### Deployment & Production Guides
+- **Functionality**: Step-by-step deployment guides for Vercel, Docker, AWS, and self-hosting with configuration examples, security checklists, and monitoring setup
+- **Purpose**: Enable developers to deploy AI applications to production with confidence using best practices
+- **Trigger**: Navigate to Deploy tab
+- **Progression**: Choose deployment platform → Review requirements → Follow configuration steps → Deploy → Set up monitoring → Review security checklist
+- **Success criteria**: Working examples for 4+ deployment platforms, environment configuration guides, security best practices, monitoring setup, cost optimization tips
 
 ### Perplexity-Like Search Implementation
 - **Functionality**: Complete architecture guide for building AI-powered search using Firecrawl Search API + LLM synthesis with source citations
