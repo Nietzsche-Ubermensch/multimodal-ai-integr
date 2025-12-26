@@ -13,7 +13,14 @@ This platform enables developers to understand and implement complete AI applica
 
 ## Essential Features
 
-### End-to-End RAG Pipeline Demo (NEW)
+### Node.js API Gateway (NEW)
+- **Functionality**: Production-ready Express.js/TypeScript backend providing unified REST API access to 8+ AI providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM, Nvidia NIM, Perplexity, HuggingFace) with JWT authentication, rate limiting, request validation, streaming support, and comprehensive error handling
+- **Purpose**: Enable secure, scalable backend integration for AI applications with provider abstraction, centralized API key management, monitoring, and consistent request/response formats across all providers
+- **Trigger**: Start API gateway server (`npm run dev` in api-gateway directory)
+- **Progression**: Configure API keys → Start gateway → Register/login user → Get JWT token → Make chat/embeddings/rerank requests → Monitor health/metrics → Deploy with Docker
+- **Success criteria**: Working authentication flow, successful API calls to configured providers, rate limiting enforcement, streaming chat responses, comprehensive API documentation, Docker deployment ready, Redis integration for rate limiting, provider health checks
+
+### End-to-End RAG Pipeline Demo
 - **Functionality**: Interactive demonstration of complete RAG workflow: Oxylabs web scraping → embedding generation → Supabase vector storage → similarity search → LiteLLM answer generation with real-time progress tracking and step-by-step visualization
 - **Purpose**: Show developers exactly how to build production RAG applications combining web scraping, vector databases, and LLM inference with working code examples
 - **Trigger**: Navigate to RAG Demo tab (featured prominently on overview page)
