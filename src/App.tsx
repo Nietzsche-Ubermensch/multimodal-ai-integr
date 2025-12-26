@@ -14,7 +14,8 @@ import {
   Database,
   Gauge,
   GitBranch,
-  ListMagnifyingGlass
+  ListMagnifyingGlass,
+  FileArrowDown
 } from "@phosphor-icons/react";
 import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
 import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
@@ -36,6 +37,7 @@ import { HuggingFaceEmbeddingDemo } from "@/components/HuggingFaceEmbeddingDemo"
 import { NvidiaNIMEmbeddingDemo } from "@/components/NvidiaNIMEmbeddingDemo";
 import { HuggingFaceRerankDemo } from "@/components/HuggingFaceRerankDemo";
 import { NvidiaNIMRerankDemo } from "@/components/NvidiaNIMRerankDemo";
+import { ProjectExporter } from "@/components/ProjectExporter";
 
 function App() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -65,10 +67,14 @@ function App() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 lg:grid-cols-15 w-full mb-8">
+          <TabsList className="grid grid-cols-5 lg:grid-cols-16 w-full mb-8">
             <TabsTrigger value="overview" className="gap-2">
               <BookOpen size={16} />
               <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="export" className="gap-2">
+              <FileArrowDown size={16} />
+              <span className="hidden sm:inline">Export</span>
             </TabsTrigger>
             <TabsTrigger value="rag" className="gap-2">
               <GitBranch size={16} />
@@ -139,13 +145,22 @@ function App() {
               </p>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer border-accent bg-gradient-to-br from-purple-500/5 to-pink-500/5" onClick={() => setActiveTab("export")}>
+                  <FileArrowDown size={32} className="text-purple-500 mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">Export Template</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Generate complete production-ready project templates with all integrations
+                  </p>
+                  <Badge className="mt-2 bg-purple-500/20 text-purple-700" variant="secondary">New!</Badge>
+                </Card>
+
                 <Card className="p-6 hover:border-accent transition-colors cursor-pointer border-accent bg-gradient-to-br from-accent/5 to-primary/5" onClick={() => setActiveTab("rag")}>
                   <GitBranch size={32} className="text-accent mb-3" weight="duotone" />
                   <h3 className="font-bold text-lg mb-2">End-to-End RAG Demo</h3>
                   <p className="text-sm text-muted-foreground">
                     Complete RAG pipeline: Oxylabs scraping + Supabase vectors + LiteLLM generation
                   </p>
-                  <Badge className="mt-2" variant="secondary">New!</Badge>
+                  <Badge className="mt-2" variant="secondary">Featured</Badge>
                 </Card>
 
                 <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("anthropic")}>
@@ -234,6 +249,10 @@ function App() {
 
             <EnvSetup />
             <ApiDocumentation />
+          </TabsContent>
+
+          <TabsContent value="export">
+            <ProjectExporter />
           </TabsContent>
 
           <TabsContent value="rag">
