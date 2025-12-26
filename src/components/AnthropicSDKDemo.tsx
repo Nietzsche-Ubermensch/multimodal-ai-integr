@@ -5,15 +5,41 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { CodeBlock } from "@/components/CodeBlock";
-import { Brain, Play, Copy, CheckCircle, XCircle } from "@phosphor-icons/react";
+import { Brain, Play, Copy, CheckCircle, XCircle, Sliders } from "@phosphor-icons/react";
 import { toast } from "sonner";
+
+interface ModelParameters {
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  top_k: number;
+  includeTemperature: boolean;
+  includeMaxTokens: boolean;
+  includeTopP: boolean;
+  includeTopK: boolean;
+}
 
 export function AnthropicSDKDemo() {
   const [prompt, setPrompt] = useState("Explain the concept of neural attention mechanisms in 2-3 sentences.");
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [useRealAPI, setUseRealAPI] = useState(false);
+  const [showParameters, setShowParameters] = useState(false);
+  const [parameters, setParameters] = useState<ModelParameters>({
+    temperature: 1.0,
+    max_tokens: 1024,
+    top_p: 1.0,
+    top_k: 0,
+    includeTemperature: true,
+    includeMaxTokens: true,
+    includeTopP: false,
+    includeTopK: false,
+  });
 
   const handleTest = async () => {
     setLoading(true);
@@ -28,10 +54,18 @@ export function AnthropicSDKDemo() {
 
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      const usedParams = {
+        ...(parameters.includeTemperature && { temperature: parameters.temperature }),
+        ...(parameters.includeMaxTokens && { max_tokens: parameters.max_tokens }),
+        ...(parameters.includeTopP && { top_p: parameters.top_p }),
+        ...(parameters.includeTopK && { top_k: parameters.top_k }),
+      };
+      
       setResponse(
-        "Neural attention mechanisms allow models to dynamically focus on relevant parts of input sequences, " +
-        "computing weighted representations based on learned importance scores. This enables transformers to " +
-        "process long-range dependencies efficiently without sequential computation constraints."
+        `Neural attention mechanisms allow models to dynamically focus on relevant parts of input sequences, ` +
+        `computing weighted representations based on learned importance scores. This enables transformers to ` +
+        `process long-range dependencies efficiently without sequential computation constraints.\n\n` +
+        `[Parameters used: ${JSON.stringify(usedParams, null, 2)}]`
       );
       
       toast.success("Response generated successfully");
@@ -57,7 +91,7 @@ const anthropic = new Anthropic({
 
 const message = await anthropic.messages.create({
   model: 'claude-3-5-sonnet-20241022',
-  max_tokens: 1024,
+  max_tokens: ${parameters.includeMaxTokens ? parameters.max_tokens : 1024},${parameters.includeTemperature ? `\n  temperature: ${parameters.temperature},` : ''}${parameters.includeTopP ? `\n  top_p: ${parameters.top_p},` : ''}${parameters.includeTopK ? `\n  top_k: ${parameters.top_k},` : ''}
   messages: [
     { role: 'user', content: 'Explain quantum computing' }
   ],
@@ -155,7 +189,166 @@ for await (const textPart of result.textStream) {
                 {useRealAPI ? <CheckCircle size={16} className="mr-2" /> : <XCircle size={16} className="mr-2" />}
                 {useRealAPI ? "Real API" : "Simulated"}
               </Button>
+
+              <Button
+                variant={showParameters ? "default" : "outline"}
+                onClick={() => setShowParameters(!showParameters)}
+                size="sm"
+              >
+                <Sliders size={16} className="mr-2" />
+                Parameters
+              </Button>
             </div>
+
+            {showParameters && (
+              <Card className="border-accent/30 bg-muted/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Model Parameters</CardTitle>
+                  <CardDescription className="text-xs">
+                    Configure model parameters like temperature, max tokens, etc. Check the boxes to include parameters in this request.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="temp-include"
+                            checked={parameters.includeTemperature}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeTemperature: checked }))
+                            }
+                          />
+                          <Label htmlFor="temp-include" className="text-sm font-medium">
+                            Temperature
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.temperature.toFixed(2)}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[parameters.temperature]}
+                        onValueChange={([value]) => 
+                          setParameters(p => ({ ...p, temperature: value }))
+                        }
+                        min={0}
+                        max={2}
+                        step={0.1}
+                        disabled={!parameters.includeTemperature}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Controls randomness in the output. Lower values are more deterministic.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="topp-include"
+                            checked={parameters.includeTopP}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeTopP: checked }))
+                            }
+                          />
+                          <Label htmlFor="topp-include" className="text-sm font-medium">
+                            Top P
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.top_p.toFixed(2)}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[parameters.top_p]}
+                        onValueChange={([value]) => 
+                          setParameters(p => ({ ...p, top_p: value }))
+                        }
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        disabled={!parameters.includeTopP}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Nucleus sampling parameter. Controls diversity via cumulative probability.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="topk-include"
+                            checked={parameters.includeTopK}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeTopK: checked }))
+                            }
+                          />
+                          <Label htmlFor="topk-include" className="text-sm font-medium">
+                            Top K
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.top_k}
+                        </span>
+                      </div>
+                      <Input
+                        type="number"
+                        value={parameters.top_k}
+                        onChange={(e) => 
+                          setParameters(p => ({ ...p, top_k: parseInt(e.target.value) || 0 }))
+                        }
+                        min={0}
+                        max={100}
+                        disabled={!parameters.includeTopK}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Limits the number of highest probability tokens to consider.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="maxtokens-include"
+                            checked={parameters.includeMaxTokens}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeMaxTokens: checked }))
+                            }
+                          />
+                          <Label htmlFor="maxtokens-include" className="text-sm font-medium">
+                            Max Tokens
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.max_tokens}
+                        </span>
+                      </div>
+                      <Input
+                        type="number"
+                        value={parameters.max_tokens}
+                        onChange={(e) => 
+                          setParameters(p => ({ ...p, max_tokens: parseInt(e.target.value) || 1024 }))
+                        }
+                        min={1}
+                        max={8192}
+                        disabled={!parameters.includeMaxTokens}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Maximum number of tokens to generate.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {response && (
               <Alert>

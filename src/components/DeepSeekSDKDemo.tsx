@@ -5,9 +5,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { CodeBlock } from "@/components/CodeBlock";
-import { Brain, Play, Copy, CheckCircle, XCircle, ChartBar } from "@phosphor-icons/react";
+import { Brain, Play, Copy, CheckCircle, XCircle, ChartBar, Sliders } from "@phosphor-icons/react";
 import { toast } from "sonner";
+
+interface ModelParameters {
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  frequency_penalty: number;
+  presence_penalty: number;
+  includeTemperature: boolean;
+  includeMaxTokens: boolean;
+  includeTopP: boolean;
+  includeFrequencyPenalty: boolean;
+  includePresencePenalty: boolean;
+}
 
 export function DeepSeekSDKDemo() {
   const [prompt, setPrompt] = useState("Solve: ∫(x² + 2x + 1)dx from 0 to 2");
@@ -15,6 +32,19 @@ export function DeepSeekSDKDemo() {
   const [loading, setLoading] = useState(false);
   const [useRealAPI, setUseRealAPI] = useState(false);
   const [selectedModel, setSelectedModel] = useState("deepseek-chat");
+  const [showParameters, setShowParameters] = useState(false);
+  const [parameters, setParameters] = useState<ModelParameters>({
+    temperature: 0.7,
+    max_tokens: 2048,
+    top_p: 1.0,
+    frequency_penalty: 0.0,
+    presence_penalty: 0.0,
+    includeTemperature: true,
+    includeMaxTokens: true,
+    includeTopP: false,
+    includeFrequencyPenalty: false,
+    includePresencePenalty: false,
+  });
 
   const handleTest = async () => {
     setLoading(true);
@@ -79,9 +109,7 @@ const completion = await deepseek.chat.completions.create({
   messages: [
     { role: 'system', content: 'You are a helpful assistant' },
     { role: 'user', content: 'Explain the Riemann hypothesis' }
-  ],
-  max_tokens: 2048,
-  temperature: 0.7,
+  ],${parameters.includeMaxTokens ? `\n  max_tokens: ${parameters.max_tokens},` : ''}${parameters.includeTemperature ? `\n  temperature: ${parameters.temperature},` : ''}${parameters.includeTopP ? `\n  top_p: ${parameters.top_p},` : ''}${parameters.includeFrequencyPenalty ? `\n  frequency_penalty: ${parameters.frequency_penalty},` : ''}${parameters.includePresencePenalty ? `\n  presence_penalty: ${parameters.presence_penalty},` : ''}
 });
 
 console.log(completion.choices[0].message.content);`;
@@ -200,7 +228,195 @@ response = completion(
                 {useRealAPI ? <CheckCircle size={16} className="mr-2" /> : <XCircle size={16} className="mr-2" />}
                 {useRealAPI ? "Real API" : "Simulated"}
               </Button>
+
+              <Button
+                variant={showParameters ? "default" : "outline"}
+                onClick={() => setShowParameters(!showParameters)}
+                size="sm"
+              >
+                <Sliders size={16} className="mr-2" />
+                Parameters
+              </Button>
             </div>
+
+            {showParameters && (
+              <Card className="border-accent/30 bg-muted/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Model Parameters</CardTitle>
+                  <CardDescription className="text-xs">
+                    Configure model parameters. Check the boxes next to parameters you want to include.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="ds-temp-include"
+                            checked={parameters.includeTemperature}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeTemperature: checked }))
+                            }
+                          />
+                          <Label htmlFor="ds-temp-include" className="text-sm font-medium">
+                            Temperature
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.temperature.toFixed(2)}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[parameters.temperature]}
+                        onValueChange={([value]) => 
+                          setParameters(p => ({ ...p, temperature: value }))
+                        }
+                        min={0}
+                        max={2}
+                        step={0.1}
+                        disabled={!parameters.includeTemperature}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Controls randomness. Lower = more deterministic.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="ds-topp-include"
+                            checked={parameters.includeTopP}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeTopP: checked }))
+                            }
+                          />
+                          <Label htmlFor="ds-topp-include" className="text-sm font-medium">
+                            Top P
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.top_p.toFixed(2)}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[parameters.top_p]}
+                        onValueChange={([value]) => 
+                          setParameters(p => ({ ...p, top_p: value }))
+                        }
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        disabled={!parameters.includeTopP}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Nucleus sampling. Controls diversity via cumulative probability.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="ds-freqpen-include"
+                            checked={parameters.includeFrequencyPenalty}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeFrequencyPenalty: checked }))
+                            }
+                          />
+                          <Label htmlFor="ds-freqpen-include" className="text-sm font-medium">
+                            Frequency Penalty
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.frequency_penalty.toFixed(2)}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[parameters.frequency_penalty]}
+                        onValueChange={([value]) => 
+                          setParameters(p => ({ ...p, frequency_penalty: value }))
+                        }
+                        min={-2}
+                        max={2}
+                        step={0.1}
+                        disabled={!parameters.includeFrequencyPenalty}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Reduces repetition based on token frequency.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="ds-prespen-include"
+                            checked={parameters.includePresencePenalty}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includePresencePenalty: checked }))
+                            }
+                          />
+                          <Label htmlFor="ds-prespen-include" className="text-sm font-medium">
+                            Presence Penalty
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.presence_penalty.toFixed(2)}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[parameters.presence_penalty]}
+                        onValueChange={([value]) => 
+                          setParameters(p => ({ ...p, presence_penalty: value }))
+                        }
+                        min={-2}
+                        max={2}
+                        step={0.1}
+                        disabled={!parameters.includePresencePenalty}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Reduces repetition based on whether tokens appear.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id="ds-maxtokens-include"
+                            checked={parameters.includeMaxTokens}
+                            onCheckedChange={(checked) => 
+                              setParameters(p => ({ ...p, includeMaxTokens: checked }))
+                            }
+                          />
+                          <Label htmlFor="ds-maxtokens-include" className="text-sm font-medium">
+                            Max Tokens
+                          </Label>
+                        </div>
+                        <span className="text-sm font-mono text-muted-foreground">
+                          {parameters.max_tokens}
+                        </span>
+                      </div>
+                      <Input
+                        type="number"
+                        value={parameters.max_tokens}
+                        onChange={(e) => 
+                          setParameters(p => ({ ...p, max_tokens: parseInt(e.target.value) || 2048 }))
+                        }
+                        min={1}
+                        max={8192}
+                        disabled={!parameters.includeMaxTokens}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Maximum number of tokens to generate.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {response && (
               <Alert>
