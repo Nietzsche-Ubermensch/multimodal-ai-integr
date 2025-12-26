@@ -13,7 +13,8 @@ import {
   TestTube,
   Database,
   Gauge,
-  GitBranch
+  GitBranch,
+  ListMagnifyingGlass
 } from "@phosphor-icons/react";
 import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
 import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
@@ -31,6 +32,10 @@ import { SupabaseMCPIntegration } from "@/components/SupabaseMCPIntegration";
 import { OxylabsAIStudioDemo } from "@/components/OxylabsAIStudioDemo";
 import { LiteLLMGatewayDemo } from "@/components/LiteLLMGatewayDemo";
 import { RAGDemo } from "@/components/RAGDemo";
+import { HuggingFaceEmbeddingDemo } from "@/components/HuggingFaceEmbeddingDemo";
+import { NvidiaNIMEmbeddingDemo } from "@/components/NvidiaNIMEmbeddingDemo";
+import { HuggingFaceRerankDemo } from "@/components/HuggingFaceRerankDemo";
+import { NvidiaNIMRerankDemo } from "@/components/NvidiaNIMRerankDemo";
 
 function App() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -60,7 +65,7 @@ function App() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 lg:grid-cols-13 w-full mb-8">
+          <TabsList className="grid grid-cols-5 lg:grid-cols-15 w-full mb-8">
             <TabsTrigger value="overview" className="gap-2">
               <BookOpen size={16} />
               <span className="hidden sm:inline">Overview</span>
@@ -92,6 +97,14 @@ function App() {
             <TabsTrigger value="gateway" className="gap-2">
               <Gauge size={16} />
               <span className="hidden sm:inline">Gateway</span>
+            </TabsTrigger>
+            <TabsTrigger value="embeddings" className="gap-2">
+              <Database size={16} />
+              <span className="hidden sm:inline">Embeddings</span>
+            </TabsTrigger>
+            <TabsTrigger value="rerank" className="gap-2">
+              <ListMagnifyingGlass size={16} />
+              <span className="hidden sm:inline">Rerank</span>
             </TabsTrigger>
             <TabsTrigger value="firecrawl" className="gap-2">
               <TestTube size={16} />
@@ -175,6 +188,24 @@ function App() {
                   </p>
                 </Card>
 
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("embeddings")}>
+                  <Database size={32} className="text-purple-500 mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">Embeddings API</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Generate embeddings with HuggingFace and NVIDIA NIM for RAG and semantic search
+                  </p>
+                  <Badge className="mt-2" variant="secondary">New!</Badge>
+                </Card>
+
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("rerank")}>
+                  <ListMagnifyingGlass size={32} className="text-pink-500 mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">Rerank API</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Improve search relevance with HuggingFace and NVIDIA NIM reranking models
+                  </p>
+                  <Badge className="mt-2" variant="secondary">New!</Badge>
+                </Card>
+
                 <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("firecrawl")}>
                   <TestTube size={32} className="text-accent mb-3" weight="duotone" />
                   <h3 className="font-bold text-lg mb-2">Firecrawl API</h3>
@@ -231,6 +262,34 @@ function App() {
 
           <TabsContent value="gateway">
             <LiteLLMGatewayDemo />
+          </TabsContent>
+
+          <TabsContent value="embeddings">
+            <div className="space-y-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Embeddings API Integration</h2>
+                <p className="text-muted-foreground mb-6">
+                  Generate text embeddings using HuggingFace and NVIDIA NIM models for semantic search, RAG applications, and document similarity.
+                </p>
+              </Card>
+              
+              <HuggingFaceEmbeddingDemo />
+              <NvidiaNIMEmbeddingDemo />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="rerank">
+            <div className="space-y-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Rerank API Integration</h2>
+                <p className="text-muted-foreground mb-6">
+                  Improve search relevance by reordering documents based on semantic similarity using HuggingFace and NVIDIA NIM reranking models.
+                </p>
+              </Card>
+              
+              <HuggingFaceRerankDemo />
+              <NvidiaNIMRerankDemo />
+            </div>
           </TabsContent>
 
           <TabsContent value="firecrawl">
