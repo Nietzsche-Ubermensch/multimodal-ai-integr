@@ -22,6 +22,7 @@ import { ApiKeyValidator } from "@/components/ApiKeyValidator";
 import { ApiDocumentation } from "@/components/ApiDocumentation";
 import { DeploymentGuide } from "@/components/DeploymentGuide";
 import { EnvSetup } from "@/components/EnvSetup";
+import { ApiStatusDashboard } from "@/components/ApiStatusDashboard";
 
 function App() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -180,7 +181,22 @@ function App() {
           </TabsContent>
 
           <TabsContent value="security">
-            <ApiKeyValidator />
+            <div className="space-y-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Real-Time API Status</h2>
+                <p className="text-muted-foreground mb-6">
+                  Monitor the live status of all configured AI providers with automatic connectivity checks and latency monitoring.
+                </p>
+              </Card>
+              <ApiStatusDashboard />
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-4">API Key Configuration & Validation</h2>
+                <p className="text-muted-foreground mb-6">
+                  Configure and validate your API keys with real-time testing across all supported providers.
+                </p>
+              </Card>
+              <ApiKeyValidator />
+            </div>
           </TabsContent>
 
           <TabsContent value="deploy">

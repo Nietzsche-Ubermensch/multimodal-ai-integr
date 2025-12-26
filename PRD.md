@@ -76,12 +76,26 @@ This platform transforms 23 separate presentation slides and SDK demos into a un
 - **Progression**: Select provider/model → Adjust temperature slider → Toggle real/simulated API → Edit request JSON → Send request → View formatted response with latency/tokens → Copy JSON or cURL
 - **Success criteria**: Accurate model-specific responses (both simulated and real), dynamic parameter controls, token counting, latency measurement, real API integration with error handling, copy functionality
 
-### API Key Validation (6 Providers)
-- **Functionality**: Real-time API key validation for OpenRouter, DeepSeek, xAI, NVIDIA, OpenAI, and Anthropic with live endpoint testing, format validation, and availability checks
-- **Purpose**: Allow users to validate API keys before using them, with real latency metrics and model availability information
-- **Trigger**: Navigate to API Key Validation slide
-- **Progression**: Enter API key → Automatic format validation → Click test → View validation result with latency and model count → See success/error feedback
-- **Success criteria**: Real API endpoint testing, accurate format validation with regex patterns, model availability counts, latency metrics, secure local storage with privacy warnings
+### API Key Validation & Real-Time Status Monitoring (6 Providers)
+- **Functionality**: Comprehensive API key management system with real-time validation, live provider status monitoring, latency tracking, auto-refresh capabilities, and security best practices for OpenRouter, DeepSeek, xAI, NVIDIA, OpenAI, and Anthropic
+- **Purpose**: Enable developers to validate API keys before deployment, monitor provider availability in real-time, track performance metrics, and ensure all required integrations are functional
+- **Trigger**: Navigate to Security tab
+- **Progression**: 
+  1. **Status Dashboard**: View live status of all providers → Monitor latency metrics → Check required vs optional providers → Enable auto-refresh (30s intervals)
+  2. **Key Configuration**: Enter API key → Automatic format validation → Click individual test or validate all → View validation result with latency and model count → See success/error feedback with detailed messages
+  3. **Monitoring**: Track provider uptime → View average latency across all providers → Monitor connection health → Receive visual status indicators
+- **Success criteria**: 
+  - Real API endpoint testing with 10s timeout
+  - Accurate format validation with regex patterns (sk-or-v1-*, sk-ant-*, xai-*, nvapi-*, etc.)
+  - Model availability counts and lists
+  - Latency metrics with color-coded performance indicators (<2000ms green, >2000ms yellow)
+  - Secure local storage with privacy warnings
+  - Live status dashboard showing online/offline/degraded/unknown states
+  - Auto-refresh capability for continuous monitoring
+  - Summary cards showing configured count, validated count, required provider status, and average latency
+  - Progress bars for latency visualization
+  - Last-checked timestamps for each provider
+  - Detailed error messages for failed validations
 
 ### Embedding Generation Testing
 - **Functionality**: Interactive embedding generation with support for Google Gemini and OpenAI models, real/simulated API toggle, vector statistics display (magnitude, mean, std dev, range), and export functionality

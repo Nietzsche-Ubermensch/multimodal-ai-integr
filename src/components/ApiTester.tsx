@@ -242,8 +242,12 @@ export function ApiTester() {
         
         setLatency(result.latency);
         
-        if (result.success && result.data) {
-          setResponse(JSON.stringify(result.data, null, 2));
+        if (result.success && result.response) {
+          setResponse(JSON.stringify({
+            content: result.response,
+            usage: result.usage,
+            latency_ms: result.latency
+          }, null, 2));
           toast.success(`Request completed in ${(result.latency / 1000).toFixed(2)}s`);
         } else {
           setResponse(JSON.stringify({
