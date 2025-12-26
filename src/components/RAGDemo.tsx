@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { 
   Globe, 
   Database, 
@@ -20,9 +21,16 @@ import {
   Sparkle,
   FileText,
   MagnifyingGlass,
-  Download
+  Download,
+  Warning
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
+import { 
+  OxylabsClient, 
+  SupabaseVectorClient, 
+  LiteLLMClient, 
+  chunkText 
+} from "@/lib/api-clients";
 
 interface RAGStep {
   id: string;
@@ -38,7 +46,13 @@ export function RAGDemo() {
   const [llmProvider, setLLMProvider] = useState("openrouter/anthropic/claude-3.5-sonnet");
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [demoMode, setDemoMode] = useState(true);
+  const [liveMode, setLiveMode] = useState(false);
+  
+  const [apiKeys, setApiKeys] = useState({
+    oxylabs: "",
+    supabaseUrl: "",
+    supabaseKey: "",
+  });
   
   const [steps, setSteps] = useState<RAGStep[]>([
     { id: 'scrape', name: 'Web Scraping (Oxylabs)', status: 'pending', icon: Globe },
@@ -75,11 +89,127 @@ export function RAGDemo() {
     setProgress(0);
     
     try {
-      // Reset steps
       setSteps(prev => prev.map(s => ({ ...s, status: 'pending' as const, result: undefined })));
       
-      // Step 1: Web Scraping with Oxylabs
-      toast.info("Step 1: Scraping web content...");
+      if (liveMode) {
+        await runLiveRAGPipeline();
+      } else {
+        await runDemoRAGPipeline();
+      }
+
+      const code = generateImplementationCode();
+      setGeneratedCode(code);
+
+    } catch (error) {
+      toast.error(`Error in RAG pipeline: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error(error);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const runLiveRAGPipeline = async () => {
+    try {
+      toast.info("Step 1: Scraping web content with Oxylabs...");
+      updateStep('scrape', 'running');
+      setProgress(10);
+
+      if (!apiKeys.oxylabs) {
+        throw new Error("Oxylabs API key not configured");
+      }
+
+      const oxyClient = new OxylabsClient({ apiKey: apiKeys.oxylabs });
+      const scrapeResult = await oxyClient.scrapeUrl(url);
+      
+      setScrapedContent(scrapeResult.content);
+      updateStep('scrape', 'complete');
+      toast.success("Web content scraped successfully!");
+      setProgress(25);
+
+      toast.info("Step 2: Chunking and generating embeddings...");
+      updateStep('embed', 'running');
+      
+      const chunks = chunkText(scrapeResult.content, 500, 50);
+      const llmClient = new LiteLLMClient({ provider: llmProvider });
+      
+      const embeddingsList: number[][] = [];
+      for (const chunk of chunks.slice(0, 5)) {
+        const embResult = await llmClient.generateEmbedding(chunk);
+        embeddingsList.push(embResult.embedding);
+      }
+      
+      setEmbeddings(embeddingsList);
+      updateStep('embed', 'complete');
+      toast.success("Embeddings generated!");
+      setProgress(50);
+
+      if (apiKeys.supabaseUrl && apiKeys.supabaseKey) {
+        toast.info("Step 3: Storing in Supabase vector database...");
+        updateStep('store', 'running');
+        
+        const supaClient = new SupabaseVectorClient({
+          url: apiKeys.supabaseUrl,
+          key: apiKeys.supabaseKey,
+        });
+        
+        await supaClient.storeEmbeddings(
+          chunks.slice(0, 5),
+          embeddingsList,
+          { source: url, scrapedAt: scrapeResult.metadata.scrapedAt }
+        );
+        
+        updateStep('store', 'complete');
+        toast.success("Stored in vector database!");
+        setProgress(65);
+
+        toast.info("Step 4: Performing similarity search...");
+        updateStep('retrieve', 'running');
+        
+        const queryEmbResult = await llmClient.generateEmbedding(query);
+        const searchResults = await supaClient.searchSimilar(queryEmbResult.embedding, 0.7, 3);
+        
+        const retrievedTexts = searchResults.map(r => r.content);
+        setRetrievedChunks(retrievedTexts);
+        updateStep('retrieve', 'complete');
+        toast.success("Retrieved relevant chunks!");
+        setProgress(85);
+      } else {
+        updateStep('store', 'complete');
+        updateStep('retrieve', 'complete');
+        setRetrievedChunks(chunks.slice(0, 3));
+        setProgress(85);
+        toast.info("Skipping Supabase (not configured) - using local chunks");
+      }
+
+      toast.info("Step 5: Generating answer with LLM...");
+      updateStep('generate', 'running');
+      
+      const contextText = retrievedChunks.join('\n\n');
+      const answer = await llmClient.complete([
+        {
+          role: 'system',
+          content: 'You are a helpful assistant. Answer questions based on the provided context.',
+        },
+        {
+          role: 'user',
+          content: `Context:\n${contextText}\n\nQuestion: ${query}`,
+        },
+      ]);
+      
+      setFinalAnswer(answer);
+      updateStep('generate', 'complete');
+      toast.success("RAG pipeline complete!");
+      setProgress(100);
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Live API error: ${errorMsg}`);
+      throw error;
+    }
+  };
+
+  const runDemoRAGPipeline = async () => {
+    toast.info("Step 1: Scraping web content...");
       setProgress(20);
       await simulateStep('scrape', 2000);
       
@@ -117,12 +247,10 @@ response = completion(
       setScrapedContent(mockScrapedContent);
       toast.success("Web content scraped successfully!");
 
-      // Step 2: Generate Embeddings
       toast.info("Step 2: Generating embeddings...");
       setProgress(40);
       await simulateStep('embed', 1500);
       
-      // Mock embeddings (in reality, these would be 1536-dimensional vectors)
       const mockEmbeddings = [
         Array(8).fill(0).map(() => Math.random()),
         Array(8).fill(0).map(() => Math.random()),
@@ -131,13 +259,11 @@ response = completion(
       setEmbeddings(mockEmbeddings);
       toast.success("Embeddings generated!");
 
-      // Step 3: Store in Supabase
       toast.info("Step 3: Storing embeddings in Supabase...");
       setProgress(60);
       await simulateStep('store', 1000);
       toast.success("Stored in vector database!");
 
-      // Step 4: Vector Search & Retrieval
       toast.info("Step 4: Performing similarity search...");
       setProgress(80);
       await simulateStep('retrieve', 1500);
@@ -150,7 +276,6 @@ response = completion(
       setRetrievedChunks(mockRetrievedChunks);
       toast.success("Retrieved relevant chunks!");
 
-      // Step 5: Generate Answer with LiteLLM
       toast.info("Step 5: Generating answer with LLM...");
       setProgress(100);
       await simulateStep('generate', 2000);
@@ -184,17 +309,6 @@ This integration allows you to access OpenRouter's model marketplace through Lit
       
       setFinalAnswer(mockAnswer);
       toast.success("RAG pipeline complete!");
-
-      // Generate implementation code
-      const code = generateImplementationCode();
-      setGeneratedCode(code);
-
-    } catch (error) {
-      toast.error("Error in RAG pipeline");
-      console.error(error);
-    } finally {
-      setIsRunning(false);
-    }
   };
 
   const generateImplementationCode = () => {
@@ -442,17 +556,78 @@ if __name__ == "__main__":
                 </Select>
               </div>
 
+              <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                <div className="flex-1">
+                  <Label htmlFor="live-mode" className="font-semibold">Live API Mode</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Connect to real Oxylabs, Supabase, and LiteLLM APIs
+                  </p>
+                </div>
+                <Switch
+                  id="live-mode"
+                  checked={liveMode}
+                  onCheckedChange={setLiveMode}
+                  disabled={isRunning}
+                />
+              </div>
+
+              {liveMode && (
+                <Card className="p-4 border-accent/20 bg-accent/5">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Warning size={18} className="text-accent" />
+                    API Configuration
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="oxylabs-key" className="text-xs">Oxylabs API Key</Label>
+                      <Input
+                        id="oxylabs-key"
+                        type="password"
+                        value={apiKeys.oxylabs}
+                        onChange={(e) => setApiKeys(prev => ({ ...prev, oxylabs: e.target.value }))}
+                        placeholder="Enter your Oxylabs API key"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="supabase-url" className="text-xs">Supabase URL</Label>
+                      <Input
+                        id="supabase-url"
+                        value={apiKeys.supabaseUrl}
+                        onChange={(e) => setApiKeys(prev => ({ ...prev, supabaseUrl: e.target.value }))}
+                        placeholder="https://your-project.supabase.co"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="supabase-key" className="text-xs">Supabase Anon Key</Label>
+                      <Input
+                        id="supabase-key"
+                        type="password"
+                        value={apiKeys.supabaseKey}
+                        onChange={(e) => setApiKeys(prev => ({ ...prev, supabaseKey: e.target.value }))}
+                        placeholder="Enter your Supabase anon key"
+                        className="mt-1"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      LLM calls will use the built-in Spark LLM API
+                    </p>
+                  </div>
+                </Card>
+              )}
+
               <Alert>
                 <AlertDescription>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant={demoMode ? "default" : "secondary"}>
-                      {demoMode ? "Demo Mode" : "Live API Mode"}
+                    <Badge variant={liveMode ? "secondary" : "default"}>
+                      {liveMode ? "Live API Mode" : "Demo Mode"}
                     </Badge>
                   </div>
-                  {demoMode ? (
-                    "Using simulated data for demonstration. Enable Live API mode to connect real services."
+                  {liveMode ? (
+                    "Connected to live APIs. Oxylabs will scrape real content, and results will be stored in your Supabase database."
                   ) : (
-                    "Connected to live APIs. Ensure API keys are configured: OXYLABS_API_KEY, SUPABASE_URL, SUPABASE_KEY, and LLM provider keys."
+                    "Using simulated data for demonstration. Enable Live API mode to connect real services."
                   )}
                 </AlertDescription>
               </Alert>
