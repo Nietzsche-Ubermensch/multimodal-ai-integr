@@ -12,7 +12,8 @@ import {
   BookOpen,
   TestTube,
   Database,
-  Gauge
+  Gauge,
+  GitBranch
 } from "@phosphor-icons/react";
 import { AnthropicSDKDemo } from "@/components/AnthropicSDKDemo";
 import { DeepSeekSDKDemo } from "@/components/DeepSeekSDKDemo";
@@ -29,6 +30,7 @@ import { ApiStatusDashboard } from "@/components/ApiStatusDashboard";
 import { SupabaseMCPIntegration } from "@/components/SupabaseMCPIntegration";
 import { OxylabsAIStudioDemo } from "@/components/OxylabsAIStudioDemo";
 import { LiteLLMGatewayDemo } from "@/components/LiteLLMGatewayDemo";
+import { RAGDemo } from "@/components/RAGDemo";
 
 function App() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -58,10 +60,14 @@ function App() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 lg:grid-cols-12 w-full mb-8">
+          <TabsList className="grid grid-cols-5 lg:grid-cols-13 w-full mb-8">
             <TabsTrigger value="overview" className="gap-2">
               <BookOpen size={16} />
               <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="rag" className="gap-2">
+              <GitBranch size={16} />
+              <span className="hidden sm:inline">RAG Demo</span>
             </TabsTrigger>
             <TabsTrigger value="anthropic" className="gap-2">
               <Brain size={16} />
@@ -120,6 +126,15 @@ function App() {
               </p>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+                <Card className="p-6 hover:border-accent transition-colors cursor-pointer border-accent bg-gradient-to-br from-accent/5 to-primary/5" onClick={() => setActiveTab("rag")}>
+                  <GitBranch size={32} className="text-accent mb-3" weight="duotone" />
+                  <h3 className="font-bold text-lg mb-2">End-to-End RAG Demo</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Complete RAG pipeline: Oxylabs scraping + Supabase vectors + LiteLLM generation
+                  </p>
+                  <Badge className="mt-2" variant="secondary">New!</Badge>
+                </Card>
+
                 <Card className="p-6 hover:border-accent transition-colors cursor-pointer" onClick={() => setActiveTab("anthropic")}>
                   <Brain size={32} className="text-accent mb-3" weight="duotone" />
                   <h3 className="font-bold text-lg mb-2">Anthropic Claude</h3>
@@ -188,6 +203,10 @@ function App() {
 
             <EnvSetup />
             <ApiDocumentation />
+          </TabsContent>
+
+          <TabsContent value="rag">
+            <RAGDemo />
           </TabsContent>
 
           <TabsContent value="anthropic">

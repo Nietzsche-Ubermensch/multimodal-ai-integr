@@ -1,17 +1,24 @@
 # Planning Guide
 
-A unified AI Integration Platform that consolidates all AI provider SDK demos, interactive API testers, and comprehensive documentation into a single, production-ready application. This platform enables developers to test, validate, and integrate Anthropic Claude, DeepSeek, xAI Grok, OpenRouter, LiteLLM, and Firecrawl APIs through interactive demos with real-time testing, code generation, and deployment guides.
+A unified AI Integration Platform featuring an end-to-end RAG (Retrieval-Augmented Generation) demo that combines Oxylabs web scraping, Supabase vector storage, and LiteLLM unified inference. This platform consolidates all AI provider SDK demos, interactive API testers, and comprehensive documentation into a single, production-ready application enabling developers to build intelligent applications with real-world data.
 
 **Experience Qualities**: 
-1. **Unified & Intuitive**: Single dashboard interface with tab-based navigation consolidating all 23+ AI concepts and interactive demos into one cohesive platform - eliminating context switching between presentations and enabling seamless exploration across all providers
-2. **Production-Ready & Interactive**: Live SDK testing for all major providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM, Firecrawl), real-time API validation, automatic code generation in TypeScript/Python, streaming responses, and production deployment patterns
-3. **Comprehensive & Educational**: Complete coverage of AI integration topics including security best practices, environment setup, API key management, model comparison, pricing analysis, deployment guides (Vercel/Docker/AWS), and interactive web scraping demos
+1. **Unified & Intelligent**: Complete RAG pipeline demonstration showing web scraping → embedding → vector storage → retrieval → LLM generation, plus individual SDK testing for all major providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM, Firecrawl, Oxylabs, Supabase) - eliminating the complexity of integrating multiple services
+2. **Production-Ready & Interactive**: Live end-to-end RAG demo with configurable URLs, questions, and LLM providers, real-time pipeline visualization, automatic code generation for Oxylabs + Supabase + LiteLLM integration, plus individual API testing for each service
+3. **Comprehensive & Educational**: Complete coverage of modern AI application patterns including RAG architecture, vector databases, web scraping for LLMs, embedding generation, similarity search, and multi-provider LLM orchestration with security best practices
 
-**Complexity Level**: Complex Application (advanced functionality with multiple interactive views, real-time API testing, and comprehensive educational content)
+**Complexity Level**: Complex Application (advanced functionality with full RAG pipeline, multiple interactive views, real-time API testing, vector search demonstrations, and comprehensive educational content)
 
-This platform transforms 23 separate presentation slides and SDK demos into a unified, production-ready application where developers can instantly test AI APIs, validate integrations, generate production code, and learn best practices - all from a single interface.
+This platform enables developers to understand and implement complete AI applications - from gathering fresh data via web scraping to storing embeddings in vector databases to generating intelligent answers using multiple LLM providers - all demonstrated through interactive, production-ready examples.
 
 ## Essential Features
+
+### End-to-End RAG Pipeline Demo (NEW)
+- **Functionality**: Interactive demonstration of complete RAG workflow: Oxylabs web scraping → embedding generation → Supabase vector storage → similarity search → LiteLLM answer generation with real-time progress tracking and step-by-step visualization
+- **Purpose**: Show developers exactly how to build production RAG applications combining web scraping, vector databases, and LLM inference with working code examples
+- **Trigger**: Navigate to RAG Demo tab (featured prominently on overview page)
+- **Progression**: Configure URL and question → Select LLM provider → Run pipeline → View scraped content → See embeddings generated → Watch Supabase storage → Observe vector search → Read AI-generated answer → Copy production Python code → Review Supabase schema → Deploy
+- **Success criteria**: Complete 5-step pipeline execution (scrape, embed, store, retrieve, generate), real-time progress indicators, working demo mode with realistic data, production code generation, Supabase SQL schema examples, architecture diagrams, environment setup guide
 
 ### Unified Dashboard Interface
 - **Functionality**: Tab-based navigation system consolidating all AI provider demos, API testers, documentation, and deployment guides into a single cohesive interface

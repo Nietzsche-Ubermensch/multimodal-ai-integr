@@ -271,7 +271,7 @@ $$;`;
                 type="text"
                 placeholder="https://your-project.supabase.co"
                 value={supabaseUrl}
-                onChange={(e) => setSuppabaseUrl(e.target.value)}
+                onChange={(e) => setSupabaseUrl(e.target.value)}
               />
             </div>
 
