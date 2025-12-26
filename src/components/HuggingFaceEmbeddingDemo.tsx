@@ -8,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkle, Copy, CheckCircle, XCircle, Clock, ChartBar, Lightning, Database, ArrowsClockwise } from "@phosphor-icons/react";
+import { Sparkle, Copy, CheckCircle, XCircle, Clock, ChartBar, Lightning, Database, ArrowsClockwise, Key } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { CodeBlock } from "./CodeBlock";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const HUGGINGFACE_MODELS = [
   { id: "microsoft/codebert-base", name: "CodeBERT Base", dims: 768, context: "512 tokens", description: "Code-optimized embeddings" },
@@ -46,6 +47,7 @@ interface ComparisonResult {
 export function HuggingFaceEmbeddingDemo() {
   const [selectedModel, setSelectedModel] = useState(HUGGINGFACE_MODELS[0].id);
   const [inputText, setInputText] = useState("LiteLLM supports text-embedding-inference models from HuggingFace");
+  const [apiKey, setApiKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<EmbeddingResult | null>(null);
   const [comparisonMode, setComparisonMode] = useState(false);
@@ -66,38 +68,73 @@ export function HuggingFaceEmbeddingDemo() {
   };
 
   const generateEmbedding = async () => {
+    if (!apiKey) {
+      toast.error("Please enter your HuggingFace API token");
+      return;
+    }
+
     setIsLoading(true);
     setResult(null);
 
     try {
       const startTime = Date.now();
-      await new Promise(resolve => setTimeout(resolve, 800));
 
-      const mockEmbedding = Array.from({ length: selectedModelInfo?.dims || 768 }, () => 
-        (Math.random() - 0.5) * 0.2
-      );
+      const response = await fetch('https://api-inference.huggingface.co/pipeline/feature-extraction/' + selectedModel, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          inputs: inputText,
+          options: {
+            wait_for_model: true
+          }
+        })
+      });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HuggingFace API error: ${response.status} - ${errorText}`);
+      }
+
+      const embeddings = await response.json();
       const latency = Date.now() - startTime;
+
+      let embedding: number[];
+      if (Array.isArray(embeddings) && Array.isArray(embeddings[0])) {
+        embedding = embeddings[0];
+      } else if (Array.isArray(embeddings)) {
+        embedding = embeddings;
+      } else {
+        throw new Error('Unexpected embedding format');
+      }
 
       setResult({
         model: selectedModel,
-        dimensions: mockEmbedding.length,
-        embedding: mockEmbedding.slice(0, 10),
-        fullEmbedding: mockEmbedding,
+        dimensions: embedding.length,
+        embedding: embedding.slice(0, 10),
+        fullEmbedding: embedding,
         totalTokens: Math.ceil(inputText.split(" ").length * 1.3),
         latency,
         timestamp: Date.now(),
       });
 
-      toast.success("Embedding generated successfully");
+      toast.success(`Embedding generated: ${embedding.length} dimensions`);
     } catch (error) {
-      toast.error("Failed to generate embedding");
+      console.error('Embedding error:', error);
+      toast.error(error instanceof Error ? error.message : "Failed to generate embedding");
     } finally {
       setIsLoading(false);
     }
   };
 
   const compareModels = async () => {
+    if (!apiKey) {
+      toast.error("Please enter your HuggingFace API token");
+      return;
+    }
+
     if (selectedModels.length < 2) {
       toast.error("Select at least 2 models to compare");
       return;
@@ -113,24 +150,57 @@ export function HuggingFaceEmbeddingDemo() {
         const modelInfo = HUGGINGFACE_MODELS.find(m => m.id === modelId);
         if (!modelInfo) continue;
 
-        const startTime = Date.now();
-        await new Promise(resolve => setTimeout(resolve, 600));
+        try {
+          const startTime = Date.now();
 
-        const mockEmbedding = Array.from({ length: modelInfo.dims }, () => 
-          (Math.random() - 0.5) * 0.2
-        );
+          const response = await fetch('https://api-inference.huggingface.co/pipeline/feature-extraction/' + modelId, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+              inputs: inputText,
+              options: {
+                wait_for_model: true
+              }
+            })
+          });
 
-        const latency = Date.now() - startTime;
+          if (!response.ok) {
+            console.error(`Model ${modelId} failed:`, response.status);
+            continue;
+          }
 
-        results.push({
-          model: modelId,
-          dimensions: mockEmbedding.length,
-          embedding: mockEmbedding.slice(0, 10),
-          fullEmbedding: mockEmbedding,
-          totalTokens: Math.ceil(inputText.split(" ").length * 1.3),
-          latency,
-          timestamp: Date.now(),
-        });
+          const embeddings = await response.json();
+          const latency = Date.now() - startTime;
+
+          let embedding: number[];
+          if (Array.isArray(embeddings) && Array.isArray(embeddings[0])) {
+            embedding = embeddings[0];
+          } else if (Array.isArray(embeddings)) {
+            embedding = embeddings;
+          } else {
+            console.error(`Unexpected format for ${modelId}`);
+            continue;
+          }
+
+          results.push({
+            model: modelId,
+            dimensions: embedding.length,
+            embedding: embedding.slice(0, 10),
+            fullEmbedding: embedding,
+            totalTokens: Math.ceil(inputText.split(" ").length * 1.3),
+            latency,
+            timestamp: Date.now(),
+          });
+        } catch (error) {
+          console.error(`Error with model ${modelId}:`, error);
+        }
+      }
+
+      if (results.length === 0) {
+        throw new Error("No models generated embeddings successfully");
       }
 
       const avgLatency = results.reduce((sum, r) => sum + r.latency, 0) / results.length;
@@ -143,9 +213,10 @@ export function HuggingFaceEmbeddingDemo() {
         timestamp: Date.now(),
       });
 
-      toast.success(`Compared ${selectedModels.length} models successfully`);
+      toast.success(`Compared ${results.length} models successfully`);
     } catch (error) {
-      toast.error("Failed to compare models");
+      console.error('Comparison error:', error);
+      toast.error(error instanceof Error ? error.message : "Failed to compare models");
     } finally {
       setIsComparing(false);
     }
@@ -164,31 +235,51 @@ export function HuggingFaceEmbeddingDemo() {
   const pythonCode = `from litellm import embedding
 import os
 
-os.environ['HF_TOKEN'] = "hf_xxxxxx"
+# Set your HuggingFace token
+os.environ['HF_TOKEN'] = "${apiKey || 'hf_xxxxxx'}"
 
+# Generate embedding
 response = embedding(
     model='huggingface/${selectedModel}',
     input=["${inputText.replace(/"/g, '\\"')}"]
 )
 
-print(f"Dimensions: {len(response.data[0]['embedding'])}")
-print(f"First 10 values: {response.data[0]['embedding'][:10]}")`;
+# Access the embedding
+embedding_vector = response.data[0]['embedding']
+print(f"Model: ${selectedModel}")
+print(f"Dimensions: {len(embedding_vector)}")
+print(f"First 10 values: {embedding_vector[:10]}")
+print(f"Vector magnitude: {sum(x**2 for x in embedding_vector)**0.5:.6f}")`;
 
   const comparisonCode = `from litellm import embedding
 import os
+import time
 
-os.environ['HF_TOKEN'] = "hf_xxxxxx"
+os.environ['HF_TOKEN'] = "${apiKey || 'hf_xxxxxx'}"
 
 models = [
 ${selectedModels.map(m => `    'huggingface/${m}'`).join(',\n')}
 ]
 
 text = "${inputText.replace(/"/g, '\\"')}"
+results = []
 
 for model in models:
+    start = time.time()
     response = embedding(model=model, input=[text])
+    latency = (time.time() - start) * 1000
+    
     dims = len(response.data[0]['embedding'])
-    print(f"{model}: {dims} dimensions")`;
+    results.append({
+        'model': model,
+        'dimensions': dims,
+        'latency_ms': round(latency, 2)
+    })
+    print(f"{model}: {dims}D, {latency:.0f}ms")
+
+# Compare dimensions
+print(f"\\nDimension range: {min(r['dimensions'] for r in results)}-{max(r['dimensions'] for r in results)}")
+print(f"Average latency: {sum(r['latency_ms'] for r in results) / len(results):.0f}ms")`;
 
   return (
     <div className="space-y-6">
@@ -198,11 +289,44 @@ for model in models:
             <Database size={24} weight="duotone" className="text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-2">HuggingFace Embeddings Comparison</h2>
+            <h2 className="text-2xl font-bold mb-2">HuggingFace Embeddings - Real API Integration</h2>
             <p className="text-muted-foreground">
-              Test and compare different HuggingFace embedding models with varying dimensions
+              Generate embeddings with actual HuggingFace API calls and compare different models
             </p>
           </div>
+        </div>
+
+        <Alert className="mb-6 border-purple-500/30 bg-purple-500/5">
+          <Key size={16} className="text-purple-500" />
+          <AlertDescription>
+            Enter your HuggingFace API token to generate real embeddings. Get your free token at{" "}
+            <a 
+              href="https://huggingface.co/settings/tokens" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-semibold underline hover:text-purple-500"
+            >
+              huggingface.co/settings/tokens
+            </a>
+          </AlertDescription>
+        </Alert>
+
+        <div className="mb-6">
+          <Label htmlFor="api-key" className="flex items-center gap-2">
+            <Key size={16} />
+            HuggingFace API Token
+          </Label>
+          <Input
+            id="api-key"
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="hf_..."
+            className="font-mono"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Your token is only used in your browser and never stored
+          </p>
         </div>
 
         <div className="flex items-center gap-3 mb-6 p-4 bg-background/50 rounded-lg border">
@@ -256,7 +380,7 @@ for model in models:
 
               <Button
                 onClick={generateEmbedding}
-                disabled={isLoading || !inputText}
+                disabled={isLoading || !inputText || !apiKey}
                 className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
               >
                 <Lightning size={18} className="mr-2" weight="fill" />
@@ -346,7 +470,7 @@ for model in models:
 
             <Button
               onClick={compareModels}
-              disabled={isComparing || !inputText || selectedModels.length < 2}
+              disabled={isComparing || !inputText || selectedModels.length < 2 || !apiKey}
               className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
             >
               <ArrowsClockwise size={18} className="mr-2" weight="bold" />
