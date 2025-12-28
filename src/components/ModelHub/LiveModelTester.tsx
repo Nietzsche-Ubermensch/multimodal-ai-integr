@@ -28,6 +28,7 @@ import {
 import { UNIFIED_MODEL_CATALOG, Model } from "@/data/models";
 import { useKV } from "@github/spark/hooks";
 import { toast } from "sonner";
+import { modelRouter, ModelRequest } from "@/lib/modelRouter";
 
 interface StreamingMessage {
   role: "user" | "assistant" | "system";
@@ -67,6 +68,7 @@ export function LiveModelTester() {
   const [maxTokens, setMaxTokens] = useState(1000);
   const [topP, setTopP] = useState(1.0);
   const [enableStreaming, setEnableStreaming] = useState(true);
+  const [useRouter, setUseRouter] = useState(true);
   
   const abortControllerRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -280,6 +282,99 @@ export function LiveModelTester() {
 
   const estimateTokens = (text: string): number => {
     return Math.ceil(text.length / 4);
+  };
+
+  const runTestWithRouter = async () => {
+    if (!selectedModel) {
+      toast.error("Please select a model");
+      return;
+    }
+
+    if (!prompt.trim()) {
+      toast.error("Please enter a prompt");
+      return;
+    }
+
+    const testId = `test-${Date.now()}`;
+    const startTime = Date.now();
+
+    const newMessages: StreamingMessage[] = [
+      ...messages,
+      { role: "user", content: prompt }
+    ];
+
+    setMessages(newMessages);
+    setCurrentResponse("");
+    setIsStreaming(true);
+    setPrompt("");
+
+    const newResult: TestResult = {
+      id: testId,
+      modelId: selectedModel.id,
+      modelName: selectedModel.name,
+      prompt,
+      response: "",
+      status: "streaming",
+      startTime
+    };
+
+    setTestResults(current => [...(current || []), newResult]);
+
+    try {
+      const request: ModelRequest = {
+        prompt,
+        model: selectedModel.id,
+        temperature,
+        maxTokens,
+        messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+      };
+
+      const response = await modelRouter.route(request);
+
+      setMessages([...newMessages, { role: "assistant", content: response.content }]);
+      setCurrentResponse("");
+
+      setTestResults(current =>
+        (current || []).map(r =>
+          r.id === testId
+            ? {
+                ...r,
+                response: response.content,
+                status: "complete",
+                endTime: Date.now(),
+                latency: response.latency,
+                tokensUsed: response.tokens,
+                cost: response.cost.total
+              }
+            : r
+        )
+      );
+
+      toast.success("Response complete", {
+        description: `${response.latency}ms · ${response.tokens.total} tokens · $${response.cost.total.toFixed(4)}`
+      });
+    } catch (error: any) {
+      console.error("Test error:", error);
+      
+      setTestResults(current =>
+        (current || []).map(r =>
+          r.id === testId
+            ? {
+                ...r,
+                status: "error" as const,
+                endTime: Date.now(),
+                error: error.message
+              }
+            : r
+        )
+      );
+
+      toast.error("Test failed", {
+        description: error.message
+      });
+    } finally {
+      setIsStreaming(false);
+    }
   };
 
   const runTest = async () => {
@@ -534,6 +629,24 @@ export function LiveModelTester() {
                     onCheckedChange={setEnableStreaming}
                   />
                 </div>
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="router">Use Model Router</Label>
+                  <Switch
+                    id="router"
+                    checked={useRouter}
+                    onCheckedChange={setUseRouter}
+                  />
+                </div>
+
+                {useRouter && (
+                  <Alert>
+                    <Sparkle size={16} className="text-accent" />
+                    <AlertDescription className="text-xs">
+                      Router mode includes automatic fallbacks and unified error handling
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
             </>
           )}
@@ -609,7 +722,7 @@ export function LiveModelTester() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   e.preventDefault();
-                  runTest();
+                  useRouter ? runTestWithRouter() : runTest();
                 }
               }}
             />
@@ -621,12 +734,12 @@ export function LiveModelTester() {
                 </Button>
               ) : (
                 <Button
-                  onClick={runTest}
+                  onClick={useRouter ? runTestWithRouter : runTest}
                   disabled={!selectedModel || !prompt.trim()}
                   className="gap-2"
                 >
                   <Play size={16} weight="fill" />
-                  Send (⌘+Enter)
+                  Send {useRouter && <Badge variant="secondary" className="ml-1 text-[10px]">Router</Badge>}
                 </Button>
               )}
               
