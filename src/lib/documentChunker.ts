@@ -473,23 +473,31 @@ export class DocumentChunker {
 
     const textChunks = chunker.splitText(text);
     
-    const chunks: DocumentChunk[] = textChunks.map((content, index) => ({
-      id: this._generateChunkId(index),
-      content: content.trim(),
-      index,
-      totalChunks: textChunks.length,
-      metadata: {
-        startChar: this._calculateStartChar(text, content, index),
-        endChar: this._calculateEndChar(text, content, index),
-        chunkSize: content.length,
-        overlap: this.config.chunkOverlap,
-        strategy: this.config.strategy,
-        ...additionalMetadata
-      }
-    }));
+    // Pre-compute chunk positions in a single pass for O(n) complexity
+    // instead of O(n*m) with repeated indexOf calls
+    const chunkPositions = this._computeChunkPositions(text, textChunks);
+    
+    const chunks: DocumentChunk[] = textChunks.map((content, index) => {
+      const position = chunkPositions[index];
+      return {
+        id: this._generateChunkId(index),
+        content: content.trim(),
+        index,
+        totalChunks: textChunks.length,
+        metadata: {
+          startChar: position.start,
+          endChar: position.end,
+          chunkSize: content.length,
+          overlap: this.config.chunkOverlap,
+          strategy: this.config.strategy,
+          ...additionalMetadata
+        }
+      };
+    });
 
     const processingTime = performance.now() - startTime;
-    const avgChunkSize = chunks.reduce((sum, chunk) => sum + chunk.content.length, 0) / chunks.length;
+    const totalSize = chunks.reduce((sum, chunk) => sum + chunk.content.length, 0);
+    const avgChunkSize = chunks.length > 0 ? totalSize / chunks.length : 0;
 
     return {
       chunks,
@@ -511,13 +519,47 @@ export class DocumentChunker {
     return `chunk-${Date.now()}-${index}`;
   }
 
-  private _calculateStartChar(fullText: string, chunk: string, index: number): number {
+  /**
+   * Compute all chunk positions in a single pass through the text.
+   * This is O(n) where n is the text length, instead of O(n*m) with repeated indexOf calls.
+   */
+  private _computeChunkPositions(fullText: string, chunks: string[]): Array<{ start: number; end: number }> {
+    const positions: Array<{ start: number; end: number }> = [];
+    let searchStartIndex = 0;
+    
+    for (const chunk of chunks) {
+      const cleanChunk = chunk.trim();
+      // Search from the last found position to avoid re-scanning the entire text
+      const position = fullText.indexOf(cleanChunk, searchStartIndex);
+      
+      if (position !== -1) {
+        positions.push({ start: position, end: position + cleanChunk.length });
+        // Update search start for next chunk (account for overlapping chunks)
+        searchStartIndex = Math.max(searchStartIndex, position + 1);
+      } else {
+        // Fallback: search from beginning if not found after last position
+        const fallbackPosition = fullText.indexOf(cleanChunk);
+        if (fallbackPosition !== -1) {
+          positions.push({ start: fallbackPosition, end: fallbackPosition + cleanChunk.length });
+        } else {
+          positions.push({ start: 0, end: cleanChunk.length });
+        }
+      }
+    }
+    
+    return positions;
+  }
+
+  // Kept for backward compatibility but marked as deprecated
+  /** @deprecated Use _computeChunkPositions for better performance */
+  private _calculateStartChar(fullText: string, chunk: string, _index: number): number {
     const cleanChunk = chunk.trim();
     const position = fullText.indexOf(cleanChunk);
     return position !== -1 ? position : 0;
   }
 
-  private _calculateEndChar(fullText: string, chunk: string, index: number): number {
+  /** @deprecated Use _computeChunkPositions for better performance */
+  private _calculateEndChar(fullText: string, chunk: string, _index: number): number {
     const cleanChunk = chunk.trim();
     const position = fullText.indexOf(cleanChunk);
     return position !== -1 ? position + cleanChunk.length : cleanChunk.length;
