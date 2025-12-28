@@ -17,6 +17,7 @@ import { LiteLLMIntegrationDemo } from "@/components/LiteLLMIntegrationDemo";
 import { RealApiTester } from "@/components/RealApiTester";
 import { StreamingApiTester } from "@/components/StreamingApiTester";
 import { FirecrawlTester } from "@/components/FirecrawlTester";
+import { LiveModelTester } from "@/components/LiveModelTester";
 import { Brain, Code, Database, Lightning, CheckCircle } from "@phosphor-icons/react";
 
 interface UniversalSlideProps {
@@ -230,6 +231,8 @@ export function UniversalSlide({ slide, slideNumber, totalSlides }: UniversalSli
                 <RealApiTester />
               ) : slide.id === "streaming-api" ? (
                 <StreamingApiTester />
+              ) : slide.id === "live-model-testing" ? (
+                <LiveModelTester />
               ) : slide.id === "firecrawl-features" || slide.id === "firecrawl-perplexity" || slide.id === "firecrawl-live-tester" ? (
                 <FirecrawlTester />
               ) : null}

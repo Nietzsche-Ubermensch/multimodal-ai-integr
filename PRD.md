@@ -153,6 +153,29 @@ This platform enables developers to understand and implement complete AI applica
 - **Progression**: Select provider/model from dropdown → View model description and endpoint info → Enter API key (optional for simulation) → Write custom test prompt → Toggle real/simulated API mode → Click "Test" → View success/failure result with latency and tokens → Read response content → Switch between code example tabs (Python/Streaming/cURL/JS) → Copy implementation code → Review provider feature cards
 - **Success criteria**: Support for 8 models across 4 providers (Perplexity, OpenRouter, NVIDIA NIM, HuggingFace), working real/simulated API toggle with validation, accurate latency measurement (800-2000ms simulated), provider-specific mock responses that match real API behavior, comprehensive code examples for all 4 languages showing proper environment variable usage, API key security warnings, token count display, copy-to-clipboard for all code blocks, provider feature cards highlighting unique capabilities (web search, unified gateway, enterprise inference, embeddings)
 
+### Live Model Testing with Real API Integration (NEW - Interactive)
+- **Functionality**: Production-ready live model testing component supporting 6 AI providers (OpenAI, Anthropic, OpenRouter, Perplexity, DeepSeek, xAI) with real streaming API calls, simulation mode for development, configurable parameters (temperature, max tokens), real-time metrics (latency, tokens/sec), token-by-token streaming display, and automatic code generation for implementation
+- **Purpose**: Enable developers to test actual AI models with real API keys using streaming responses, validate API integrations before production deployment, compare model responses across providers, and generate production-ready code examples with proper security patterns
+- **Trigger**: Navigate to Live Model Testing slide
+- **Progression**: Select provider (OpenAI/Anthropic/OpenRouter/Perplexity/DeepSeek/xAI) → Choose model from dropdown → Enter API key (required for real mode, optional for simulation) → Write custom prompt → Adjust temperature slider (0-1) and max tokens (100-4000) → Toggle Real API mode (with security warnings) → Enable/disable streaming → Click "Test Real API" or "Simulate Response" → Watch real-time streaming response with live cursor → Monitor metrics panel (latency, tokens, tokens/sec, status) → Copy response to clipboard → View implementation code (TypeScript with OpenAI SDK) → Review security best practices → Copy production code examples
+- **Success criteria**: 
+  - Real API integration working for all 6 providers using OpenAI SDK with provider-specific base URLs
+  - Actual streaming responses via async generators with token-by-token display
+  - Accurate real-time metrics: latency measurement, token counting, tokens-per-second calculation
+  - Simulation mode with realistic provider-specific mock responses for development/testing
+  - Security warnings about `dangerouslyAllowBrowser` with clear guidance to use backend proxy
+  - Parameter controls: temperature (0-1, 0.05 steps), max tokens (100-4000, 100 steps)
+  - Provider-specific model lists (3-4 models per provider)
+  - Live metrics panel showing: latency (ms), tokens generated, speed (t/s), status badges
+  - Response display with auto-scroll during streaming, copy button, inline cursor animation
+  - Auto-generated TypeScript code examples showing streaming and non-streaming patterns
+  - Implementation code tab with syntax highlighting and one-click copy
+  - Security info tab explaining production best practices (backend proxy, rate limiting, input validation)
+  - Proper error handling with user-friendly messages
+  - Stop button to cancel ongoing streaming requests
+  - Visual status indicators (Ready/Processing/Complete with color-coded badges)
+  - Responsive layout working on desktop and mobile
+
 ### Integration Best Practices
 - **Functionality**: Enterprise-grade patterns for security (API proxy), performance (caching), scalability (async queues), monitoring (metrics), cost optimization, and failover strategies
 - **Purpose**: Guide production deployment with 99.9% uptime and cost efficiency
