@@ -1,5 +1,6 @@
-export type ProviderType = 'xai' | 'deepseek' | 'anthropic' | 'openrouter' | 'huggingface' | 'openai' | 'google' | 'nvidia' | 'cohere' | 'perplexity';
+export type ProviderType = 'xai' | 'deepseek' | 'anthropic' | 'openrouter' | 'huggingface' | 'openai' | 'google' | 'nvidia' | 'cohere' | 'perplexity' | 'venice' | 'deepinfra';
 export type ModelType = 'chat' | 'reasoning' | 'code' | 'vision' | 'embedding' | 'audio' | 'image-gen';
+export type PrivacyPolicy = 'zero-logging' | 'standard' | 'data-retention';
 
 export interface ModelCapability {
   name: string;
@@ -25,6 +26,8 @@ export interface UnifiedModel {
   description?: string;
   benchmarkScores?: Record<string, number>;
   tags: string[];
+  privacy?: PrivacyPolicy;
+  freeTier?: boolean;
 }
 
 export const UNIFIED_MODEL_CATALOG: UnifiedModel[] = [
@@ -420,6 +423,228 @@ export const UNIFIED_MODEL_CATALOG: UnifiedModel[] = [
     endpoint: 'https://integrate.api.nvidia.com/v1/embeddings',
     tags: ['embedding', 'nvidia', 'fast'],
   },
+
+  // ========================================
+  // UNCENSORED MODELS - VENICE AI
+  // ========================================
+  {
+    id: 'venice/venice-uncensored',
+    name: 'Venice Uncensored 1.1',
+    provider: 'venice',
+    sourceId: 'venice-uncensored',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.5,
+    outputCostPer1M: 0.5,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.venice.ai/api/v1/chat/completions',
+    description: 'Venice Uncensored - Zero data retention, private AI',
+    tags: ['uncensored', 'venice', 'private', 'zero-logging'],
+    privacy: 'zero-logging',
+  },
+
+  // ========================================
+  // UNCENSORED - OPENROUTER FREE MODELS
+  // ========================================
+  {
+    id: 'openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
+    name: 'Dolphin Mistral 24B (FREE)',
+    provider: 'openrouter',
+    sourceId: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    description: 'Free uncensored Dolphin model via OpenRouter',
+    tags: ['uncensored', 'dolphin', 'free', 'mistral', 'venice'],
+    freeTier: true,
+  },
+  {
+    id: 'openrouter/cognitivecomputations/dolphin3.0-r1-mistral-24b:free',
+    name: 'Dolphin 3.0 R1 (FREE)',
+    provider: 'openrouter',
+    sourceId: 'cognitivecomputations/dolphin3.0-r1-mistral-24b:free',
+    contextWindow: 32_000,
+    modelType: 'reasoning',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'reasoning', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    description: 'Dolphin 3.0 R1 with 800k reasoning traces - Free tier',
+    tags: ['uncensored', 'dolphin', 'free', 'reasoning', 'R1'],
+    freeTier: true,
+  },
+
+  // ========================================
+  // UNCENSORED - DEEPINFRA
+  // ========================================
+  {
+    id: 'deepinfra/cognitivecomputations/dolphin-2.6-mixtral-8x7b',
+    name: 'Dolphin 2.6 Mixtral 8x7B',
+    provider: 'deepinfra',
+    sourceId: 'cognitivecomputations/dolphin-2.6-mixtral-8x7b',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.2,
+    outputCostPer1M: 0.2,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.deepinfra.com/v1/openai/chat/completions',
+    description: 'Uncensored Mixtral MoE model - fast and obedient',
+    tags: ['uncensored', 'dolphin', 'mixtral', 'MoE', 'code'],
+    privacy: 'zero-logging',
+  },
+
+  // ========================================
+  // UNCENSORED - HUGGING FACE HERMES SERIES
+  // ========================================
+  {
+    id: 'huggingface/NousResearch/Hermes-4.3-36B',
+    name: 'Hermes 4.3 36B',
+    provider: 'huggingface',
+    sourceId: 'NousResearch/Hermes-4.3-36B',
+    contextWindow: 512_000,
+    modelType: 'reasoning',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+      { name: 'function_calling', supported: true },
+    ],
+    inputCostPer1M: 0.4,
+    outputCostPer1M: 0.4,
+    supportsStreaming: true,
+    supportsFunctionCalling: true,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api-inference.huggingface.co/models/NousResearch/Hermes-4.3-36B',
+    description: 'Hermes 4.3 - 512K context, frontier reasoning, uncensored',
+    tags: ['uncensored', 'hermes', 'nousresearch', '512K-context', 'frontier'],
+  },
+  {
+    id: 'huggingface/NousResearch/Hermes-3-Llama-3.1-405B',
+    name: 'Hermes 3 405B',
+    provider: 'huggingface',
+    sourceId: 'NousResearch/Hermes-3-Llama-3.1-405B',
+    contextWindow: 128_000,
+    modelType: 'reasoning',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+      { name: 'agent', supported: true },
+    ],
+    inputCostPer1M: 2.7,
+    outputCostPer1M: 2.7,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api-inference.huggingface.co/models/NousResearch/Hermes-3-Llama-3.1-405B',
+    description: 'Hermes 3 flagship - 405B frontier model, uncensored',
+    tags: ['uncensored', 'hermes', 'nousresearch', '405B', 'frontier'],
+  },
+  {
+    id: 'huggingface/dphn/Dolphin3.0-Llama3.1-8B',
+    name: 'Dolphin 3.0 Llama 3.1 8B',
+    provider: 'huggingface',
+    sourceId: 'dphn/Dolphin3.0-Llama3.1-8B',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.05,
+    outputCostPer1M: 0.05,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api-inference.huggingface.co/models/dphn/Dolphin3.0-Llama3.1-8B',
+    description: 'Dolphin 3.0 - Ultimate general-purpose local model, uncensored',
+    tags: ['uncensored', 'dolphin', 'llama', '8B', 'value'],
+  },
+  {
+    id: 'huggingface/NousResearch/Hermes-3-Llama-3.1-70B',
+    name: 'Hermes 3 70B',
+    provider: 'huggingface',
+    sourceId: 'NousResearch/Hermes-3-Llama-3.1-70B',
+    contextWindow: 128_000,
+    modelType: 'reasoning',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+      { name: 'agent', supported: true },
+    ],
+    inputCostPer1M: 1.0,
+    outputCostPer1M: 1.0,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api-inference.huggingface.co/models/NousResearch/Hermes-3-Llama-3.1-70B',
+    description: 'Hermes 3 70B - Balanced frontier model, uncensored',
+    tags: ['uncensored', 'hermes', 'nousresearch', '70B', 'frontier'],
+  },
+  {
+    id: 'huggingface/NousResearch/Hermes-3-Llama-3.1-8B',
+    name: 'Hermes 3 8B',
+    provider: 'huggingface',
+    sourceId: 'NousResearch/Hermes-3-Llama-3.1-8B',
+    contextWindow: 128_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.05,
+    outputCostPer1M: 0.05,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api-inference.huggingface.co/models/NousResearch/Hermes-3-Llama-3.1-8B',
+    description: 'Hermes 3 8B - Fast and affordable, uncensored',
+    tags: ['uncensored', 'hermes', 'nousresearch', '8B', 'value'],
+  },
 ];
 
 export const PROVIDER_COLORS: Record<ProviderType, string> = {
@@ -433,6 +658,8 @@ export const PROVIDER_COLORS: Record<ProviderType, string> = {
   nvidia: 'bg-green-500 text-white',
   cohere: 'bg-indigo-600 text-white',
   perplexity: 'bg-teal-600 text-white',
+  venice: 'bg-indigo-700 text-white',
+  deepinfra: 'bg-teal-700 text-white',
 };
 
 export class ModelCatalog {

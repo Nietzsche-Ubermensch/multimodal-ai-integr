@@ -23,7 +23,10 @@ import {
   X,
   Sliders,
   Play,
-  Info
+  Info,
+  ShieldCheck,
+  Lock,
+  Flame
 } from '@phosphor-icons/react';
 
 const CAPABILITY_ICONS: Record<string, React.ReactNode> = {
@@ -32,6 +35,9 @@ const CAPABILITY_ICONS: Record<string, React.ReactNode> = {
   vision: <Eye size={16} />,
   chat: <ChatCircle size={16} />,
   embedding: <Database size={16} />,
+  uncensored: <Flame size={16} weight="fill" />,
+  function_calling: <Sliders size={16} />,
+  agent: <Lightning size={16} />,
 };
 
 export function UnifiedModelCatalog() {
@@ -58,7 +64,12 @@ export function UnifiedModelCatalog() {
     }
 
     if (selectedType !== 'all') {
-      result = result.filter((m) => m.modelType === selectedType);
+      // Check if it's a tag-based filter (uncensored)
+      if (selectedType === 'uncensored') {
+        result = result.filter((m) => m.tags.includes('uncensored'));
+      } else {
+        result = result.filter((m) => m.modelType === selectedType);
+      }
     }
 
     if (selectedTag !== 'all') {
@@ -112,6 +123,42 @@ export function UnifiedModelCatalog() {
         </Card>
       </div>
 
+      {/* Uncensored Models Banner */}
+      {filteredModels.some(m => m.tags.includes('uncensored')) && (
+        <Card className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border-2 border-purple-200 dark:border-purple-700">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-purple-500 rounded-lg">
+                <Lightning size={24} weight="fill" className="text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
+                  Uncensored Models Available
+                </h3>
+                <p className="text-sm text-purple-700 dark:text-purple-300">
+                  Access uncensored models from <strong>Venice AI</strong> (zero-logging), <strong>DeepInfra</strong>, <strong>OpenRouter FREE tier</strong> (Dolphin), and <strong>Hugging Face</strong> (Hermes series). 
+                  These models support OpenAI-compatible APIs with enhanced privacy and no content filtering.
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <Badge className="bg-purple-500 text-white">
+                    <Lightning size={12} weight="fill" className="mr-1" />
+                    {filteredModels.filter(m => m.tags.includes('uncensored')).length} Uncensored
+                  </Badge>
+                  <Badge className="bg-indigo-500 text-white">
+                    <ShieldCheck size={12} weight="fill" className="mr-1" />
+                    {filteredModels.filter(m => m.privacy === 'zero-logging').length} Zero-Logging
+                  </Badge>
+                  <Badge className="bg-green-500 text-white">
+                    <span className="mr-1">FREE</span>
+                    {filteredModels.filter(m => m.freeTier).length} Free Tier
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters */}
       <Card className="p-6">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
@@ -127,17 +174,38 @@ export function UnifiedModelCatalog() {
 
           <div className="flex gap-2 flex-wrap">
             <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-48">
                 <Funnel size={16} className="mr-2" />
                 <SelectValue placeholder="Provider" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Providers</SelectItem>
-                {Object.entries(providerStats).map(([provider, count]) => (
-                  <SelectItem key={provider} value={provider}>
-                    {provider} ({count})
-                  </SelectItem>
-                ))}
+                
+                {/* Main Providers */}
+                {Object.entries(providerStats)
+                  .filter(([provider]) => !['venice', 'deepinfra'].includes(provider))
+                  .map(([provider, count]) => (
+                    <SelectItem key={provider} value={provider}>
+                      {provider} ({count})
+                    </SelectItem>
+                  ))}
+                
+                {/* Uncensored Providers Section */}
+                {(providerStats['venice'] || providerStats['deepinfra']) && (
+                  <>
+                    <div className="border-t my-1" />
+                    {providerStats['venice'] && (
+                      <SelectItem value="venice" className="text-indigo-600 dark:text-indigo-400 font-medium">
+                        🔓 Venice AI ({providerStats['venice']})
+                      </SelectItem>
+                    )}
+                    {providerStats['deepinfra'] && (
+                      <SelectItem value="deepinfra" className="text-teal-600 dark:text-teal-400 font-medium">
+                        🔓 DeepInfra ({providerStats['deepinfra']})
+                      </SelectItem>
+                    )}
+                  </>
+                )}
               </SelectContent>
             </Select>
 
@@ -147,11 +215,15 @@ export function UnifiedModelCatalog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="chat">Chat</SelectItem>
-                <SelectItem value="reasoning">Reasoning</SelectItem>
-                <SelectItem value="code">Code</SelectItem>
-                <SelectItem value="vision">Vision</SelectItem>
-                <SelectItem value="embedding">Embedding</SelectItem>
+                <SelectItem value="chat">💬 Chat</SelectItem>
+                <SelectItem value="reasoning">⚡ Reasoning</SelectItem>
+                <SelectItem value="code">💻 Code</SelectItem>
+                <SelectItem value="vision">👁️ Vision</SelectItem>
+                <SelectItem value="embedding">🧠 Embedding</SelectItem>
+                <div className="border-t my-1" />
+                <SelectItem value="uncensored" className="text-purple-600 dark:text-purple-400 font-medium">
+                  🔓 Uncensored
+                </SelectItem>
               </SelectContent>
             </Select>
 
@@ -191,8 +263,13 @@ export function UnifiedModelCatalog() {
         {filteredModels.map((model) => (
           <Card
             key={model.id}
-            className="hover:shadow-lg hover:shadow-accent/20 transition-all cursor-pointer group"
-            onClick={() => setSelectedModel(model)}
+            className={`hover:shadow-lg hover:shadow-accent/20 transition-all cursor-pointer group ${
+              model.tags.includes('uncensored') ? 'border-2 border-purple-300 dark:border-purple-700' : ''
+            }`}
+            onClick={() => {
+              setSelectedModel(model);
+              setShowDetailsDialog(true);
+            }}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">
@@ -204,10 +281,23 @@ export function UnifiedModelCatalog() {
                     {model.id}
                   </p>
                 </div>
-                <Badge className={PROVIDER_COLORS[model.provider]} variant="secondary">
-                  {model.provider}
-                </Badge>
+                <div className="flex flex-col gap-1 items-end">
+                  <Badge className={PROVIDER_COLORS[model.provider]} variant="secondary">
+                    {model.provider}
+                  </Badge>
+                  {model.freeTier && (
+                    <Badge className="bg-green-500 text-white text-xs">FREE</Badge>
+                  )}
+                </div>
               </div>
+              
+              {/* Privacy Badge for Zero-Logging */}
+              {model.privacy === 'zero-logging' && (
+                <div className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 mt-2">
+                  <Lock size={12} weight="fill" />
+                  <span>Zero-Logging • Private</span>
+                </div>
+              )}
             </CardHeader>
             <CardContent className="space-y-3">
               {/* Context Window */}

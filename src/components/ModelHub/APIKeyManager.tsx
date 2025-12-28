@@ -113,6 +113,26 @@ const PROVIDERS: ProviderConfig[] = [
     testModel: "nvidia/llama-3.1-nemotron-70b-instruct",
     keyFormat: /^nvapi-[a-zA-Z0-9\-_]{20,}$/,
     docs: "https://build.nvidia.com"
+  },
+  {
+    id: "venice",
+    name: "Venice AI",
+    description: "Uncensored • Zero-Logging • Privacy First",
+    required: false,
+    icon: <ShieldCheck className="w-5 h-5" />,
+    testEndpoint: "https://api.venice.ai/api/v1/chat/completions",
+    testModel: "venice-uncensored",
+    docs: "https://venice.ai"
+  },
+  {
+    id: "deepinfra",
+    name: "DeepInfra",
+    description: "Uncensored • Fast Inference • Zero-Logging",
+    required: false,
+    icon: <Lightning className="w-5 h-5" />,
+    testEndpoint: "https://api.deepinfra.com/v1/openai/chat/completions",
+    testModel: "cognitivecomputations/dolphin-2.6-mixtral-8x7b",
+    docs: "https://deepinfra.com/dash/api_keys"
   }
 ];
 
