@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   Lightning,
   Database,
-  Flask
+  Flask,
+  DownloadSimple
 } from "@phosphor-icons/react";
 import { APIKeyManager } from "./APIKeyManager";
 import { ModelExplorer } from "./ModelExplorer";
@@ -23,6 +24,7 @@ import { LiveModelTester } from "./LiveModelTester";
 import { UnifiedModelCatalog } from "./UnifiedModelCatalog";
 import { BatchModelTester } from "./BatchModelTester";
 import { RAGPipelineDemo } from "./RAGPipelineDemo";
+import { ConfigurationExporter } from "./ConfigurationExporter";
 
 export function ModelHubApp() {
   const [activeTab, setActiveTab] = useState("catalog");
@@ -67,7 +69,7 @@ export function ModelHubApp() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-8 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
+          <TabsList className="grid grid-cols-9 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
             <TabsTrigger value="catalog" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Database size={18} />
               <span className="hidden sm:inline">Catalog</span>
@@ -75,6 +77,10 @@ export function ModelHubApp() {
             <TabsTrigger value="config" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Gear size={18} />
               <span className="hidden sm:inline">Config</span>
+            </TabsTrigger>
+            <TabsTrigger value="export" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <DownloadSimple size={18} />
+              <span className="hidden sm:inline">Export</span>
             </TabsTrigger>
             <TabsTrigger value="explore" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Brain size={18} />
@@ -115,6 +121,18 @@ export function ModelHubApp() {
                 Securely configure and validate your API keys. All keys are encrypted and stored only in your browser.
               </p>
               <APIKeyManager onConfigurationChange={setApiKeysConfigured} />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="export" className="space-y-6">
+            <Card className="p-8 border-border bg-card/50 backdrop-blur-sm">
+              <h2 className="text-3xl font-bold mb-4">
+                Export / Import Configuration
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Backup and restore your API key configuration. Export to JSON or ENV format for easy sharing across devices.
+              </p>
+              <ConfigurationExporter />
             </Card>
           </TabsContent>
 
