@@ -1,10 +1,13 @@
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { catalogInstance, PROVIDER_COLORS, UnifiedModel, ProviderType, ModelType } from '@/data/unifiedModelCatalog';
+import { ModelParameterConfig } from './ModelParameterConfig';
 import { 
   MagnifyingGlass, 
   Cpu, 
@@ -16,7 +19,11 @@ import {
   Brain,
   Database,
   ChartBar,
-  Funnel
+  Funnel,
+  X,
+  Sliders,
+  Play,
+  Info
 } from '@phosphor-icons/react';
 
 const CAPABILITY_ICONS: Record<string, React.ReactNode> = {
@@ -33,6 +40,7 @@ export function UnifiedModelCatalog() {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [selectedModel, setSelectedModel] = useState<UnifiedModel | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   const allModels = catalogInstance.getAllModels();
   const allTags = catalogInstance.getAllTags();
@@ -273,147 +281,201 @@ export function UnifiedModelCatalog() {
         </Card>
       )}
 
-      {/* Model Detail Modal */}
-      {selectedModel && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedModel(null)}
-        >
-          <Card
-            className="max-w-2xl w-full max-h-[90vh] overflow-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-2xl">{selectedModel.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground font-mono mt-1">{selectedModel.id}</p>
-                </div>
-                <Badge className={PROVIDER_COLORS[selectedModel.provider]}>
-                  {selectedModel.provider}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {selectedModel.description && (
-                <div>
-                  <h3 className="font-semibold mb-2">Description</h3>
-                  <p className="text-sm text-muted-foreground">{selectedModel.description}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-semibold mb-2">Specifications</h3>
-                  <dl className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Context Window:</dt>
-                      <dd className="font-mono">{selectedModel.contextWindow.toLocaleString()} tokens</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Model Type:</dt>
-                      <dd className="capitalize">{selectedModel.modelType}</dd>
-                    </div>
-                    {selectedModel.maxTokens && (
-                      <div className="flex justify-between">
-                        <dt className="text-muted-foreground">Max Output:</dt>
-                        <dd className="font-mono">{selectedModel.maxTokens.toLocaleString()}</dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-
-                {selectedModel.inputCostPer1M !== undefined && (
+      {/* Model Detail Dialog with Parameters */}
+      <Dialog open={!!selectedModel} onOpenChange={(open) => !open && setSelectedModel(null)}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          {selectedModel && (
+            <>
+              <DialogHeader>
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-semibold mb-2">Pricing (per 1M tokens)</h3>
-                    <dl className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <dt className="text-muted-foreground">Input:</dt>
-                        <dd className="font-mono">${selectedModel.inputCostPer1M.toFixed(2)}</dd>
-                      </div>
-                      <div className="flex justify-between">
-                        <dt className="text-muted-foreground">Output:</dt>
-                        <dd className="font-mono">${selectedModel.outputCostPer1M?.toFixed(2) || '0.00'}</dd>
-                      </div>
-                    </dl>
+                    <DialogTitle className="text-2xl">{selectedModel.name}</DialogTitle>
+                    <DialogDescription className="font-mono mt-1">{selectedModel.id}</DialogDescription>
                   </div>
-                )}
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Capabilities</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedModel.capabilities.map((cap) => (
-                    <Badge key={cap.name} variant={cap.supported ? 'default' : 'outline'}>
-                      {cap.name}
-                    </Badge>
-                  ))}
+                  <Badge className={PROVIDER_COLORS[selectedModel.provider]} variant="secondary">
+                    {selectedModel.provider}
+                  </Badge>
                 </div>
-              </div>
+              </DialogHeader>
 
-              <div>
-                <h3 className="font-semibold mb-2">Features</h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    {selectedModel.supportsStreaming ? '✅' : '❌'}
-                    <span>Streaming</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {selectedModel.supportsFunctionCalling ? '✅' : '❌'}
-                    <span>Function Calling</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {selectedModel.supportsVision ? '✅' : '❌'}
-                    <span>Vision</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {selectedModel.requiresApiKey ? '🔑' : '🆓'}
-                    <span>API Key Required</span>
-                  </div>
-                </div>
-              </div>
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="overview" className="gap-2">
+                    <Info size={16} />
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger value="parameters" className="gap-2">
+                    <Sliders size={16} />
+                    Parameters
+                  </TabsTrigger>
+                  <TabsTrigger value="test" className="gap-2">
+                    <Play size={16} />
+                    Test Model
+                  </TabsTrigger>
+                </TabsList>
 
-              {selectedModel.benchmarkScores && (
-                <div>
-                  <h3 className="font-semibold mb-2">Benchmark Scores</h3>
-                  <div className="space-y-2">
-                    {Object.entries(selectedModel.benchmarkScores).map(([key, value]) => (
-                      <div key={key} className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground capitalize w-24">{key}:</span>
-                        <div className="flex-1 bg-muted rounded-full h-2">
-                          <div
-                            className="bg-accent rounded-full h-2"
-                            style={{ width: `${value}%` }}
-                          />
+                <TabsContent value="overview" className="space-y-6 mt-6">
+                  {selectedModel.description && (
+                    <div>
+                      <h3 className="font-semibold mb-2 text-sm uppercase tracking-wide text-muted-foreground">Description</h3>
+                      <p className="text-sm">{selectedModel.description}</p>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-muted-foreground">Specifications</h3>
+                        <dl className="space-y-2 text-sm">
+                          <div className="flex justify-between py-2 border-b border-border">
+                            <dt className="text-muted-foreground">Context Window</dt>
+                            <dd className="font-mono font-medium">{selectedModel.contextWindow.toLocaleString()} tokens</dd>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-border">
+                            <dt className="text-muted-foreground">Model Type</dt>
+                            <dd className="font-medium capitalize">{selectedModel.modelType}</dd>
+                          </div>
+                          {selectedModel.maxTokens && (
+                            <div className="flex justify-between py-2 border-b border-border">
+                              <dt className="text-muted-foreground">Max Output</dt>
+                              <dd className="font-mono font-medium">{selectedModel.maxTokens.toLocaleString()}</dd>
+                            </div>
+                          )}
+                          <div className="flex justify-between py-2 border-b border-border">
+                            <dt className="text-muted-foreground">Streaming</dt>
+                            <dd>
+                              <Badge variant={selectedModel.supportsStreaming ? "default" : "secondary"} className="text-xs">
+                                {selectedModel.supportsStreaming ? 'Supported' : 'Not Supported'}
+                              </Badge>
+                            </dd>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-border">
+                            <dt className="text-muted-foreground">Function Calling</dt>
+                            <dd>
+                              <Badge variant={selectedModel.supportsFunctionCalling ? "default" : "secondary"} className="text-xs">
+                                {selectedModel.supportsFunctionCalling ? 'Supported' : 'Not Supported'}
+                              </Badge>
+                            </dd>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-border">
+                            <dt className="text-muted-foreground">Vision</dt>
+                            <dd>
+                              <Badge variant={selectedModel.supportsVision ? "default" : "secondary"} className="text-xs">
+                                {selectedModel.supportsVision ? 'Supported' : 'Not Supported'}
+                              </Badge>
+                            </dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {selectedModel.inputCostPer1M !== undefined && (
+                        <div>
+                          <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-muted-foreground">Pricing</h3>
+                          <dl className="space-y-2 text-sm">
+                            <div className="flex justify-between py-2 border-b border-border">
+                              <dt className="text-muted-foreground">Input (per 1M tokens)</dt>
+                              <dd className="font-mono font-medium">${selectedModel.inputCostPer1M.toFixed(2)}</dd>
+                            </div>
+                            <div className="flex justify-between py-2 border-b border-border">
+                              <dt className="text-muted-foreground">Output (per 1M tokens)</dt>
+                              <dd className="font-mono font-medium">${selectedModel.outputCostPer1M?.toFixed(2) || '0.00'}</dd>
+                            </div>
+                          </dl>
                         </div>
-                        <span className="text-sm font-mono w-12 text-right">{value.toFixed(1)}</span>
-                      </div>
-                    ))}
+                      )}
+
+                      {selectedModel.benchmarkScores && Object.keys(selectedModel.benchmarkScores).length > 0 && (
+                        <div>
+                          <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-muted-foreground">Benchmark Scores</h3>
+                          <dl className="space-y-2 text-sm">
+                            {Object.entries(selectedModel.benchmarkScores).map(([benchmark, score]) => (
+                              <div key={benchmark} className="flex justify-between py-2 border-b border-border">
+                                <dt className="text-muted-foreground capitalize">{benchmark}</dt>
+                                <dd className="font-mono font-medium">{score.toFixed(1)}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              <div>
-                <h3 className="font-semibold mb-2">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedModel.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+                  {selectedModel.capabilities.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-muted-foreground">Capabilities</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedModel.capabilities.map((cap) => (
+                          <Badge key={cap.name} variant="outline" className="gap-2">
+                            {CAPABILITY_ICONS[cap.name]}
+                            {cap.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              <div className="flex gap-2">
-                <Button className="flex-1">Test This Model</Button>
-                <Button variant="outline" onClick={() => setSelectedModel(null)}>
-                  Close
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                  {selectedModel.tags.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-muted-foreground">Tags</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedModel.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedModel.endpoint && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-muted-foreground">API Endpoint</h3>
+                      <code className="block bg-muted p-3 rounded text-xs font-mono break-all">
+                        {selectedModel.endpoint}
+                      </code>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="parameters" className="mt-6">
+                  <ModelParameterConfig 
+                    model={{
+                      id: selectedModel.id,
+                      name: selectedModel.name,
+                      provider: selectedModel.provider as any,
+                      contextWindow: selectedModel.contextWindow,
+                      maxTokens: selectedModel.maxTokens,
+                    } as any}
+                    showPresetSave={true}
+                  />
+                </TabsContent>
+
+                <TabsContent value="test" className="mt-6">
+                  <Card className="border-dashed border-2 bg-muted/30">
+                    <CardContent className="p-8 text-center space-y-4">
+                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                        <Play size={32} className="text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">Test This Model</h3>
+                        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                          Configure your API keys in the Config tab, then use the Live Test or Batch Test features to try this model.
+                        </p>
+                      </div>
+                      <Button className="gap-2">
+                        <Play size={18} />
+                        Go to Live Tester
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
