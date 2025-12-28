@@ -10,7 +10,9 @@ import {
   BookmarkSimple,
   Gear,
   ShieldCheck,
-  Lightning
+  Lightning,
+  Database,
+  Flask
 } from "@phosphor-icons/react";
 import { APIKeyManager } from "./APIKeyManager";
 import { ModelExplorer } from "./ModelExplorer";
@@ -18,9 +20,12 @@ import { EnhancedPromptTester } from "./EnhancedPromptTester";
 import { ResponseComparison } from "./ResponseComparison";
 import { SavedPrompts } from "./SavedPrompts";
 import { LiveModelTester } from "./LiveModelTester";
+import { UnifiedModelCatalog } from "./UnifiedModelCatalog";
+import { BatchModelTester } from "./BatchModelTester";
+import { RAGPipelineDemo } from "./RAGPipelineDemo";
 
 export function ModelHubApp() {
-  const [activeTab, setActiveTab] = useState("explore");
+  const [activeTab, setActiveTab] = useState("catalog");
   const [apiKeysConfigured, setApiKeysConfigured] = useState(false);
 
   return (
@@ -34,9 +39,9 @@ export function ModelHubApp() {
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 animate-pulse" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">ModelHub</h1>
+                <h1 className="text-2xl font-bold tracking-tight">AI Integration Platform</h1>
                 <p className="text-sm text-muted-foreground font-mono">
-                  Test & Compare Multiple AI Models
+                  Unified Model Catalog - 70+ Models from All Providers
                 </p>
               </div>
             </div>
@@ -53,7 +58,7 @@ export function ModelHubApp() {
                 </Badge>
               )}
               <Badge variant="outline" className="font-mono">
-                v1.0.0
+                v2.0.0
               </Badge>
             </div>
           </div>
@@ -62,10 +67,14 @@ export function ModelHubApp() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-6 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
+          <TabsList className="grid grid-cols-8 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
+            <TabsTrigger value="catalog" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Database size={18} />
+              <span className="hidden sm:inline">Catalog</span>
+            </TabsTrigger>
             <TabsTrigger value="config" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Gear size={18} />
-              <span className="hidden sm:inline">API Config</span>
+              <span className="hidden sm:inline">Config</span>
             </TabsTrigger>
             <TabsTrigger value="explore" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Brain size={18} />
@@ -73,11 +82,15 @@ export function ModelHubApp() {
             </TabsTrigger>
             <TabsTrigger value="live" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Lightning size={18} weight="fill" />
-              <span className="hidden sm:inline">Live API</span>
+              <span className="hidden sm:inline">Live</span>
             </TabsTrigger>
             <TabsTrigger value="test" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <TestTube size={18} />
               <span className="hidden sm:inline">Test</span>
+            </TabsTrigger>
+            <TabsTrigger value="batch" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Flask size={18} />
+              <span className="hidden sm:inline">Batch</span>
             </TabsTrigger>
             <TabsTrigger value="compare" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <SquaresFour size={18} />
@@ -88,6 +101,10 @@ export function ModelHubApp() {
               <span className="hidden sm:inline">Saved</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="catalog">
+            <UnifiedModelCatalog />
+          </TabsContent>
 
           <TabsContent value="config" className="space-y-6">
             <Card className="p-8 border-border bg-card/50 backdrop-blur-sm">
@@ -113,6 +130,10 @@ export function ModelHubApp() {
             <EnhancedPromptTester apiKeysConfigured={apiKeysConfigured} />
           </TabsContent>
 
+          <TabsContent value="batch">
+            <BatchModelTester />
+          </TabsContent>
+
           <TabsContent value="compare">
             <ResponseComparison apiKeysConfigured={apiKeysConfigured} />
           </TabsContent>
@@ -121,13 +142,18 @@ export function ModelHubApp() {
             <SavedPrompts />
           </TabsContent>
         </Tabs>
+
+        {/* RAG Pipeline Section */}
+        <div className="mt-12">
+          <RAGPipelineDemo />
+        </div>
       </main>
 
       <footer className="border-t border-border mt-16 py-8 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
-          <p className="font-mono">ModelHub - Unified AI Integration Platform</p>
+          <p className="font-mono">AI Integration Platform - Unified Model Catalog</p>
           <p className="mt-2">
-            Supports OpenRouter, xAI Grok, DeepSeek, Anthropic Claude, and OpenAI
+            70+ Models: xAI Grok, DeepSeek, Anthropic Claude, OpenRouter, HuggingFace, OpenAI, Google Gemini, NVIDIA NIM
           </p>
           <p className="mt-2 text-xs opacity-60">
             🔒 All API keys are encrypted and stored locally in your browser. No server-side storage.
