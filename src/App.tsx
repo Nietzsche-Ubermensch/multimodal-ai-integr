@@ -1,8 +1,9 @@
 import { ModelHubApp } from "@/components/ModelHub/ModelHubApp";
 import PromptStudio from "@/components/PromptEngineering/PromptStudio";
 import { SupabaseVectorRAG } from "@/components/SupabaseVectorRAG";
+import { DocumentChunkingDemo } from "@/components/DocumentChunkingDemo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database, Brain } from "lucide-react";
+import { Sparkles, Database, Brain, Scissors } from "lucide-react";
 
 function App() {
   return (
@@ -32,6 +33,13 @@ function App() {
                 <Brain className="w-4 h-4" />
                 Vector RAG
               </TabsTrigger>
+              <TabsTrigger
+                value="chunking"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Scissors className="w-4 h-4" />
+                Document Chunking
+              </TabsTrigger>
             </TabsList>
           </div>
         </div>
@@ -47,6 +55,12 @@ function App() {
         <TabsContent value="vector-rag" className="mt-0">
           <div className="container mx-auto py-8 max-w-6xl">
             <SupabaseVectorRAG />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="chunking" className="mt-0">
+          <div className="container mx-auto py-8 max-w-6xl">
+            <DocumentChunkingDemo />
           </div>
         </TabsContent>
       </Tabs>
