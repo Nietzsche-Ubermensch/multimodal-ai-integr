@@ -13,7 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { APIKeyManager } from "./APIKeyManager";
 import { ModelExplorer } from "./ModelExplorer";
-import { PromptTester } from "./PromptTester";
+import { EnhancedPromptTester } from "./EnhancedPromptTester";
 import { ResponseComparison } from "./ResponseComparison";
 import { SavedPrompts } from "./SavedPrompts";
 
@@ -100,7 +100,7 @@ export function ModelHubApp() {
           </TabsContent>
 
           <TabsContent value="test">
-            <PromptTester apiKeysConfigured={apiKeysConfigured} />
+            <EnhancedPromptTester apiKeysConfigured={apiKeysConfigured} />
           </TabsContent>
 
           <TabsContent value="compare">
