@@ -1,7 +1,43 @@
 import { ModelHubApp } from "@/components/ModelHub/ModelHubApp";
+import PromptStudio from "@/components/PromptEngineering/PromptStudio";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sparkles, Database } from "lucide-react";
 
 function App() {
-  return <ModelHubApp />;
+  return (
+    <div className="min-h-screen bg-background">
+      <Tabs defaultValue="modelhub" className="w-full">
+        <div className="border-b bg-card sticky top-0 z-50">
+          <div className="container mx-auto">
+            <TabsList className="h-14 w-full justify-start rounded-none bg-transparent border-b-0">
+              <TabsTrigger
+                value="modelhub"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Database className="w-4 h-4" />
+                Model Hub
+              </TabsTrigger>
+              <TabsTrigger
+                value="prompt-studio"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Sparkles className="w-4 h-4" />
+                Prompt Engineering Studio
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
+
+        <TabsContent value="modelhub" className="mt-0">
+          <ModelHubApp />
+        </TabsContent>
+
+        <TabsContent value="prompt-studio" className="mt-0">
+          <PromptStudio />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 }
 
 export default App;
