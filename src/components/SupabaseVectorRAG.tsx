@@ -1,0 +1,655 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { 
+  Database, 
+  MagnifyingGlass,
+  CloudArrowUp,
+  ArrowsClockwise,
+  Sparkle,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Lightning,
+  Brain
+} from "@phosphor-icons/react";
+import { toast } from "sonner";
+import { useKV } from "@github/spark/hooks";
+import { CodeBlock } from "./CodeBlock";
+
+interface Document {
+  id: string;
+  content: string;
+  metadata: Record<string, any>;
+  embedding?: number[];
+  created_at: string;
+}
+
+interface SearchResult extends Document {
+  similarity: number;
+}
+
+interface EmbeddingModel {
+  id: string;
+  name: string;
+  dimensions: number;
+  provider: string;
+  cost_per_1m: number;
+}
+
+const EMBEDDING_MODELS: EmbeddingModel[] = [
+  { id: "text-embedding-3-large", name: "OpenAI Large (3072d)", dimensions: 3072, provider: "openai", cost_per_1m: 0.13 },
+  { id: "text-embedding-3-small", name: "OpenAI Small (1536d)", dimensions: 1536, provider: "openai", cost_per_1m: 0.02 },
+  { id: "bge-large-en-v1.5", name: "BGE Large (1024d)", dimensions: 1024, provider: "huggingface", cost_per_1m: 0.0 },
+];
+
+export function SupabaseVectorRAG() {
+  const [supabaseUrl, setSupabaseUrl] = useKV<string>("supabase_url", "");
+  const [supabaseKey, setSupabaseKey] = useKV<string>("supabase_key", "");
+  const [openaiKey, setOpenaiKey] = useKV<string>("openai_api_key", "");
+  
+  const [selectedModel, setSelectedModel] = useState<string>("text-embedding-3-small");
+  const [documentText, setDocumentText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [topK, setTopK] = useState(5);
+  const [similarityThreshold, setSimilarityThreshold] = useState(0.7);
+  
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  
+  const [processing, setProcessing] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const generateEmbedding = async (text: string, modelId: string): Promise<number[]> => {
+    const model = EMBEDDING_MODELS.find(m => m.id === modelId);
+    
+    if (model?.provider === "openai") {
+      const response = await fetch("https://api.openai.com/v1/embeddings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openaiKey}`
+        },
+        body: JSON.stringify({
+          model: modelId,
+          input: text
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenAI API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data[0].embedding;
+    } else if (model?.provider === "huggingface") {
+      const response = await fetch(`https://api-inference.huggingface.co/models/BAAI/${modelId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.HUGGINGFACE_TOKEN || ""}`
+        },
+        body: JSON.stringify({ inputs: text })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HuggingFace API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    }
+
+    throw new Error("Unsupported embedding model");
+  };
+
+  const storeDocument = async () => {
+    if (!documentText.trim()) {
+      toast.error("Please enter document text");
+      return;
+    }
+
+    if (!supabaseUrl || !supabaseKey) {
+      toast.error("Please configure Supabase connection");
+      return;
+    }
+
+    if (!openaiKey && selectedModel.startsWith("text-embedding")) {
+      toast.error("Please enter OpenAI API key");
+      return;
+    }
+
+    setProcessing(true);
+    setProgress(0);
+
+    try {
+      setProgress(30);
+      const embedding = await generateEmbedding(documentText, selectedModel);
+      
+      setProgress(60);
+      const response = await fetch(`${supabaseUrl}/rest/v1/rag_vectors`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          content: documentText,
+          embedding,
+          embedding_model: selectedModel,
+          metadata: {
+            source: "manual_upload",
+            timestamp: new Date().toISOString(),
+            char_count: documentText.length
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Supabase error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setProgress(100);
+      
+      toast.success("Document stored with embedding!");
+      setDocumentText("");
+      loadDocuments();
+    } catch (error) {
+      toast.error(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setProcessing(false);
+      setTimeout(() => setProgress(0), 500);
+    }
+  };
+
+  const semanticSearch = async () => {
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a search query");
+      return;
+    }
+
+    if (!supabaseUrl || !supabaseKey) {
+      toast.error("Please configure Supabase connection");
+      return;
+    }
+
+    setSearching(true);
+
+    try {
+      const queryEmbedding = await generateEmbedding(searchQuery, selectedModel);
+
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/vector_search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`
+        },
+        body: JSON.stringify({
+          query_embedding: queryEmbedding,
+          match_threshold: similarityThreshold,
+          match_count: topK
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Search error: ${response.statusText}`);
+      }
+
+      const results = await response.json();
+      setSearchResults(results);
+      
+      toast.success(`Found ${results.length} relevant documents`);
+    } catch (error) {
+      toast.error(`Search error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const loadDocuments = async () => {
+    if (!supabaseUrl || !supabaseKey) return;
+
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/rag_vectors?select=id,content,metadata,created_at&order=created_at.desc&limit=10`, {
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDocuments(data);
+      }
+    } catch (error) {
+      console.error("Error loading documents:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadDocuments();
+  }, [supabaseUrl, supabaseKey]);
+
+  const selectedModelInfo = EMBEDDING_MODELS.find(m => m.id === selectedModel);
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <Brain size={24} className="text-purple-400" weight="duotone" />
+            </div>
+            <div>
+              <CardTitle>Supabase pgvector RAG</CardTitle>
+              <CardDescription>
+                Real-time document storage with semantic search using vector embeddings
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="bg-card/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Database size={16} />
+                  pgvector
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  PostgreSQL vector extension for similarity search
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Sparkle size={16} />
+                  Live Embeddings
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Generate embeddings on-the-fly with OpenAI/HuggingFace
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <MagnifyingGlass size={16} />
+                  Semantic Search
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Find relevant documents by meaning, not keywords
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Lightning size={16} />
+                  Real-time
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Instant indexing and sub-second search responses
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Configuration</h3>
+            
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Supabase Project URL</Label>
+                <Input
+                  type="text"
+                  placeholder="https://your-project.supabase.co"
+                  value={supabaseUrl}
+                  onChange={(e) => setSupabaseUrl(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Supabase Service Key</Label>
+                <Input
+                  type="password"
+                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  value={supabaseKey}
+                  onChange={(e) => setSupabaseKey(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>OpenAI API Key</Label>
+                <Input
+                  type="password"
+                  placeholder="sk-..."
+                  value={openaiKey}
+                  onChange={(e) => setOpenaiKey(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Embedding Model</Label>
+                <Select value={selectedModel} onValueChange={setSelectedModel}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EMBEDDING_MODELS.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.name} - ${model.cost_per_1m.toFixed(3)}/1M
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedModelInfo && (
+                  <p className="text-xs text-muted-foreground">
+                    {selectedModelInfo.dimensions} dimensions • {selectedModelInfo.provider}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Document Storage</CardTitle>
+          <CardDescription>
+            Store documents with automatic embedding generation
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Document Content</Label>
+            <Textarea
+              placeholder="Enter text to store with vector embedding..."
+              value={documentText}
+              onChange={(e) => setDocumentText(e.target.value)}
+              rows={6}
+              className="font-mono text-sm"
+            />
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>{documentText.length} characters</span>
+              {documentText.length > 0 && selectedModelInfo && (
+                <span>
+                  Est. cost: ${((documentText.length / 1000000) * selectedModelInfo.cost_per_1m).toFixed(6)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {processing && progress > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {progress < 40 ? "Generating embedding..." : progress < 80 ? "Storing in Supabase..." : "Complete!"}
+                </span>
+                <span className="font-mono">{progress}%</span>
+              </div>
+              <Progress value={progress} className="h-2" />
+            </div>
+          )}
+
+          <Button 
+            onClick={storeDocument} 
+            disabled={processing || !documentText.trim()}
+            className="w-full"
+          >
+            {processing ? (
+              <>
+                <ArrowsClockwise className="animate-spin mr-2" size={16} />
+                Processing...
+              </>
+            ) : (
+              <>
+                <CloudArrowUp className="mr-2" size={16} />
+                Store Document with Embedding
+              </>
+            )}
+          </Button>
+
+          {documents.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Recent Documents ({documents.length})</Label>
+                <Button variant="ghost" size="sm" onClick={loadDocuments}>
+                  <ArrowsClockwise size={14} />
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {documents.map((doc) => (
+                  <Card key={doc.id} className="p-3">
+                    <p className="text-sm line-clamp-2">{doc.content}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">
+                        {new Date(doc.created_at).toLocaleDateString()}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {doc.content.length} chars
+                      </Badge>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Semantic Search</CardTitle>
+          <CardDescription>
+            Find relevant documents using vector similarity
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Search Query</Label>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="What are you looking for?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && semanticSearch()}
+              />
+              <Button onClick={semanticSearch} disabled={searching || !searchQuery.trim()}>
+                {searching ? (
+                  <ArrowsClockwise className="animate-spin" size={16} />
+                ) : (
+                  <MagnifyingGlass size={16} />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Top K Results</Label>
+              <Select value={topK.toString()} onValueChange={(v) => setTopK(Number(v))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[3, 5, 10, 20].map((k) => (
+                    <SelectItem key={k} value={k.toString()}>
+                      {k} results
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Similarity Threshold</Label>
+              <Select value={similarityThreshold.toString()} onValueChange={(v) => setSimilarityThreshold(Number(v))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[0.5, 0.6, 0.7, 0.8, 0.9].map((t) => (
+                    <SelectItem key={t} value={t.toString()}>
+                      {t} ({t === 0.5 ? "Relaxed" : t === 0.7 ? "Balanced" : t === 0.9 ? "Strict" : "Custom"})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {searchResults.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Search Results</Label>
+                <Badge>{searchResults.length} matches</Badge>
+              </div>
+              <div className="space-y-3">
+                {searchResults.map((result, idx) => (
+                  <Card key={result.id} className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="secondary">#{idx + 1}</Badge>
+                          <Badge 
+                            className={
+                              result.similarity > 0.9 ? "bg-green-500/20 text-green-400" :
+                              result.similarity > 0.8 ? "bg-blue-500/20 text-blue-400" :
+                              "bg-yellow-500/20 text-yellow-400"
+                            }
+                          >
+                            {(result.similarity * 100).toFixed(1)}% match
+                          </Badge>
+                        </div>
+                        <p className="text-sm">{result.content}</p>
+                        {result.metadata && (
+                          <div className="flex items-center gap-2 mt-2">
+                            {result.metadata.source && (
+                              <Badge variant="outline" className="text-xs">
+                                {result.metadata.source}
+                              </Badge>
+                            )}
+                            {result.metadata.timestamp && (
+                              <Badge variant="outline" className="text-xs">
+                                {new Date(result.metadata.timestamp).toLocaleString()}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {searchResults.length === 0 && searchQuery && !searching && (
+            <Alert>
+              <AlertDescription>
+                No results found. Try adjusting the similarity threshold or using different search terms.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>SQL Schema</CardTitle>
+          <CardDescription>
+            Run this in your Supabase SQL Editor to set up pgvector
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CodeBlock
+            language="sql"
+            code={`-- Enable pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Create vectors table
+CREATE TABLE rag_vectors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  content TEXT NOT NULL,
+  embedding VECTOR(${selectedModelInfo?.dimensions || 1536}),
+  embedding_model VARCHAR(100) NOT NULL,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create index for faster similarity search
+CREATE INDEX ON rag_vectors USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+
+-- Semantic search function
+CREATE OR REPLACE FUNCTION vector_search(
+  query_embedding VECTOR(${selectedModelInfo?.dimensions || 1536}),
+  match_threshold FLOAT DEFAULT 0.7,
+  match_count INT DEFAULT 5
+)
+RETURNS TABLE (
+  id UUID,
+  content TEXT,
+  metadata JSONB,
+  similarity FLOAT,
+  created_at TIMESTAMPTZ
+)
+LANGUAGE sql STABLE
+AS $$
+  SELECT
+    id,
+    content,
+    metadata,
+    1 - (embedding <=> query_embedding) AS similarity,
+    created_at
+  FROM rag_vectors
+  WHERE 1 - (embedding <=> query_embedding) > match_threshold
+  ORDER BY embedding <=> query_embedding
+  LIMIT match_count;
+$$;
+
+-- Enable Row Level Security (optional)
+ALTER TABLE rag_vectors ENABLE ROW LEVEL SECURITY;
+
+-- Policy for public access (adjust as needed)
+CREATE POLICY "Allow public read access" ON rag_vectors
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow public insert access" ON rag_vectors
+  FOR INSERT WITH CHECK (true);`}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

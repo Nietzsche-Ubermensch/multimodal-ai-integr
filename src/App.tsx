@@ -1,7 +1,8 @@
 import { ModelHubApp } from "@/components/ModelHub/ModelHubApp";
 import PromptStudio from "@/components/PromptEngineering/PromptStudio";
+import { SupabaseVectorRAG } from "@/components/SupabaseVectorRAG";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database } from "lucide-react";
+import { Sparkles, Database, Brain } from "lucide-react";
 
 function App() {
   return (
@@ -24,6 +25,13 @@ function App() {
                 <Sparkles className="w-4 h-4" />
                 Prompt Engineering Studio
               </TabsTrigger>
+              <TabsTrigger
+                value="vector-rag"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Brain className="w-4 h-4" />
+                Vector RAG
+              </TabsTrigger>
             </TabsList>
           </div>
         </div>
@@ -34,6 +42,12 @@ function App() {
 
         <TabsContent value="prompt-studio" className="mt-0">
           <PromptStudio />
+        </TabsContent>
+
+        <TabsContent value="vector-rag" className="mt-0">
+          <div className="container mx-auto py-8 max-w-6xl">
+            <SupabaseVectorRAG />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
