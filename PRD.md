@@ -1,52 +1,24 @@
 # Planning Guide
 
-A unified AI Integration Platform featuring an end-to-end RAG (Retrieval-Augmented Generation) demo that combines Oxylabs web scraping, Supabase vector storage, and LiteLLM unified inference. This platform consolidates all AI provider SDK demos, interactive API testers, and comprehensive documentation into a single, production-ready application enabling developers to build intelligent applications with real-world data.
+**ModelHub - Unified AI Integration Platform**: A comprehensive, production-ready platform that unifies testing, comparison, and integration of 14+ AI models from 7 providers (xAI, DeepSeek, Anthropic, OpenRouter, HuggingFace, OpenAI, NVIDIA NIM) with real API integration, live model testing, streaming responses, and comprehensive model catalog.
 
 **Experience Qualities**: 
-1. **Unified & Intelligent**: Complete RAG pipeline demonstration showing web scraping → embedding → vector storage → retrieval → LLM generation, plus individual SDK testing for all major providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM, Firecrawl, Oxylabs, Supabase) - eliminating the complexity of integrating multiple services
-2. **Production-Ready & Interactive**: Live end-to-end RAG demo with configurable URLs, questions, and LLM providers, real-time pipeline visualization, automatic code generation for Oxylabs + Supabase + LiteLLM integration, plus individual API testing for each service
-3. **Comprehensive & Educational**: Complete coverage of modern AI application patterns including RAG architecture, vector databases, web scraping for LLMs, embedding generation, similarity search, and multi-provider LLM orchestration with security best practices
+1. **Unified & Comprehensive**: Single platform consolidating 14+ AI models from 7 providers with real-time API testing, streaming responses, model comparison, and comprehensive specifications - eliminating the need to manage multiple provider dashboards
+2. **Production-Ready & Interactive**: Live API integration with all major providers, real-time validation, streaming chat responses, side-by-side model comparison, and instant feedback - enabling developers to test and integrate AI capabilities immediately
+3. **Secure & Intelligent**: Browser-only encrypted API key storage, real-time validation with actual API calls, comprehensive error handling, and intelligent model selection based on capabilities and cost - prioritizing security while maintaining developer productivity
 
-**Complexity Level**: Complex Application (advanced functionality with full RAG pipeline, multiple interactive views, real-time API testing, vector search demonstrations, and comprehensive educational content)
+**Complexity Level**: Complex Application (advanced functionality with real API integration, streaming responses, multi-provider orchestration, secure key management, and comprehensive model testing)
 
-This platform enables developers to understand and implement complete AI applications - from gathering fresh data via web scraping to storing embeddings in vector databases to generating intelligent answers using multiple LLM providers - all demonstrated through interactive, production-ready examples.
+This platform enables developers to explore, test, and integrate multiple AI providers through a single unified interface - from secure API key configuration to live model testing with streaming responses to comparing outputs side-by-side - all with production-ready security and performance.
 
 ## Essential Features
 
-### Node.js API Gateway (NEW)
-- **Functionality**: Production-ready Express.js/TypeScript backend providing unified REST API access to 8+ AI providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM, Nvidia NIM, Perplexity, HuggingFace) with JWT authentication, rate limiting, request validation, streaming support, and comprehensive error handling
-- **Purpose**: Enable secure, scalable backend integration for AI applications with provider abstraction, centralized API key management, monitoring, and consistent request/response formats across all providers
-- **Trigger**: Start API gateway server (`npm run dev` in api-gateway directory)
-- **Progression**: Configure API keys → Start gateway → Register/login user → Get JWT token → Make chat/embeddings/rerank requests → Monitor health/metrics → Deploy with Docker
-- **Success criteria**: Working authentication flow, successful API calls to configured providers, rate limiting enforcement, streaming chat responses, comprehensive API documentation, Docker deployment ready, Redis integration for rate limiting, provider health checks
-
-### End-to-End RAG Pipeline Demo
-- **Functionality**: Interactive demonstration of complete RAG workflow: Oxylabs web scraping → embedding generation → Supabase vector storage → similarity search → LiteLLM answer generation with real-time progress tracking and step-by-step visualization
-- **Purpose**: Show developers exactly how to build production RAG applications combining web scraping, vector databases, and LLM inference with working code examples
-- **Trigger**: Navigate to RAG Demo tab (featured prominently on overview page)
-- **Progression**: Configure URL and question → Select LLM provider → Run pipeline → View scraped content → See embeddings generated → Watch Supabase storage → Observe vector search → Read AI-generated answer → Copy production Python code → Review Supabase schema → Deploy
-- **Success criteria**: Complete 5-step pipeline execution (scrape, embed, store, retrieve, generate), real-time progress indicators, working demo mode with realistic data, production code generation, Supabase SQL schema examples, architecture diagrams, environment setup guide
-
-### Unified Dashboard Interface
-- **Functionality**: Tab-based navigation system consolidating all AI provider demos, API testers, documentation, and deployment guides into a single cohesive interface
-- **Purpose**: Eliminate context switching between separate presentations/tools and enable seamless exploration of all AI integration concepts from one central hub
-- **Trigger**: App loads with overview dashboard showing all available providers and features
-- **Progression**: View overview → Select provider tab (Anthropic/DeepSeek/xAI/OpenRouter/LiteLLM/Firecrawl) → Test APIs → View documentation → Deploy → Return to overview
-- **Success criteria**: Smooth tab navigation, persistent state across tabs, responsive design for all screen sizes, clear visual hierarchy, quick access to all 9 main sections
-
-### Multi-Provider SDK Testing Suite
-- **Functionality**: Interactive SDK demo components for 5 major AI providers (Anthropic, DeepSeek, xAI, OpenRouter, LiteLLM) with live API testing, model selection, real-time response generation, and production-ready code examples
-- **Purpose**: Enable developers to test each provider's SDK with real or simulated API calls, compare model capabilities side-by-side, and generate production code instantly
-- **Trigger**: Navigate to any provider tab (Anthropic/DeepSeek/xAI/OpenRouter/LiteLLM)
-- **Progression**: Select provider → Choose model → Enter prompt → Toggle real/simulated API → Execute test → View streaming response → Copy TypeScript/Python code → Switch between installation/basic/advanced examples
-- **Success criteria**: Working demos for all 5 providers, accurate model information for 20+ models, streaming support, vision API examples, error handling, toast notifications, syntax-highlighted code blocks
-
-### Firecrawl Live API Tester
-- **Functionality**: Real-time web scraping demo with URL input, endpoint selection (Scrape/Map/Search), toggle between demo and live API modes, instant Markdown/HTML preview, and automatic Python code generation
-- **Purpose**: Allow developers to test Firecrawl API endpoints immediately without writing code, understand LLM-ready response formats, and build RAG applications
-- **Trigger**: Navigate to Firecrawl tab
-- **Progression**: Select endpoint type → Enter URL or search query → Configure options → Toggle real API mode → Execute → View formatted Markdown response → Copy JSON or Python code → Test different URLs
-- **Success criteria**: Working scrape/map/search endpoints, real API integration, clean Markdown preview, JSON response viewer, auto-generated code, loading states, error handling
+### Unified Model Catalog (14+ Models from 7 Providers)
+- **Functionality**: Centralized catalog of 14 production AI models from xAI (Grok 4.1, Grok Code, Grok Vision), DeepSeek (Chat, Reasoner), Anthropic (Claude Opus 4.5, Sonnet 4.5), HuggingFace (Qwen3, Llama 3.1), OpenRouter (GPT-4, Gemini 2.5), and NVIDIA NIM (Embeddings, Reranking) with real-time search, filtering by provider/type, sorting by name/cost/context, and comprehensive specifications
+- **Purpose**: Enable developers to discover and compare AI models across providers with detailed capability information, pricing transparency, and context window sizes to make informed integration decisions
+- **Trigger**: Navigate to "Explore" tab or use search/filter controls
+- **Progression**: View all models → Search by name/capability → Filter by provider (7 options) → Filter by type (chat/reasoning/code/vision/embedding) → Sort by criteria → View detailed specs → Click "Test Model"
+- **Success criteria**: 14 models displayed with accurate specifications, sub-200ms search/filter performance, responsive grid layout (3 cols desktop, 2 tablet, 1 mobile), visual provider badges, capability tags, pricing display, context window info
 
 ### Environment Setup & API Key Management
 - **Functionality**: Comprehensive guide for setting up API keys securely across all providers with validation, security best practices, and example .env configurations
