@@ -9,13 +9,15 @@ import {
   SquaresFour,
   BookmarkSimple,
   Gear,
-  ShieldCheck
+  ShieldCheck,
+  Lightning
 } from "@phosphor-icons/react";
 import { APIKeyManager } from "./APIKeyManager";
 import { ModelExplorer } from "./ModelExplorer";
 import { EnhancedPromptTester } from "./EnhancedPromptTester";
 import { ResponseComparison } from "./ResponseComparison";
 import { SavedPrompts } from "./SavedPrompts";
+import { LiveModelTester } from "./LiveModelTester";
 
 export function ModelHubApp() {
   const [activeTab, setActiveTab] = useState("explore");
@@ -60,7 +62,7 @@ export function ModelHubApp() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
+          <TabsList className="grid grid-cols-6 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
             <TabsTrigger value="config" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Gear size={18} />
               <span className="hidden sm:inline">API Config</span>
@@ -68,6 +70,10 @@ export function ModelHubApp() {
             <TabsTrigger value="explore" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Brain size={18} />
               <span className="hidden sm:inline">Explore</span>
+            </TabsTrigger>
+            <TabsTrigger value="live" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Lightning size={18} weight="fill" />
+              <span className="hidden sm:inline">Live API</span>
             </TabsTrigger>
             <TabsTrigger value="test" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <TestTube size={18} />
@@ -97,6 +103,10 @@ export function ModelHubApp() {
 
           <TabsContent value="explore">
             <ModelExplorer />
+          </TabsContent>
+
+          <TabsContent value="live">
+            <LiveModelTester />
           </TabsContent>
 
           <TabsContent value="test">
