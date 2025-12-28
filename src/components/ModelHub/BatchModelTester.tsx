@@ -127,9 +127,24 @@ export function BatchModelTester() {
       // Execute batch concurrently
       const results = await Promise.allSettled(batchPromises);
       
-      for (const result of results) {
+      for (let j = 0; j < results.length; j++) {
+        const result = results[j];
         if (result.status === 'fulfilled') {
           batchResults.push(result.value);
+        } else {
+          // Handle rejected promises - create error result for failed API calls
+          const modelId = batch[j];
+          const model = catalogInstance.getModel(modelId);
+          batchResults.push({
+            modelId,
+            modelName: model?.name || 'Unknown',
+            response: '',
+            latency: 0,
+            tokens: 0,
+            cost: 0,
+            status: 'error',
+            error: result.reason instanceof Error ? result.reason.message : 'Request failed',
+          });
         }
       }
       

@@ -534,15 +534,20 @@ export class DocumentChunker {
       
       if (position !== -1) {
         positions.push({ start: position, end: position + cleanChunk.length });
-        // Update search start for next chunk (account for overlapping chunks)
-        searchStartIndex = Math.max(searchStartIndex, position + 1);
+        // Update search start for next chunk, accounting for overlap
+        // Move forward by chunk length minus overlap to find overlapping chunks
+        const overlapAdjustedStart = position + Math.max(1, cleanChunk.length - this.config.chunkOverlap);
+        searchStartIndex = overlapAdjustedStart;
       } else {
         // Fallback: search from beginning if not found after last position
         const fallbackPosition = fullText.indexOf(cleanChunk);
         if (fallbackPosition !== -1) {
           positions.push({ start: fallbackPosition, end: fallbackPosition + cleanChunk.length });
         } else {
-          positions.push({ start: 0, end: cleanChunk.length });
+          // Chunk not found in text - estimate position based on previous chunks
+          // This can happen if the chunk was modified (trimmed differently) during splitting
+          const lastPosition = positions.length > 0 ? positions[positions.length - 1].end : 0;
+          positions.push({ start: lastPosition, end: lastPosition + cleanChunk.length });
         }
       }
     }
