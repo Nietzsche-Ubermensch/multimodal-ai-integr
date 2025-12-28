@@ -18,7 +18,8 @@ import {
   Lightning,
   Key,
   PlayCircle,
-  Info
+  Info,
+  Database
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 
@@ -133,6 +134,26 @@ const PROVIDERS: ProviderConfig[] = [
     testEndpoint: "https://api.deepinfra.com/v1/openai/chat/completions",
     testModel: "cognitivecomputations/dolphin-2.6-mixtral-8x7b",
     docs: "https://deepinfra.com/dash/api_keys"
+  },
+  {
+    id: "firecrawl",
+    name: "Firecrawl",
+    description: "Web scraping • LLM-ready markdown • Fast crawling",
+    required: false,
+    icon: <Lightning className="w-5 h-5" weight="fill" />,
+    testEndpoint: "https://api.firecrawl.dev/v1/scrape",
+    testModel: "firecrawl-scrape",
+    docs: "https://www.firecrawl.dev"
+  },
+  {
+    id: "oxylabs",
+    name: "Oxylabs AI Studio",
+    description: "Geo-targeted scraping • Proxy rotation • Enterprise",
+    required: false,
+    icon: <Database className="w-5 h-5" />,
+    testEndpoint: "https://realtime.oxylabs.io/v1/queries",
+    testModel: "oxylabs-scraper",
+    docs: "https://oxylabs.io/products/ai-studio"
   }
 ];
 

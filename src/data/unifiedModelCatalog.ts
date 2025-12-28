@@ -1,5 +1,5 @@
-export type ProviderType = 'xai' | 'deepseek' | 'anthropic' | 'openrouter' | 'huggingface' | 'openai' | 'google' | 'nvidia' | 'cohere' | 'perplexity' | 'venice' | 'deepinfra';
-export type ModelType = 'chat' | 'reasoning' | 'code' | 'vision' | 'embedding' | 'audio' | 'image-gen';
+export type ProviderType = 'xai' | 'deepseek' | 'anthropic' | 'openrouter' | 'huggingface' | 'openai' | 'google' | 'nvidia' | 'cohere' | 'perplexity' | 'venice' | 'deepinfra' | 'firecrawl' | 'oxylabs';
+export type ModelType = 'chat' | 'reasoning' | 'code' | 'vision' | 'embedding' | 'audio' | 'image-gen' | 'scraping' | 'rerank';
 export type PrivacyPolicy = 'zero-logging' | 'standard' | 'data-retention';
 
 export interface ModelCapability {
@@ -645,6 +645,235 @@ export const UNIFIED_MODEL_CATALOG: UnifiedModel[] = [
     description: 'Hermes 3 8B - Fast and affordable, uncensored',
     tags: ['uncensored', 'hermes', 'nousresearch', '8B', 'value'],
   },
+
+  // ========================================
+  // VENICE AI - UNCENSORED WITH ZERO LOGGING
+  // ========================================
+  {
+    id: 'venice/venice-uncensored',
+    name: 'Venice Uncensored 1.1',
+    provider: 'venice',
+    sourceId: 'venice-uncensored',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.5,
+    outputCostPer1M: 0.5,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.venice.ai/api/v1/chat/completions',
+    description: 'Venice Uncensored - Zero data retention, private AI',
+    tags: ['uncensored', 'venice', 'private', 'zero-logging'],
+    privacy: 'zero-logging',
+  },
+
+  // ========================================
+  // DEEPINFRA - UNCENSORED WITH ZERO LOGGING
+  // ========================================
+  {
+    id: 'deepinfra/cognitivecomputations/dolphin-2.6-mixtral-8x7b',
+    name: 'Dolphin 2.6 Mixtral 8x7B',
+    provider: 'deepinfra',
+    sourceId: 'cognitivecomputations/dolphin-2.6-mixtral-8x7b',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.2,
+    outputCostPer1M: 0.2,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.deepinfra.com/v1/openai/chat/completions',
+    description: 'Uncensored Mixtral MoE model - fast and obedient',
+    tags: ['uncensored', 'dolphin', 'mixtral', 'MoE', 'code'],
+    privacy: 'zero-logging',
+  },
+
+  // ========================================
+  // OPENROUTER - FREE UNCENSORED MODELS
+  // ========================================
+  {
+    id: 'openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
+    name: 'Dolphin Mistral 24B (FREE)',
+    provider: 'openrouter',
+    sourceId: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
+    contextWindow: 32_000,
+    modelType: 'chat',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    description: 'Free uncensored Dolphin model via OpenRouter',
+    tags: ['uncensored', 'dolphin', 'free', 'mistral', 'venice'],
+    freeTier: true,
+  },
+  {
+    id: 'openrouter/cognitivecomputations/dolphin3.0-r1-mistral-24b:free',
+    name: 'Dolphin 3.0 R1 (FREE)',
+    provider: 'openrouter',
+    sourceId: 'cognitivecomputations/dolphin3.0-r1-mistral-24b:free',
+    contextWindow: 32_000,
+    modelType: 'reasoning',
+    capabilities: [
+      { name: 'text', supported: true },
+      { name: 'code', supported: true },
+      { name: 'reasoning', supported: true },
+      { name: 'uncensored', supported: true },
+    ],
+    inputCostPer1M: 0.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: true,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    description: 'Dolphin 3.0 R1 with 800k reasoning traces - Free tier',
+    tags: ['uncensored', 'dolphin', 'free', 'reasoning', 'R1'],
+    freeTier: true,
+  },
+
+  // ========================================
+  // FIRECRAWL - WEB SCRAPING
+  // ========================================
+  {
+    id: 'firecrawl/scrape',
+    name: 'Firecrawl Scraper',
+    provider: 'firecrawl',
+    sourceId: 'firecrawl-scrape',
+    contextWindow: 0,
+    modelType: 'scraping',
+    capabilities: [
+      { name: 'scraping', supported: true },
+      { name: 'markdown', supported: true },
+      { name: 'fast', supported: true },
+    ],
+    inputCostPer1M: 25.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: false,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.firecrawl.dev/v1/scrape',
+    description: 'Fast LLM-ready markdown extraction from any website',
+    tags: ['scraping', 'fast', 'markdown', 'clean'],
+  },
+  {
+    id: 'firecrawl/crawl',
+    name: 'Firecrawl Crawler',
+    provider: 'firecrawl',
+    sourceId: 'firecrawl-crawl',
+    contextWindow: 0,
+    modelType: 'scraping',
+    capabilities: [
+      { name: 'crawling', supported: true },
+      { name: 'sitemap', supported: true },
+      { name: 'batch', supported: true },
+    ],
+    inputCostPer1M: 25.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: false,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.firecrawl.dev/v1/crawl',
+    description: 'Crawl entire websites with automatic sitemap discovery',
+    tags: ['crawling', 'sitemap', 'batch', 'discovery'],
+  },
+
+  // ========================================
+  // OXYLABS - GEO-TARGETED SCRAPING
+  // ========================================
+  {
+    id: 'oxylabs/web-scraper',
+    name: 'Oxylabs Web Scraper',
+    provider: 'oxylabs',
+    sourceId: 'oxylabs-scraper',
+    contextWindow: 0,
+    modelType: 'scraping',
+    capabilities: [
+      { name: 'geo_targeting', supported: true },
+      { name: 'proxy_rotation', supported: true },
+      { name: 'js_rendering', supported: true },
+    ],
+    inputCostPer1M: 20.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: false,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://realtime.oxylabs.io/v1/queries',
+    description: 'Enterprise-grade scraping with geo-targeting and proxy management',
+    tags: ['scraping', 'geo', 'proxy', 'enterprise'],
+  },
+
+  // ========================================
+  // NVIDIA NIM - RERANKING
+  // ========================================
+  {
+    id: 'nvidia_nim/llama-3.2-nv-rerankqa-1b-v2',
+    name: 'NVIDIA NIM Reranker',
+    provider: 'nvidia',
+    sourceId: 'nvidia/llama-3.2-nv-rerankqa-1b-v2',
+    contextWindow: 0,
+    modelType: 'rerank',
+    capabilities: [
+      { name: 'reranking', supported: true },
+      { name: 'rag_optimization', supported: true },
+    ],
+    inputCostPer1M: 5.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: false,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://ai.api.nvidia.com/v1/ranking',
+    description: 'High-performance reranking for RAG pipelines',
+    tags: ['reranking', 'rag', 'optimization', 'fast'],
+  },
+
+  // ========================================
+  // COHERE - RERANKING
+  // ========================================
+  {
+    id: 'cohere/rerank-v3.5',
+    name: 'Cohere Rerank v3.5',
+    provider: 'cohere',
+    sourceId: 'rerank-v3.5',
+    contextWindow: 0,
+    modelType: 'rerank',
+    capabilities: [
+      { name: 'reranking', supported: true },
+      { name: 'multilingual', supported: true },
+    ],
+    inputCostPer1M: 2.0,
+    outputCostPer1M: 0.0,
+    supportsStreaming: false,
+    supportsFunctionCalling: false,
+    supportsVision: false,
+    requiresApiKey: true,
+    endpoint: 'https://api.cohere.com/v1/rerank',
+    description: 'Multilingual reranking for 100+ languages',
+    tags: ['reranking', 'multilingual', 'rag', '100+languages'],
+  },
 ];
 
 export const PROVIDER_COLORS: Record<ProviderType, string> = {
@@ -660,6 +889,8 @@ export const PROVIDER_COLORS: Record<ProviderType, string> = {
   perplexity: 'bg-teal-600 text-white',
   venice: 'bg-indigo-700 text-white',
   deepinfra: 'bg-teal-700 text-white',
+  firecrawl: 'bg-orange-600 text-white',
+  oxylabs: 'bg-pink-600 text-white',
 };
 
 export class ModelCatalog {
