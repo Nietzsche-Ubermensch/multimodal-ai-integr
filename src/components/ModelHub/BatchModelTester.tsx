@@ -34,6 +34,72 @@ export function BatchModelTester() {
     );
   };
 
+  // Helper to test a single model
+  const testSingleModel = async (modelId: string): Promise<BatchResult> => {
+    const model = catalogInstance.getModel(modelId);
+    if (!model) {
+      return {
+        modelId,
+        modelName: 'Unknown',
+        response: '',
+        latency: 0,
+        tokens: 0,
+        cost: 0,
+        status: 'error',
+        error: 'Model not found',
+      };
+    }
+
+    try {
+      const startTime = performance.now();
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: model.provider,
+          model: model.sourceId,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      });
+
+      const endTime = performance.now();
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Request failed');
+      }
+
+      const inputTokens = data.usage?.prompt_tokens || 0;
+      const outputTokens = data.usage?.completion_tokens || 0;
+      const tokens = data.usage?.total_tokens || 0;
+      const cost =
+        (inputTokens / 1_000_000) * (model.inputCostPer1M || 0) +
+        (outputTokens / 1_000_000) * (model.outputCostPer1M || 0);
+
+      return {
+        modelId: model.id,
+        modelName: model.name,
+        response: data.choices?.[0]?.message?.content || '',
+        latency: endTime - startTime,
+        tokens,
+        cost,
+        status: 'success',
+      };
+    } catch (error) {
+      return {
+        modelId: model.id,
+        modelName: model.name,
+        response: '',
+        latency: 0,
+        tokens: 0,
+        cost: 0,
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  };
+
   const runBatchTest = async () => {
     if (!prompt.trim()) {
       toast.error('Please enter a prompt');
@@ -48,61 +114,41 @@ export function BatchModelTester() {
     setIsRunning(true);
     setResults([]);
 
+    // Use concurrent execution with controlled parallelism for better performance
+    // Limit concurrent requests to avoid overwhelming APIs
+    const CONCURRENCY_LIMIT = 3;
     const batchResults: BatchResult[] = [];
-
-    for (const modelId of selectedModels) {
-      const model = catalogInstance.getModel(modelId);
-      if (!model) continue;
-
-      try {
-        const startTime = performance.now();
-
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            provider: model.provider,
-            model: model.sourceId,
-            messages: [{ role: 'user', content: prompt }],
-          }),
-        });
-
-        const endTime = performance.now();
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Request failed');
+    
+    // Process models in batches for concurrent execution
+    for (let i = 0; i < selectedModels.length; i += CONCURRENCY_LIMIT) {
+      const batch = selectedModels.slice(i, i + CONCURRENCY_LIMIT);
+      const batchPromises = batch.map(testSingleModel);
+      
+      // Execute batch concurrently
+      const results = await Promise.allSettled(batchPromises);
+      
+      for (let j = 0; j < results.length; j++) {
+        const result = results[j];
+        if (result.status === 'fulfilled') {
+          batchResults.push(result.value);
+        } else {
+          // Handle rejected promises - create error result for failed API calls
+          const modelId = batch[j];
+          const model = catalogInstance.getModel(modelId);
+          batchResults.push({
+            modelId,
+            modelName: model?.name || 'Unknown',
+            response: '',
+            latency: 0,
+            tokens: 0,
+            cost: 0,
+            status: 'error',
+            error: result.reason instanceof Error ? result.reason.message : 'Request failed',
+          });
         }
-
-        const tokens = (data.usage?.total_tokens || 0);
-        const inputTokens = data.usage?.prompt_tokens || 0;
-        const outputTokens = data.usage?.completion_tokens || 0;
-        const cost =
-          (inputTokens / 1_000_000) * (model.inputCostPer1M || 0) +
-          (outputTokens / 1_000_000) * (model.outputCostPer1M || 0);
-
-        batchResults.push({
-          modelId: model.id,
-          modelName: model.name,
-          response: data.choices?.[0]?.message?.content || '',
-          latency: endTime - startTime,
-          tokens,
-          cost,
-          status: 'success',
-        });
-      } catch (error) {
-        batchResults.push({
-          modelId: model.id,
-          modelName: model.name,
-          response: '',
-          latency: 0,
-          tokens: 0,
-          cost: 0,
-          status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error',
-        });
       }
-
+      
+      // Update UI after each batch for progressive feedback
       setResults([...batchResults]);
     }
 
