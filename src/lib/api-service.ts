@@ -237,34 +237,12 @@ export async function testChatCompletion(
   request: ChatCompletionRequest
 ): Promise<ChatCompletionResponse> {
   const startTime = performance.now();
+  const latency = Math.round(performance.now() - startTime);
   
-  try {
-    await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
-    
-    const latency = Math.round(performance.now() - startTime);
-    
-    const mockResponse = `This is a simulated response from ${request.provider}/${request.model}. ` +
-      `Your message was: "${request.messages[request.messages.length - 1].content}". ` +
-      `In a real implementation, this would make an actual API call to the provider.`;
-    
-    return {
-      success: true,
-      response: mockResponse,
-      latency,
-      usage: {
-        prompt_tokens: 50,
-        completion_tokens: 100,
-        total_tokens: 150
-      }
-    };
-  } catch (error) {
-    const latency = Math.round(performance.now() - startTime);
-    
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-      latency
-    };
-  }
+  return {
+    success: false,
+    error: 'Direct chat completion is not supported. Please use the API Gateway endpoint at /api/v1/chat for secure, server-side API calls. This prevents API key exposure in the frontend.',
+    latency
+  };
 }
 
