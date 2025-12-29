@@ -492,7 +492,13 @@ export async function validateAPIKey(
       }
       
       case 'anthropic': {
-        // Anthropic requires a request to validate
+        // Use a lightweight validation approach - check API key format and make a minimal request
+        // Anthropic keys start with 'sk-ant-'
+        if (!apiKey.startsWith('sk-ant-')) {
+          return { valid: false, error: 'Invalid Anthropic key format (should start with sk-ant-)' };
+        }
+        // Make a request that will fail fast if key is invalid
+        // Using a very minimal request to reduce cost
         const response = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
@@ -503,11 +509,11 @@ export async function validateAPIKey(
           body: JSON.stringify({
             model: 'claude-3-haiku-20240307',
             max_tokens: 1,
-            messages: [{ role: 'user', content: 'Hi' }],
+            messages: [{ role: 'user', content: '.' }],
           }),
         });
-        // 401 = invalid key, 200 = valid
-        return { valid: response.status !== 401 };
+        // 401/403 = invalid key, 200/400 = valid key (400 might be rate limit or other error but key is valid)
+        return { valid: response.status !== 401 && response.status !== 403 };
       }
       
       case 'openrouter': {

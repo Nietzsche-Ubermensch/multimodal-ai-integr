@@ -6,8 +6,9 @@ import { UnifiedScrapingLayer } from "@/components/UnifiedScrapingLayer";
 import { RAGTestingPanel } from "@/components/RAGTestingPanel";
 import { ModelHubDashboard } from "@/components/ModelHubDashboard";
 import { AISearchPanel } from "@/components/AISearchPanel";
+import { LibreChatInterface } from "@/components/LibreChatInterface";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search } from "lucide-react";
+import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search, MessageSquare } from "lucide-react";
 
 function App() {
   return (
@@ -43,6 +44,13 @@ function App() {
               >
                 <Search className="w-4 h-4" />
                 AI Search
+              </TabsTrigger>
+              <TabsTrigger
+                value="chat"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Chat
               </TabsTrigger>
               <TabsTrigger
                 value="rag-testing"
@@ -94,6 +102,10 @@ function App() {
           <div className="container mx-auto py-8 max-w-4xl">
             <AISearchPanel />
           </div>
+        </TabsContent>
+
+        <TabsContent value="chat" className="mt-0">
+          <LibreChatInterface />
         </TabsContent>
 
         <TabsContent value="rag-testing" className="mt-0">

@@ -61,7 +61,7 @@ export function RAGTestingPanel() {
   const [url, setUrl] = useState("");
   const [documents, setDocuments] = useState<RAGDocument[]>([]);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
-  const [isScrapin, setIsScraping] = useState(false);
+  const [isScraping, setIsScraping] = useState(false);
   const [scrapeProgress, setScrapeProgress] = useState(0);
 
   // Scraping Config
@@ -324,11 +324,11 @@ ${relevantChunks[0].substring(0, 200)}...
                   placeholder="https://example.com/article"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  disabled={isScrapin}
+                  disabled={isScraping}
                 />
               </div>
 
-              {isScrapin && scrapeProgress > 0 && (
+              {isScraping && scrapeProgress > 0 && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Scraping...</span>
@@ -340,10 +340,10 @@ ${relevantChunks[0].substring(0, 200)}...
 
               <Button
                 onClick={handleScrape}
-                disabled={isScrapin || !url.trim()}
+                disabled={isScraping || !url.trim()}
                 className="w-full"
               >
-                {isScrapin ? (
+                {isScraping ? (
                   <>
                     <ArrowsClockwise size={16} className="animate-spin mr-2" />
                     Scraping...

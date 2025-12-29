@@ -255,28 +255,91 @@ ${request.prompt ? `Based on prompt: "${request.prompt}"` : 'Standard extraction
   }
 
   private cleanHtml(html: string): string {
-    let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-    text = text.replace(/<[^>]+>/g, ' ');
+    // Use DOMParser for safer HTML parsing (available in browser)
+    if (typeof DOMParser !== 'undefined') {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Remove script and style elements
+        doc.querySelectorAll('script, style').forEach(el => el.remove());
+        
+        // Get text content
+        return (doc.body?.textContent || '').replace(/\s+/g, ' ').trim();
+      } catch {
+        // Fallback to simple regex if DOMParser fails
+      }
+    }
+    
+    // Fallback: simple regex with bounded patterns
+    let text = html;
+    // Remove script tags (with bounded repetition)
+    text = text.replace(/<script[^>]*>[\s\S]{0,100000}?<\/script>/gi, '');
+    // Remove style tags
+    text = text.replace(/<style[^>]*>[\s\S]{0,100000}?<\/style>/gi, '');
+    // Remove all HTML tags
+    text = text.replace(/<[^>]{0,1000}>/g, ' ');
     text = text.replace(/\s+/g, ' ').trim();
     return text;
   }
 
   private extractTitle(html: string): string {
-    const match = html.match(/<title>(.*?)<\/title>/i);
+    // Use DOMParser for safer extraction
+    if (typeof DOMParser !== 'undefined') {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        return doc.querySelector('title')?.textContent || 'Untitled';
+      } catch {
+        // Fallback
+      }
+    }
+    const match = html.match(/<title[^>]*>([^<]{0,500})<\/title>/i);
     return match ? match[1] : 'Untitled';
   }
 
   private htmlToMarkdown(html: string): string {
+    // Use DOMParser for safer conversion
+    if (typeof DOMParser !== 'undefined') {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        let md = '';
+        
+        // Process headings
+        doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(el => {
+          const level = parseInt(el.tagName[1]);
+          md += '#'.repeat(level) + ' ' + (el.textContent || '') + '\n\n';
+        });
+        
+        // Process paragraphs
+        doc.querySelectorAll('p').forEach(el => {
+          md += (el.textContent || '') + '\n\n';
+        });
+        
+        // If we got content, return it
+        if (md.trim()) {
+          return md.trim();
+        }
+        
+        // Fallback to body text
+        return doc.body?.textContent || '';
+      } catch {
+        // Fallback to regex
+      }
+    }
+    
+    // Fallback with bounded patterns
     let md = html;
-    md = md.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n');
-    md = md.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n');
-    md = md.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n');
-    md = md.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
-    md = md.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
-    md = md.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
-    md = md.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
-    md = md.replace(/<[^>]+>/g, '');
+    md = md.replace(/<h1[^>]{0,200}>([^<]{0,1000})<\/h1>/gi, '# $1\n\n');
+    md = md.replace(/<h2[^>]{0,200}>([^<]{0,1000})<\/h2>/gi, '## $1\n\n');
+    md = md.replace(/<h3[^>]{0,200}>([^<]{0,1000})<\/h3>/gi, '### $1\n\n');
+    md = md.replace(/<p[^>]{0,200}>([^<]{0,5000})<\/p>/gi, '$1\n\n');
+    md = md.replace(/<a[^>]{0,500}href="([^"]{0,2000})"[^>]{0,500}>([^<]{0,500})<\/a>/gi, '[$2]($1)');
+    md = md.replace(/<strong[^>]{0,200}>([^<]{0,1000})<\/strong>/gi, '**$1**');
+    md = md.replace(/<em[^>]{0,200}>([^<]{0,1000})<\/em>/gi, '*$1*');
+    md = md.replace(/<[^>]{0,1000}>/g, '');
     md = md.replace(/\n{3,}/g, '\n\n');
     return md.trim();
   }
