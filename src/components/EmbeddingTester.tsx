@@ -22,6 +22,12 @@ interface EmbeddingModel {
 const embeddingModels: EmbeddingModel[] = [
   {
     provider: "openrouter",
+    model: "together/baai/bge-large-en-v1.5",
+    dimensions: 1024,
+    description: "Together AI BGE Large - Best cost/quality for RAG (via OpenRouter)"
+  },
+  {
+    provider: "openrouter",
     model: "google/gemini-embedding-001",
     dimensions: 768,
     description: "Google Gemini - Optimized for semantic search"
