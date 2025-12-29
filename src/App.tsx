@@ -7,43 +7,30 @@ import { RAGTestingPanel } from "@/components/RAGTestingPanel";
 import { ModelHubDashboard } from "@/components/ModelHubDashboard";
 import { AISearchPanel } from "@/components/AISearchPanel";
 import { LibreChatInterface } from "@/components/LibreChatInterface";
+import { GitHubModelsPlayground } from "@/components/GitHubModelsPlayground";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search, MessageSquare } from "lucide-react";
+import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search, MessageSquare, Github } from "lucide-react";
 
 function App() {
   return (
     <div className="min-h-screen bg-background">
-      <Tabs defaultValue="dashboard" className="w-full">
+      <Tabs defaultValue="github-models" className="w-full">
         <div className="border-b bg-card sticky top-0 z-50">
           <div className="container mx-auto">
             <TabsList className="h-14 w-full justify-start rounded-none bg-transparent border-b-0 overflow-x-auto">
+              <TabsTrigger
+                value="github-models"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Github className="w-4 h-4" />
+                GitHub Models
+              </TabsTrigger>
               <TabsTrigger
                 value="dashboard"
                 className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
               >
                 <FlaskConical className="w-4 h-4" />
                 Dashboard
-              </TabsTrigger>
-              <TabsTrigger
-                value="modelhub"
-                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-              >
-                <Database className="w-4 h-4" />
-                Model Hub
-              </TabsTrigger>
-              <TabsTrigger
-                value="scraping"
-                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-              >
-                <Globe className="w-4 h-4" />
-                Scraping
-              </TabsTrigger>
-              <TabsTrigger
-                value="ai-search"
-                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-              >
-                <Search className="w-4 h-4" />
-                AI Search
               </TabsTrigger>
               <TabsTrigger
                 value="chat"
@@ -53,6 +40,13 @@ function App() {
                 Chat
               </TabsTrigger>
               <TabsTrigger
+                value="ai-search"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Search className="w-4 h-4" />
+                AI Search
+              </TabsTrigger>
+              <TabsTrigger
                 value="rag-testing"
                 className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
               >
@@ -60,11 +54,25 @@ function App() {
                 RAG Testing
               </TabsTrigger>
               <TabsTrigger
+                value="scraping"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Globe className="w-4 h-4" />
+                Scraping
+              </TabsTrigger>
+              <TabsTrigger
                 value="prompt-studio"
                 className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
               >
                 <Sparkles className="w-4 h-4" />
-                Prompt Studio
+                Prompts
+              </TabsTrigger>
+              <TabsTrigger
+                value="modelhub"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Database className="w-4 h-4" />
+                Legacy Hub
               </TabsTrigger>
               <TabsTrigger
                 value="vector-rag"
@@ -84,18 +92,18 @@ function App() {
           </div>
         </div>
 
+        <TabsContent value="github-models" className="mt-0">
+          <div className="container mx-auto py-8 max-w-7xl">
+            <GitHubModelsPlayground />
+          </div>
+        </TabsContent>
+
         <TabsContent value="dashboard" className="mt-0">
           <ModelHubDashboard />
         </TabsContent>
 
-        <TabsContent value="modelhub" className="mt-0">
-          <ModelHubApp />
-        </TabsContent>
-
-        <TabsContent value="scraping" className="mt-0">
-          <div className="container mx-auto py-8 max-w-6xl">
-            <UnifiedScrapingLayer />
-          </div>
+        <TabsContent value="chat" className="mt-0">
+          <LibreChatInterface />
         </TabsContent>
 
         <TabsContent value="ai-search" className="mt-0">
@@ -104,18 +112,24 @@ function App() {
           </div>
         </TabsContent>
 
-        <TabsContent value="chat" className="mt-0">
-          <LibreChatInterface />
-        </TabsContent>
-
         <TabsContent value="rag-testing" className="mt-0">
           <div className="container mx-auto py-8 max-w-7xl">
             <RAGTestingPanel />
           </div>
         </TabsContent>
 
+        <TabsContent value="scraping" className="mt-0">
+          <div className="container mx-auto py-8 max-w-6xl">
+            <UnifiedScrapingLayer />
+          </div>
+        </TabsContent>
+
         <TabsContent value="prompt-studio" className="mt-0">
           <PromptStudio />
+        </TabsContent>
+
+        <TabsContent value="modelhub" className="mt-0">
+          <ModelHubApp />
         </TabsContent>
 
         <TabsContent value="vector-rag" className="mt-0">
