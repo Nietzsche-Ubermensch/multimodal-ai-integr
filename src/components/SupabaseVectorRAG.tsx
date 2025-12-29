@@ -41,7 +41,8 @@ interface EmbeddingModel {
   provider: string;
   dimensions: number;
   cost_per_1m: number;
-  endpoint: string;
+  /** Which API endpoint to use: 'openrouter' or 'openai' */
+  endpoint: 'openrouter' | 'openai';
 }
 
 const EMBEDDING_MODELS: EmbeddingModel[] = [
@@ -371,7 +372,7 @@ export function SupabaseVectorRAG() {
               </div>
 
               <div className="space-y-2">
-                <Label>OpenRouter API Key (for Together AI)</Label>
+                <Label>OpenRouter API Key</Label>
                 <Input
                   type="password"
                   placeholder="sk-or-v1-..."
@@ -381,7 +382,7 @@ export function SupabaseVectorRAG() {
               </div>
 
               <div className="space-y-2">
-                <Label>OpenAI API Key (optional)</Label>
+                <Label>OpenAI API Key</Label>
                 <Input
                   type="password"
                   placeholder="sk-..."
