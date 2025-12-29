@@ -29,6 +29,17 @@ const vectorSearchRateLimiter = createRateLimiter({
 });
 
 /**
+ * Interface for Supabase search result
+ */
+interface SupabaseSearchResult {
+  id: string;
+  content: string;
+  similarity: number;
+  metadata?: Record<string, any>;
+  created_at?: string;
+}
+
+/**
  * Generate embedding using OpenAI API
  * This is server-side only to keep API keys secure
  */
@@ -36,18 +47,22 @@ async function generateEmbedding(
   text: string,
   model: string = 'text-embedding-3-small'
 ): Promise<number[]> {
-  const openaiApiKey = config.providers.openrouter; // Using OpenRouter as fallback
+  // Try OpenAI key first, then fall back to OpenRouter
+  const openaiApiKey = config.providers.openrouter || config.providers.litellm;
   
   if (!openaiApiKey) {
-    throw new Error('OpenAI/OpenRouter API key not configured on server');
+    throw new Error('OpenAI/OpenRouter API key not configured on server. Please set OPENROUTER_API_KEY or LITELLM_API_KEY in environment variables.');
   }
 
   try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
+    // Use OpenRouter endpoint which is compatible with OpenAI API format
+    const response = await fetch('https://openrouter.ai/api/v1/embeddings', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': config.server.baseUrl,
+        'X-Title': 'AI Integration Gateway',
       },
       body: JSON.stringify({
         model,
@@ -58,7 +73,7 @@ async function generateEmbedding(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        `OpenAI API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`
+        `OpenRouter API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`
       );
     }
 
@@ -156,16 +171,16 @@ router.post(
         'Vector search completed'
       );
 
-      // Step 3: Return results
+      // Step 3: Return results with proper typing
       res.json({
         success: true,
         query,
-        results: results.map((r: any) => ({
+        results: (results as SupabaseSearchResult[]).map((r) => ({
           id: r.id,
           content: r.content,
           similarity: r.similarity,
           metadata: r.metadata || {},
-          created_at: r.created_at,
+          created_at: r.created_at || new Date().toISOString(),
         })),
         metadata: {
           resultCount: results.length,

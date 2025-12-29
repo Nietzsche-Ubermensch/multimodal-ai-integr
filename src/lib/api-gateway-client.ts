@@ -226,8 +226,9 @@ export class ApiGatewayClient {
       }
 
       if (stream) {
-        // For streaming, return the response directly for the caller to handle
-        return response as any;
+        // For streaming, return the response object for the caller to handle
+        // The caller should process the ReadableStream from response.body
+        return response as unknown as ChatCompletionResponse;
       }
 
       const data: ChatCompletionResponse = await response.json();

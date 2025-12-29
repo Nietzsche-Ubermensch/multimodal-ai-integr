@@ -103,15 +103,18 @@ export function validateUrl(url: string): { valid: boolean; error?: string } {
       }
       
       // Block IPv6 link-local (fe80::/10)
-      if (hostname.startsWith('fe80:')) {
+      if (hostname.startsWith('fe80:') || hostname.startsWith('fe8') || hostname.startsWith('fe9') || 
+          hostname.startsWith('fea') || hostname.startsWith('feb')) {
         return {
           valid: false,
           error: 'IPv6 link-local addresses are not allowed.'
         };
       }
       
-      // Block IPv6 unique local (fc00::/7)
-      if (hostname.startsWith('fc') || hostname.startsWith('fd')) {
+      // Block IPv6 unique local (fc00::/7 - fc00:: to fdff::)
+      // Check first hex digit: 'fc' and 'fd' prefixes
+      const firstTwoChars = hostname.substring(0, 2).toLowerCase();
+      if (firstTwoChars === 'fc' || firstTwoChars === 'fd') {
         return {
           valid: false,
           error: 'IPv6 unique local addresses are not allowed.'
@@ -131,6 +134,14 @@ export function validateUrl(url: string): { valid: boolean; error?: string } {
 /**
  * Sanitizes text by removing control characters and trimming
  * Also limits length to prevent DoS attacks
+ * 
+ * Note: Removes most control characters (0x00-0x1F) except:
+ * - \n (0x0A) - newline
+ * - \r (0x0D) - carriage return  
+ * - \t (0x09) - tab
+ * Also removes:
+ * - \x0C (form feed) - rarely used, can cause issues in text processing
+ * - DEL character (0x7F)
  */
 export function sanitizeText(
   text: string,
@@ -148,7 +159,8 @@ export function sanitizeText(
   
   let sanitized = text;
   
-  // Remove control characters (0x00-0x1F except \n, \r, \t)
+  // Remove control characters (0x00-0x1F except \n, \r, \t) and DEL (0x7F)
+  // Including form feed (0x0C) which can cause parsing issues
   if (removeControlChars) {
     // eslint-disable-next-line no-control-regex
     sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
