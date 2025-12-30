@@ -13,6 +13,7 @@ import rerankRouter from '@/routes/rerank';
 import providersRouter from '@/routes/providers';
 import healthRouter from '@/routes/health';
 import authRouter from '@/routes/auth';
+import vectorSearchRouter from '@/routes/vectorSearch';
 
 const app: Application = express();
 
@@ -55,6 +56,7 @@ app.get('/', (req, res) => {
       rerank: '/api/v1/rerank',
       providers: '/api/v1/providers',
       health: '/api/v1/health',
+      vectorSearch: '/api/v1/vector-search',
     },
   });
 });
@@ -65,6 +67,7 @@ app.use('/api/v1/embeddings', embeddingsRouter);
 app.use('/api/v1/rerank', rerankRouter);
 app.use('/api/v1/providers', providersRouter);
 app.use('/api/v1/health', healthRouter);
+app.use('/api/v1/vector-search', vectorSearchRouter);
 
 app.use((req, res) => {
   res.status(404).json({

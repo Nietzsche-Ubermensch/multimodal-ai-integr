@@ -172,16 +172,11 @@ export class LiteLLMClient {
   }
 
   async generateEmbedding(text: string): Promise<EmbeddingResult> {
-    try {
-      const mockEmbedding = Array(1536).fill(0).map(() => Math.random() - 0.5);
-      
-      return {
-        embedding: mockEmbedding,
-        model: 'text-embedding-3-small',
-      };
-    } catch (error) {
-      throw new Error(`Embedding generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    throw new Error(
+      'Direct embedding generation is not supported. ' +
+      'Please use the API Gateway endpoint at /api/v1/embeddings for secure, server-side embedding generation. ' +
+      'This prevents API key exposure in the frontend.'
+    );
   }
 
   async complete(messages: Array<{ role: string; content: string }>): Promise<string> {
