@@ -3,7 +3,7 @@
  * This avoids CORS issues by using the wrappers Edge Function as a proxy
  */
 
-import { supabase, WRAPPERS_URL, getAuthToken } from './supabase';
+import { WRAPPERS_URL, getAuthToken } from './supabase';
 
 export type Provider = 'openrouter' | 'deepseek' | 'xai' | 'anthropic' | 'gemini' | 'perplexity';
 
@@ -246,9 +246,15 @@ export async function* chatStream(request: ChatRequest): AsyncGenerator<string, 
 
       try {
         const parsed = JSON.parse(data);
-        const content = parsed.choices?.[0]?.delta?.content ||
-                       parsed.delta?.text ||
-                       '';
+        // Handle different streaming formats:
+        // - OpenAI/compatible: choices[0].delta.content
+        // - Anthropic: delta.text or content_block_delta with delta.text
+        // - Gemini: candidates[0].content.parts[0].text (but usually not streamed this way)
+        const content =
+          parsed.choices?.[0]?.delta?.content ||  // OpenAI format
+          parsed.delta?.text ||                    // Anthropic content_block_delta
+          parsed.content_block?.text ||            // Anthropic content_block_start
+          '';
         if (content) yield content;
       } catch {
         // Skip unparseable chunks

@@ -46,12 +46,13 @@ export interface ModelResponse {
 
 // Model to provider mapping
 const MODEL_PROVIDERS: Record<string, Provider> = {
-  // Anthropic
+  // Anthropic (use dated model IDs from https://docs.anthropic.com/en/docs/about-claude/models)
   'claude-3-5-sonnet-20241022': 'anthropic',
+  'claude-3-5-haiku-20241022': 'anthropic',
   'claude-3-haiku-20240307': 'anthropic',
   'claude-3-opus-20240229': 'anthropic',
-  'claude-sonnet-4-5': 'anthropic',
-  'claude-opus-4-5': 'anthropic',
+  'claude-sonnet-4-20250514': 'anthropic',
+  'claude-opus-4-20250514': 'anthropic',
   // DeepSeek
   'deepseek-chat': 'deepseek',
   'deepseek-reasoner': 'deepseek',
