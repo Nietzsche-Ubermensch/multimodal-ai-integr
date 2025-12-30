@@ -4,11 +4,37 @@
 
 The Supabase Vector RAG integration provides **real-time document storage and semantic search** using PostgreSQL's pgvector extension. This enables you to build production-ready Retrieval-Augmented Generation (RAG) systems with:
 
-- **Live Embedding Generation**: Generate embeddings on-the-fly using OpenAI or HuggingFace models
+- **Live Embedding Generation**: Generate embeddings on-the-fly using OpenAI, Together AI, or HuggingFace models
 - **Vector Similarity Search**: Find relevant documents using cosine similarity
 - **Real-time Indexing**: Instant document storage with sub-second search
 - **Scalable Storage**: PostgreSQL with pgvector handles millions of vectors efficiently
-- **Cost-Effective**: Choose from free (HuggingFace) or low-cost (OpenAI) embedding models
+- **Cost-Effective**: Choose from Together AI BGE (recommended), OpenAI, or free HuggingFace models
+
+---
+
+## 🌟 Recommended: Together AI via OpenRouter
+
+**Why Together AI BGE-large?**
+- **Best cost/quality ratio** for RAG applications
+- Uses **1024 dimensions** (more efficient than OpenAI's 1536)
+- Open-source and highly performant
+- Access via OpenRouter BYOK (Bring Your Own Key)
+
+```typescript
+// Example: Generate embeddings via OpenRouter
+const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://your-app.com"
+  },
+  body: JSON.stringify({
+    model: "together/baai/bge-large-en-v1.5",
+    input: "Your text to embed"
+  })
+});
+```
 
 ---
 
@@ -23,15 +49,15 @@ The Supabase Vector RAG integration provides **real-time document storage and se
 │   │   Frontend   │───▶│  Embedding   │───▶│  Supabase   │  │
 │   │   (React)    │    │   Provider   │    │  pgvector   │  │
 │   │              │    │              │    │             │  │
-│   │ • Upload doc │    │ • OpenAI     │    │ • Store     │  │
-│   │ • Search     │    │ • HuggingFace│    │ • Index     │  │
+│   │ • Upload doc │    │ • Together AI│    │ • Store     │  │
+│   │ • Search     │    │ • OpenAI     │    │ • Index     │  │
 │   └──────────────┘    └──────────────┘    └─────────────┘  │
 │                              │                    │         │
 │                              ▼                    ▼         │
 │                       ┌─────────────┐    ┌─────────────┐   │
 │                       │  Generate   │    │   Vector    │   │
 │                       │  Embedding  │    │   Search    │   │
-│                       │  (1536-3072d)│   │  (Cosine)   │   │
+│                       │ (1024-3072d)│    │  (Cosine)   │   │
 │                       └─────────────┘    └─────────────┘   │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
@@ -55,21 +81,40 @@ CREATE EXTENSION IF NOT EXISTS vector;
 Choose your embedding dimensions based on the model:
 
 ```sql
--- For OpenAI text-embedding-3-small (1536 dimensions)
+-- RECOMMENDED: For Together AI BGE-large (1024 dimensions)
 CREATE TABLE rag_vectors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content TEXT NOT NULL,
-  embedding VECTOR(1536),
+  embedding VECTOR(1024),
   embedding_model VARCHAR(100) NOT NULL,
   metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- For OpenAI text-embedding-3-large (3072 dimensions)
--- Change VECTOR(1536) to VECTOR(3072)
+-- For OpenAI text-embedding-3-small (1536 dimensions)
+-- Change VECTOR(1024) to VECTOR(1536)
 
--- For HuggingFace BGE-large (1024 dimensions)
--- Change VECTOR(1536) to VECTOR(1024)
+-- For OpenAI text-embedding-3-large (3072 dimensions)
+-- Change VECTOR(1024) to VECTOR(3072)
+```
+
+**Migration from 1536 to 1024 dimensions:**
+
+```sql
+-- If you have existing data with different dimensions, run this:
+-- 1. Clear existing data (incompatible dimensions)
+TRUNCATE TABLE rag_vectors;
+
+-- 2. Resize the vector column to 1024
+ALTER TABLE rag_vectors 
+ALTER COLUMN embedding TYPE vector(1024);
+
+-- 3. Update the index for the new size
+DROP INDEX IF EXISTS rag_vectors_embedding_idx;
+CREATE INDEX rag_vectors_embedding_idx 
+ON rag_vectors 
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
 ```
 
 ### 3. Create Vector Index
@@ -97,7 +142,7 @@ WITH (m = 16, ef_construction = 64);
 
 ```sql
 CREATE OR REPLACE FUNCTION vector_search(
-  query_embedding VECTOR(1536),  -- Match your dimension
+  query_embedding VECTOR(1024),  -- Match your dimension (1024 for BGE)
   match_threshold FLOAT DEFAULT 0.7,
   match_count INT DEFAULT 5
 )
@@ -153,13 +198,18 @@ CREATE POLICY "Users can read own vectors" ON rag_vectors
 
 ### Embedding Provider Keys (choose one)
 
-**Option 1: OpenAI (Recommended)**
+**Option 1: Together AI via OpenRouter (Recommended)**
+- **API Key**: Get from https://openrouter.ai/keys
+- **Setup**: Connect your Together AI key in OpenRouter dashboard
+- **Model**: `together/baai/bge-large-en-v1.5` (1024d) - ~$0.01/1M tokens
+
+**Option 2: OpenAI**
 - **API Key**: Get from https://platform.openai.com/api-keys
 - **Models**:
   - `text-embedding-3-small` (1536d) - $0.02/1M tokens
   - `text-embedding-3-large` (3072d) - $0.13/1M tokens
 
-**Option 2: HuggingFace (Free)**
+**Option 3: HuggingFace (Free)**
 - **Token**: Get from https://huggingface.co/settings/tokens
 - **Models**:
   - `BAAI/bge-large-en-v1.5` (1024d) - Free via Inference API
@@ -168,14 +218,24 @@ CREATE POLICY "Users can read own vectors" ON rag_vectors
 
 ## 📝 Usage Examples
 
-### Store a Document
+### Store a Document (Together AI)
 
 ```typescript
-// 1. Generate embedding
-const embedding = await generateEmbedding(
-  "Your document text here",
-  "text-embedding-3-small"
-);
+// 1. Generate embedding via OpenRouter
+const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://your-app.com"
+  },
+  body: JSON.stringify({
+    model: "together/baai/bge-large-en-v1.5",
+    input: "Your document text here"
+  })
+});
+const data = await response.json();
+const embedding = data.data[0].embedding;
 
 // 2. Store in Supabase
 const { data, error } = await supabase
@@ -183,7 +243,7 @@ const { data, error } = await supabase
   .insert({
     content: "Your document text here",
     embedding,
-    embedding_model: "text-embedding-3-small",
+    embedding_model: "together/baai/bge-large-en-v1.5",
     metadata: {
       source: "manual_upload",
       timestamp: new Date().toISOString()
@@ -195,13 +255,22 @@ const { data, error } = await supabase
 
 ```typescript
 // 1. Generate query embedding
-const queryEmbedding = await generateEmbedding(
-  "What is RAG?",
-  "text-embedding-3-small"
-);
+const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "together/baai/bge-large-en-v1.5",
+    input: "What is RAG?"
+  })
+});
+const data = await response.json();
+const queryEmbedding = data.data[0].embedding;
 
 // 2. Search vectors
-const { data, error } = await supabase
+const { data: results, error } = await supabase
   .rpc('vector_search', {
     query_embedding: queryEmbedding,
     match_threshold: 0.7,
@@ -209,7 +278,7 @@ const { data, error } = await supabase
   });
 
 // Results sorted by similarity (highest first)
-data.forEach((result) => {
+results.forEach((result) => {
   console.log(`${(result.similarity * 100).toFixed(1)}% - ${result.content}`);
 });
 ```
@@ -220,14 +289,15 @@ data.forEach((result) => {
 
 | Model | Dimensions | Cost/1M | Provider | Best For |
 |-------|-----------|---------|----------|----------|
+| **together/baai/bge-large-en-v1.5** | **1024** | **~$0.01** | **OpenRouter** | **Recommended - Best cost/quality for RAG** |
 | text-embedding-3-large | 3072 | $0.13 | OpenAI | High precision, long documents |
-| text-embedding-3-small | 1536 | $0.02 | OpenAI | **Recommended** - Best balance |
+| text-embedding-3-small | 1536 | $0.02 | OpenAI | Good balance of cost/quality |
 | bge-large-en-v1.5 | 1024 | Free | HuggingFace | Budget-friendly, English only |
 
 **Recommendations**:
-- **Production**: `text-embedding-3-small` (best cost/quality ratio)
+- **Production**: `together/baai/bge-large-en-v1.5` via OpenRouter (best cost/quality ratio)
 - **Research**: `text-embedding-3-large` (highest quality)
-- **Development**: `bge-large-en-v1.5` (free tier)
+- **Development**: `bge-large-en-v1.5` (free HuggingFace tier)
 
 ---
 

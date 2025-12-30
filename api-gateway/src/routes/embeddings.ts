@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { AuthRequest, authenticateToken } from '@/middleware/auth';
 import { validateEmbeddingsRequest } from '@/middleware/validation';
+import { OpenRouterService } from '@/services/providers/openrouter';
 import logger from '@/utils/logger';
 
 const router = Router();
@@ -22,11 +23,23 @@ router.post(
         'Embeddings request'
       );
 
-      res.status(501).json({
+      // Support OpenRouter provider (includes Together AI models)
+      if (provider === 'openrouter') {
+        const openRouterService = new OpenRouterService();
+        const response = await openRouterService.embeddings({
+          model,
+          input,
+        });
+        
+        res.json(response);
+        return;
+      }
+
+      res.status(400).json({
         error: {
-          type: 'not_implemented',
-          message: 'Embeddings endpoint not yet implemented',
-          code: 'NOT_IMPLEMENTED',
+          type: 'unsupported_provider',
+          message: `Embeddings not supported for provider: ${provider}. Use 'openrouter' with Together AI models like 'together/baai/bge-large-en-v1.5'.`,
+          code: 'UNSUPPORTED_PROVIDER',
         },
       });
     } catch (error: any) {
