@@ -56,8 +56,9 @@ const PROVIDER_LIMITS: Record<string, { maxTokens: number; defaultTokens: number
 
 // Rate limiting config (requests per window)
 const RATE_LIMIT = {
-  windowMs: 60_000, // 1 minute
-  maxRequests: 60,  // 60 req/min per user
+  windowMs: 60_000,      // 1 minute
+  maxRequests: 60,       // 60 req/min for authenticated users
+  maxAnonRequests: 30,   // 30 req/min for anonymous (IP-based)
 };
 
 // =============================================================================
@@ -88,21 +89,23 @@ type Provider = "openrouter" | "deepseek" | "xai" | "anthropic" | "gemini" | "pe
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
-function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetIn: number } {
+function checkRateLimit(identifier: string, isAnonymous: boolean): { allowed: boolean; remaining: number; resetIn: number } {
   const now = Date.now();
-  const entry = rateLimitStore.get(userId);
+  const maxReqs = isAnonymous ? RATE_LIMIT.maxAnonRequests : RATE_LIMIT.maxRequests;
+  const key = isAnonymous ? `anon:${identifier}` : `user:${identifier}`;
+  const entry = rateLimitStore.get(key);
 
   if (!entry || now >= entry.resetAt) {
-    rateLimitStore.set(userId, { count: 1, resetAt: now + RATE_LIMIT.windowMs });
-    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1, resetIn: RATE_LIMIT.windowMs };
+    rateLimitStore.set(key, { count: 1, resetAt: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: maxReqs - 1, resetIn: RATE_LIMIT.windowMs };
   }
 
-  if (entry.count >= RATE_LIMIT.maxRequests) {
+  if (entry.count >= maxReqs) {
     return { allowed: false, remaining: 0, resetIn: entry.resetAt - now };
   }
 
   entry.count++;
-  return { allowed: true, remaining: RATE_LIMIT.maxRequests - entry.count, resetIn: entry.resetAt - now };
+  return { allowed: true, remaining: maxReqs - entry.count, resetIn: entry.resetAt - now };
 }
 
 // Cleanup old entries periodically
@@ -276,10 +279,30 @@ async function callProvider(provider: Provider, body: AiBody, signal?: AbortSign
 // AUTH VALIDATION
 // =============================================================================
 
-async function validateAuth(req: Request): Promise<{ valid: boolean; userId?: string; error?: string }> {
+interface AuthResult {
+  valid: boolean;
+  userId?: string;
+  isAnonymous: boolean;
+  clientIp?: string;
+  error?: string;
+}
+
+function getClientIp(req: Request): string {
+  // Supabase Edge Functions provide client IP in headers
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown"
+  );
+}
+
+async function validateAuth(req: Request): Promise<AuthResult> {
   const auth = req.headers.get("authorization") || req.headers.get("Authorization");
+  const clientIp = getClientIp(req);
+
   if (!auth || !/^bearer\s+.+/i.test(auth)) {
-    return { valid: false, error: "Missing or invalid Authorization header" };
+    return { valid: false, isAnonymous: false, clientIp, error: "Missing or invalid Authorization header" };
   }
 
   const token = auth.replace(/^bearer\s+/i, "");
@@ -289,12 +312,23 @@ async function validateAuth(req: Request): Promise<{ valid: boolean; userId?: st
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return { valid: false, error: authError?.message ?? "Invalid token" };
+      // Token didn't resolve to a user - might be anon key
+      // Check if it's the anon key by verifying it's a valid JWT with "anon" role
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        if (payload.role === "anon" && payload.ref) {
+          // Valid anon key - allow with IP-based rate limiting
+          return { valid: true, isAnonymous: true, clientIp };
+        }
+      } catch {
+        // Not a valid JWT
+      }
+      return { valid: false, isAnonymous: false, clientIp, error: authError?.message ?? "Invalid token" };
     }
 
-    return { valid: true, userId: user.id };
+    return { valid: true, userId: user.id, isAnonymous: false, clientIp };
   } catch (e) {
-    return { valid: false, error: (e as Error).message };
+    return { valid: false, isAnonymous: false, clientIp, error: (e as Error).message };
   }
 }
 
@@ -374,12 +408,14 @@ Deno.serve(async (req) => {
       const auth = await validateAuth(req);
       if (!auth.valid) return error(401, auth.error ?? "Unauthorized", undefined, corsHeaders);
 
-      // Rate limiting
-      const rateCheck = checkRateLimit(auth.userId!);
+      // Rate limiting - use userId for authenticated, clientIp for anonymous
+      const rateLimitId = auth.isAnonymous ? auth.clientIp! : auth.userId!;
+      const rateCheck = checkRateLimit(rateLimitId, auth.isAnonymous);
       const rateLimitHeaders = {
         ...corsHeaders,
         "X-RateLimit-Remaining": String(rateCheck.remaining),
         "X-RateLimit-Reset": String(Math.ceil(rateCheck.resetIn / 1000)),
+        "X-RateLimit-Type": auth.isAnonymous ? "anonymous" : "authenticated",
       };
 
       if (!rateCheck.allowed) {
