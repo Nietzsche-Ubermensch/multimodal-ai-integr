@@ -25,14 +25,17 @@ This guide provides comprehensive coverage of:
 17. **Providers** - In-depth coverage of Anthropic, DeepSeek, xAI, OpenRouter, NVIDIA, Microsoft
 18. **Hub API** - Becoming an inference provider, registration requirements
 19. **Resources & Documentation** - Essential repositories, learning paths, quick-starts
+20. **Explainable AI (XAI)** - Transparency and interpretability for neural network predictions
 
 📖 **Quick Reference**: See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for topic summaries and navigation guide  
 📚 **Complete Guide**: See [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md) for detailed documentation  
-📑 **Table of Contents**: See [TOC.md](./TOC.md) for complete documentation index
+📑 **Table of Contents**: See [TOC.md](./TOC.md) for complete documentation index  
+🧠 **XAI SDK Guide**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for explainable AI integration
 
 ## 🚀 Interactive Features
 
 - **4 Live SDK Demos**: Anthropic Claude, DeepSeek, xAI Grok, OpenRouter with real/simulated API calls
+- **XAI Explainer Demo**: Interactive explainable AI with 6 explanation methods (SHAP, attention, gradients, etc.)
 - **API Key Validation**: Real-time testing for 6 providers with latency metrics
 - **Live API Testing**: 10+ provider examples with editable JSON and temperature controls
 - **Embedding Generation**: Interactive vector testing with statistics and export
@@ -110,6 +113,59 @@ Navigate to the **"OpenRouter TypeScript SDK Integration"** slide in the present
 **Slide Location**: Slide 7 - "OpenRouter TypeScript SDK Integration"
 
 📖 **Full Documentation**: See [OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md) for complete integration guide.
+
+## ⭐ Featured: Explainable AI (XAI) SDK
+
+This platform now includes a **comprehensive XAI SDK** for transparent and interpretable AI predictions!
+
+### Quick XAI Integration
+
+```bash
+# No installation needed - integrated into the platform
+# Import and use directly
+```
+
+```typescript
+import { explainAIResponse } from '@/lib/xai-service';
+
+// Generate explanation for any model prediction
+const explanation = await explainAIResponse(
+  "Is this email spam?",              // Input
+  "Yes, this appears to be spam",     // Model output
+  "gpt-4o",                            // Model ID
+  "openai"                             // Provider
+);
+
+// Display top contributing features
+console.log(explanation.summary.explanation);
+explanation.summary.topFeatures.forEach(f => {
+  console.log(`${f.feature}: ${(f.score * 100).toFixed(1)}%`);
+});
+```
+
+### XAI Features
+
+- **6 Explanation Methods**: Feature importance, attention weights, gradients, integrated gradients, LRP, LIME
+- **Multi-Model Support**: Text, vision, code, and multimodal AI models
+- **Interactive Demo**: Test explanations with real models via the XAI Explainer component
+- **Visualization**: Heatmaps, bar charts, attention matrices, and gradient visualizations
+- **Export**: JSON and CSV export for further analysis
+- **Batch Processing**: Explain multiple predictions efficiently
+- **Model Comparison**: Compare explanations across different models
+
+### Interactive XAI Demo
+
+Navigate to the **"Explainable AI (XAI) SDK"** slide in the presentation to:
+- Select from multiple explanation methods (SHAP, attention, gradients, etc.)
+- Test with different AI models (GPT-4o, Claude, DeepSeek, Grok)
+- Compare explanations side-by-side
+- Visualize feature importance and attention weights
+- Export explanations for analysis
+- Understand why models make specific predictions
+
+**Slide Location**: Near the end - "Explainable AI (XAI) SDK"
+
+📖 **Full Documentation**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for complete XAI integration guide.
 
 ## 📋 Quick Start
 
