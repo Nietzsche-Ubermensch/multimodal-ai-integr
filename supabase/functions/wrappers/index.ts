@@ -3,15 +3,67 @@
 //
 // Routes:
 //   GET  /wrappers/health        → Health check (public)
-//   POST /wrappers/ai/:provider  → AI gateway (openrouter, deepseek, xai, anthropic, gemini)
+//   GET  /wrappers/health/deps   → Upstream availability check (auth required)
+//   POST /wrappers/ai/:provider  → AI gateway (openrouter, deepseek, xai, anthropic, gemini, perplexity)
 //   POST /wrappers/rpc/:fn       → Postgres RPC wrapper
 //
 // Required secrets (set via `supabase secrets set`):
-//   OPENROUTER_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY
+//   OPENROUTER_API_KEY, DEEPSEEK_API_KEY, XAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, PERPLEXITY_API_KEY
 
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2.46.2";
 
-// Types
+// =============================================================================
+// CONFIGURATION - Edit these allowlists for your deployment
+// =============================================================================
+
+// Allowed RPC functions (security allowlist)
+const ALLOWED_RPC_FUNCTIONS = new Set([
+  // Vector search
+  "match_documents",
+  "search_rag_vectors",
+  // User profile
+  "get_user_profile",
+  "get_profile",
+  // Public data
+  "search_items",
+  "get_public_data",
+]);
+
+// RPC functions that can use anon key (public read-only)
+const ANON_ALLOWED_RPC = new Set([
+  "get_public_data",
+  "search_items",
+]);
+
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = new Set([
+  "https://ccjdctnmgrweserduxhi.supabase.co",
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://localhost:8080",
+  "http://localhost:19006", // Expo web
+]);
+
+// Provider-specific configuration with token caps
+const PROVIDER_LIMITS: Record<string, { maxTokens: number; defaultTokens: number; blockedModels?: Set<string> }> = {
+  openrouter: { maxTokens: 16384, defaultTokens: 2048 },
+  deepseek: { maxTokens: 8192, defaultTokens: 2048 },
+  xai: { maxTokens: 8192, defaultTokens: 2048 },
+  anthropic: { maxTokens: 8192, defaultTokens: 1024 },
+  gemini: { maxTokens: 8192, defaultTokens: 2048 },
+  perplexity: { maxTokens: 4096, defaultTokens: 1024 },
+};
+
+// Rate limiting config (requests per window)
+const RATE_LIMIT = {
+  windowMs: 60_000, // 1 minute
+  maxRequests: 60,  // 60 req/min per user
+};
+
+// =============================================================================
+// TYPES
+// =============================================================================
+
 interface RpcBody {
   args?: Record<string, unknown>;
   useAnon?: boolean;
@@ -30,40 +82,45 @@ interface AiBody {
 
 type Provider = "openrouter" | "deepseek" | "xai" | "anthropic" | "gemini" | "perplexity";
 
-// Allowed RPC functions (security allowlist)
-const ALLOWED_RPC_FUNCTIONS = new Set([
-  "get_user_profile",
-  "search_items",
-  "get_public_data",
-  // Add your allowed RPC functions here
-]);
+// =============================================================================
+// RATE LIMITING (In-memory, resets on cold start)
+// =============================================================================
 
-// Allowed origins for CORS (set to your domains)
-const ALLOWED_ORIGINS = new Set([
-  "https://ccjdctnmgrweserduxhi.supabase.co",
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "http://localhost:8080",
-  "http://localhost:19006", // Expo web
-]);
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
-// Cached Supabase clients
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const entry = rateLimitStore.get(userId);
+
+  if (!entry || now >= entry.resetAt) {
+    rateLimitStore.set(userId, { count: 1, resetAt: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1, resetIn: RATE_LIMIT.windowMs };
+  }
+
+  if (entry.count >= RATE_LIMIT.maxRequests) {
+    return { allowed: false, remaining: 0, resetIn: entry.resetAt - now };
+  }
+
+  entry.count++;
+  return { allowed: true, remaining: RATE_LIMIT.maxRequests - entry.count, resetIn: entry.resetAt - now };
+}
+
+// Cleanup old entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitStore.entries()) {
+    if (now >= entry.resetAt) rateLimitStore.delete(key);
+  }
+}, 60_000);
+
+// =============================================================================
+// SUPABASE CLIENTS (Cached)
+// =============================================================================
+
 const clients: { anon: SupabaseClient | null; service: SupabaseClient | null } = {
   anon: null,
   service: null,
 };
-
-// Utilities
-const json = (data: unknown, init: ResponseInit = {}) =>
-  new Response(JSON.stringify(data), {
-    headers: { "Content-Type": "application/json", "Connection": "keep-alive" },
-    ...init,
-  });
-
-const error = (status: number, message: string, details?: unknown) =>
-  json({ ok: false, error: { message, details } }, { status });
-
-const ok = (data: unknown, init: ResponseInit = {}) => json({ ok: true, data }, init);
 
 const getSupabase = (useAnon = false): SupabaseClient => {
   const key = useAnon ? "anon" : "service";
@@ -77,6 +134,10 @@ const getSupabase = (useAnon = false): SupabaseClient => {
   }
   return clients[key]!;
 };
+
+// =============================================================================
+// PROVIDER CONFIGURATION
+// =============================================================================
 
 const PROVIDER_CFG: Record<Provider, { base: string; authHeader: (key: string) => [string, string]; path: string }> = {
   openrouter: {
@@ -122,6 +183,21 @@ const PROVIDER_ENV: Record<Provider, string> = {
 
 const VALID_PROVIDERS = new Set(Object.keys(PROVIDER_CFG));
 
+// =============================================================================
+// UTILITIES
+// =============================================================================
+
+const json = (data: unknown, init: ResponseInit = {}) =>
+  new Response(JSON.stringify(data), {
+    headers: { "Content-Type": "application/json", "Connection": "keep-alive" },
+    ...init,
+  });
+
+const error = (status: number, message: string, details?: unknown, headers?: Record<string, string>) =>
+  json({ ok: false, error: { message, details } }, { status, headers });
+
+const ok = (data: unknown, init: ResponseInit = {}) => json({ ok: true, data }, init);
+
 function getProviderKey(provider: Provider): string | undefined {
   const envName = PROVIDER_ENV[provider];
   return Deno.env.get(envName);
@@ -137,23 +213,25 @@ function providerUrl(provider: Provider, model?: string) {
 }
 
 function normalizePayload(provider: Provider, body: AiBody): Record<string, unknown> {
+  const limits = PROVIDER_LIMITS[provider] || { maxTokens: 4096, defaultTokens: 1024 };
+  const maxTokens = Math.min(body.max_tokens ?? limits.defaultTokens, limits.maxTokens);
+
   if (provider === "anthropic") {
     return {
       model: body.model,
       messages: body.messages ?? [],
-      max_tokens: body.max_tokens ?? 1024,
+      max_tokens: maxTokens,
       temperature: body.temperature,
     };
   }
   if (provider === "gemini") {
     const contents = (body.messages ?? []).map((m) => ({
-      // Gemini: assistant→model, system→user (Gemini doesn't support system role directly)
       role: m.role === "assistant" ? "model" : m.role === "system" ? "user" : m.role,
       parts: Array.isArray(m.content)
         ? m.content
         : [{ text: typeof m.content === "string" ? m.content : JSON.stringify(m.content) }],
     }));
-    return { contents, generationConfig: { temperature: body.temperature, maxOutputTokens: body.max_tokens } };
+    return { contents, generationConfig: { temperature: body.temperature, maxOutputTokens: maxTokens } };
   }
   // OpenAI-compatible providers (openrouter, deepseek, xai, perplexity)
   return {
@@ -161,7 +239,7 @@ function normalizePayload(provider: Provider, body: AiBody): Record<string, unkn
     messages: body.messages ?? [],
     stream: body.stream ?? false,
     temperature: body.temperature,
-    max_tokens: body.max_tokens,
+    max_tokens: maxTokens,
     top_p: body.top_p,
   };
 }
@@ -169,6 +247,12 @@ function normalizePayload(provider: Provider, body: AiBody): Record<string, unkn
 async function callProvider(provider: Provider, body: AiBody, signal?: AbortSignal): Promise<Response> {
   const key = getProviderKey(provider);
   if (!key) return error(400, `Missing API key for provider '${provider}'. Set ${PROVIDER_ENV[provider]} secret.`);
+
+  // Check for blocked models
+  const limits = PROVIDER_LIMITS[provider];
+  if (limits?.blockedModels?.has(body.model)) {
+    return error(403, `Model '${body.model}' is not allowed for provider '${provider}'.`);
+  }
 
   const url = providerUrl(provider, body.model);
   const cfg = PROVIDER_CFG[provider];
@@ -188,7 +272,10 @@ async function callProvider(provider: Provider, body: AiBody, signal?: AbortSign
   });
 }
 
-// Validate JWT token with Supabase Auth
+// =============================================================================
+// AUTH VALIDATION
+// =============================================================================
+
 async function validateAuth(req: Request): Promise<{ valid: boolean; userId?: string; error?: string }> {
   const auth = req.headers.get("authorization") || req.headers.get("Authorization");
   if (!auth || !/^bearer\s+.+/i.test(auth)) {
@@ -198,7 +285,7 @@ async function validateAuth(req: Request): Promise<{ valid: boolean; userId?: st
   const token = auth.replace(/^bearer\s+/i, "");
 
   try {
-    const supabase = getSupabase(true); // Use anon client for auth validation
+    const supabase = getSupabase(true);
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
@@ -211,6 +298,10 @@ async function validateAuth(req: Request): Promise<{ valid: boolean; userId?: st
   }
 }
 
+// =============================================================================
+// CORS
+// =============================================================================
+
 function getCorsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("origin") ?? "";
   const allowedOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "";
@@ -218,10 +309,34 @@ function getCorsHeaders(req: Request): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Request-Id",
     "Access-Control-Max-Age": "86400",
+    "Access-Control-Expose-Headers": "X-RateLimit-Remaining, X-RateLimit-Reset",
   };
 }
+
+// =============================================================================
+// HEALTH CHECK UTILITIES
+// =============================================================================
+
+async function checkProviderHealth(provider: Provider): Promise<{ ok: boolean; latencyMs?: number; error?: string }> {
+  const key = getProviderKey(provider);
+  if (!key) return { ok: false, error: "No API key configured" };
+
+  const start = Date.now();
+  try {
+    // Quick HEAD/GET to base URL (most providers don't have dedicated health endpoints)
+    const cfg = PROVIDER_CFG[provider];
+    const resp = await fetch(cfg.base, { method: "HEAD", signal: AbortSignal.timeout(5000) });
+    return { ok: resp.status < 500, latencyMs: Date.now() - start };
+  } catch (e) {
+    return { ok: false, latencyMs: Date.now() - start, error: (e as Error).message };
+  }
+}
+
+// =============================================================================
+// MAIN HANDLER
+// =============================================================================
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -232,31 +347,57 @@ Deno.serve(async (req) => {
 
     // CORS preflight
     if (req.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
+      return new Response(null, { status: 204, headers: corsHeaders });
     }
 
     // Health: public
     if (path === "/wrappers/health" && req.method === "GET") {
-      return ok({ status: "ok", time: new Date().toISOString() });
+      return ok({ status: "ok", time: new Date().toISOString(), version: "2.0.0" }, { headers: corsHeaders });
+    }
+
+    // Health/deps: check upstream availability (auth required)
+    if (path === "/wrappers/health/deps" && req.method === "GET") {
+      const auth = await validateAuth(req);
+      if (!auth.valid) return error(401, auth.error ?? "Unauthorized", undefined, corsHeaders);
+
+      const checks = await Promise.all(
+        (Object.keys(PROVIDER_CFG) as Provider[]).map(async (p) => ({
+          provider: p,
+          ...(await checkProviderHealth(p)),
+        }))
+      );
+      return ok({ providers: checks, time: new Date().toISOString() }, { headers: corsHeaders });
     }
 
     // AI Gateway
     if (path.startsWith("/wrappers/ai/") && req.method === "POST") {
       const auth = await validateAuth(req);
-      if (!auth.valid) return error(401, auth.error ?? "Unauthorized");
+      if (!auth.valid) return error(401, auth.error ?? "Unauthorized", undefined, corsHeaders);
+
+      // Rate limiting
+      const rateCheck = checkRateLimit(auth.userId!);
+      const rateLimitHeaders = {
+        ...corsHeaders,
+        "X-RateLimit-Remaining": String(rateCheck.remaining),
+        "X-RateLimit-Reset": String(Math.ceil(rateCheck.resetIn / 1000)),
+      };
+
+      if (!rateCheck.allowed) {
+        return error(429, "Rate limit exceeded. Try again later.", { resetIn: rateCheck.resetIn }, rateLimitHeaders);
+      }
 
       const provider = path.split("/")[3];
       if (!provider || !VALID_PROVIDERS.has(provider)) {
-        return error(400, `Unsupported provider. Valid: ${[...VALID_PROVIDERS].join(", ")}`);
+        return error(400, `Unsupported provider. Valid: ${[...VALID_PROVIDERS].join(", ")}`, undefined, rateLimitHeaders);
       }
 
       const body = (await req.json().catch(() => ({}))) as AiBody;
       if (!body.model) {
-        return error(400, "Missing required field: model");
+        return error(400, "Missing required field: model", undefined, rateLimitHeaders);
       }
 
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 55000); // 55s (under Edge Function limit)
+      const timeout = setTimeout(() => controller.abort(), 55000);
 
       const resp = await callProvider(provider as Provider, body, controller.signal).catch((e) => {
         if (e.name === "AbortError") {
@@ -271,46 +412,51 @@ Deno.serve(async (req) => {
       // Handle streaming response
       if (body.stream && contentType.includes("text/event-stream")) {
         return new Response(resp.body, {
-          headers: { "Content-Type": "text/event-stream", ...corsHeaders },
+          headers: { "Content-Type": "text/event-stream", ...rateLimitHeaders },
           status: resp.status,
         });
       }
 
-      // Clone response before consuming body to handle parse failures
+      // Clone response before consuming body
       const clonedResp = resp.clone();
       const data = await resp.json().catch(async () => ({ raw: await clonedResp.text() }));
 
-      return json({ ok: resp.ok, status: resp.status, data }, { status: resp.status, headers: corsHeaders });
+      return json(
+        { ok: resp.ok, status: resp.status, data, provider, model: body.model },
+        { status: resp.status, headers: rateLimitHeaders }
+      );
     }
 
     // RPC Wrapper
     if (path.startsWith("/wrappers/rpc/") && req.method === "POST") {
       const auth = await validateAuth(req);
-      if (!auth.valid) return error(401, auth.error ?? "Unauthorized");
+      if (!auth.valid) return error(401, auth.error ?? "Unauthorized", undefined, corsHeaders);
 
       const fn = decodeURIComponent(path.split("/")[3] || "");
-      if (!fn) return error(400, "Function name required");
+      if (!fn) return error(400, "Function name required", undefined, corsHeaders);
 
       // Security: Check allowlist
       if (!ALLOWED_RPC_FUNCTIONS.has(fn)) {
-        return error(403, `RPC function '${fn}' not allowed. Contact admin to allowlist.`);
+        return error(403, `RPC function '${fn}' not allowed. Contact admin to allowlist.`, undefined, corsHeaders);
       }
 
       const body = (await req.json().catch(() => ({}))) as RpcBody;
-      const useAnon = body.useAnon === true;
+
+      // Only allow anon for specific functions
+      const useAnon = body.useAnon === true && ANON_ALLOWED_RPC.has(fn);
       const args = body.args ?? {};
 
       const supabase = getSupabase(useAnon);
       const rpcRes = await supabase.rpc(fn, args);
 
       if (rpcRes.error) {
-        return error(400, rpcRes.error.message, rpcRes.error);
+        return error(400, rpcRes.error.message, rpcRes.error, corsHeaders);
       }
       return ok({ result: rpcRes.data }, { headers: corsHeaders });
     }
 
-    return error(404, "Not found");
+    return error(404, "Not found", undefined, corsHeaders);
   } catch (e) {
-    return error(500, "Unhandled error", { message: (e as Error)?.message });
+    return error(500, "Unhandled error", { message: (e as Error)?.message }, corsHeaders);
   }
 });
