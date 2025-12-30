@@ -1,3 +1,10 @@
+/**
+ * Model Router - Intelligent routing to AI providers through Supabase wrappers
+ * Routes requests through Edge Functions to avoid CORS issues
+ */
+
+import { chat, type Provider, type ChatMessage } from './ai-service';
+
 export interface ModelRequest {
   prompt: string;
   model?: string;
@@ -37,23 +44,75 @@ export interface ModelResponse {
   reasoning?: string;
 }
 
+// Model to provider mapping
+const MODEL_PROVIDERS: Record<string, Provider> = {
+  // Anthropic
+  'claude-3-5-sonnet-20241022': 'anthropic',
+  'claude-3-haiku-20240307': 'anthropic',
+  'claude-3-opus-20240229': 'anthropic',
+  'claude-sonnet-4-5': 'anthropic',
+  'claude-opus-4-5': 'anthropic',
+  // DeepSeek
+  'deepseek-chat': 'deepseek',
+  'deepseek-reasoner': 'deepseek',
+  // XAI
+  'grok-2': 'xai',
+  'grok-beta': 'xai',
+  'grok-4-1-fast-reasoning': 'xai',
+  'grok-4-1-fast-non-reasoning': 'xai',
+  'grok-code-fast-1': 'xai',
+  // Gemini
+  'gemini-1.5-flash': 'gemini',
+  'gemini-1.5-pro': 'gemini',
+  'gemini-2.0-flash': 'gemini',
+  // Perplexity
+  'llama-3.1-sonar-small-128k-online': 'perplexity',
+  'llama-3.1-sonar-large-128k-online': 'perplexity',
+  // OpenRouter (prefix with provider)
+  'openai/gpt-4o': 'openrouter',
+  'openai/gpt-4o-mini': 'openrouter',
+  'meta-llama/llama-3.1-70b-instruct': 'openrouter',
+};
+
+function getProvider(model: string): Provider {
+  // Check direct mapping
+  if (MODEL_PROVIDERS[model]) {
+    return MODEL_PROVIDERS[model];
+  }
+
+  // Check by prefix
+  if (model.startsWith('claude')) return 'anthropic';
+  if (model.startsWith('grok')) return 'xai';
+  if (model.startsWith('deepseek')) return 'deepseek';
+  if (model.startsWith('gemini')) return 'gemini';
+  if (model.includes('/')) return 'openrouter'; // Has provider prefix
+
+  // Default to openrouter for unknown models
+  return 'openrouter';
+}
+
+function extractModelId(fullModel: string): string {
+  // Remove provider prefix if present (e.g., "anthropic/claude-3" -> "claude-3")
+  const parts = fullModel.split('/');
+  return parts.length > 1 ? parts.slice(1).join('/') : fullModel;
+}
+
 export class ModelRouter {
   private config: ModelRouterConfig;
-  
+
   constructor() {
     this.config = {
       defaultModel: {
-        chat: 'anthropic/claude-sonnet-4-5',
-        code: 'xai/grok-code-fast-1',
-        reasoning: 'xai/grok-4-1-fast-reasoning',
-        vision: 'anthropic/claude-opus-4-5',
-        rag: 'deepseek/deepseek-chat'
+        chat: 'claude-3-5-sonnet-20241022',
+        code: 'deepseek-chat',
+        reasoning: 'deepseek-reasoner',
+        vision: 'gemini-1.5-pro',
+        rag: 'deepseek-chat'
       },
       fallbackChain: [
-        'anthropic/claude-sonnet-4-5',
-        'xai/grok-4-1-fast-non-reasoning',
-        'deepseek/deepseek-chat',
-        'openrouter/openai/gpt-4o-mini'
+        'claude-3-5-sonnet-20241022',
+        'deepseek-chat',
+        'gemini-1.5-flash',
       ],
       routingStrategy: 'auto'
     };
@@ -61,261 +120,84 @@ export class ModelRouter {
 
   async route(request: ModelRequest): Promise<ModelResponse> {
     const selectedModel = this.selectModel(request);
-    
-    for (const model of [selectedModel, ...this.config.fallbackChain]) {
+    const fallbacks = [selectedModel, ...this.config.fallbackChain.filter(m => m !== selectedModel)];
+
+    let lastError: Error | null = null;
+
+    for (const model of fallbacks) {
       try {
         return await this.executeWithModel(model, request);
       } catch (error) {
         console.warn(`Model ${model} failed, trying fallback...`, error);
+        lastError = error as Error;
       }
     }
-    
-    throw new Error('All models failed');
+
+    throw lastError || new Error('All models failed');
   }
 
   private selectModel(request: ModelRequest): string {
-    if (request.model) return request.model;
-    if (request.task) return this.config.defaultModel[request.task];
-    
-    if (request.prompt.includes('```')) return this.config.defaultModel.code;
-    if (request.prompt.length > 1000) return this.config.defaultModel.rag;
-    if (request.prompt.toLowerCase().includes('image')) return this.config.defaultModel.vision;
-    
+    if (request.model) {
+      // Extract model ID if it has provider prefix
+      return extractModelId(request.model);
+    }
+
+    if (request.task) {
+      return this.config.defaultModel[request.task];
+    }
+
+    // Auto-detect task from prompt
+    const prompt = request.prompt.toLowerCase();
+    if (prompt.includes('```') || prompt.includes('code') || prompt.includes('function')) {
+      return this.config.defaultModel.code;
+    }
+    if (prompt.includes('think') || prompt.includes('reason') || prompt.includes('step by step')) {
+      return this.config.defaultModel.reasoning;
+    }
+    if (prompt.length > 2000) {
+      return this.config.defaultModel.rag;
+    }
+
     return this.config.defaultModel.chat;
   }
 
   private async executeWithModel(model: string, request: ModelRequest): Promise<ModelResponse> {
-    const startTime = Date.now();
-    
-    const [provider, ...modelParts] = model.split('/');
-    const modelId = modelParts.join('/');
-    
-    const apiKey = this.getApiKey(provider);
-    if (!apiKey) {
-      throw new Error(`API key not configured for provider: ${provider}`);
-    }
+    const provider = getProvider(model);
+    const modelId = extractModelId(model);
 
-    const messages = request.messages || [{ role: 'user', content: request.prompt }];
-    
-    let response;
-    
-    switch (provider) {
-      case 'xai':
-        response = await this.callXAI(modelId, messages, apiKey, request);
-        break;
-      case 'deepseek':
-        response = await this.callDeepSeek(modelId, messages, apiKey, request);
-        break;
-      case 'anthropic':
-        response = await this.callAnthropic(modelId, messages, apiKey, request);
-        break;
-      case 'openrouter':
-        response = await this.callOpenRouter(modelId, messages, apiKey, request);
-        break;
-      default:
-        throw new Error(`Unsupported provider: ${provider}`);
-    }
-    
-    const latency = Date.now() - startTime;
-    
-    return {
-      ...response,
-      latency
-    };
-  }
+    const messages: ChatMessage[] = request.messages?.map(m => ({
+      role: m.role as 'system' | 'user' | 'assistant',
+      content: m.content,
+    })) || [{ role: 'user', content: request.prompt }];
 
-  private async callXAI(model: string, messages: any[], apiKey: string, request: ModelRequest) {
-    const response = await fetch('https://api.x.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: request.temperature || 0.7,
-        max_tokens: request.maxTokens || 4096,
-        stream: false,
-      }),
+    const response = await chat({
+      provider,
+      model: modelId,
+      messages,
+      temperature: request.temperature ?? 0.7,
+      max_tokens: request.maxTokens ?? 4096,
+      stream: false,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`xAI API error: ${error.message || response.statusText}`);
+    if (!response.success) {
+      throw new Error(response.error || 'Request failed');
     }
 
-    const data = await response.json();
-    
     return {
-      content: data.choices[0].message.content,
-      model: data.model,
-      tokens: {
-        input: data.usage.prompt_tokens,
-        output: data.usage.completion_tokens,
-        total: data.usage.total_tokens,
-      },
-      cost: this.calculateCost('xai', model, data.usage),
-      reasoning: data.choices[0].message.reasoning_content,
-    };
-  }
-
-  private async callDeepSeek(model: string, messages: any[], apiKey: string, request: ModelRequest) {
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: request.temperature || 0.7,
-        max_tokens: request.maxTokens || 4096,
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`DeepSeek API error: ${error.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    return {
-      content: data.choices[0].message.content,
-      model: data.model,
-      tokens: {
-        input: data.usage.prompt_tokens,
-        output: data.usage.completion_tokens,
-        total: data.usage.total_tokens,
-      },
-      cost: this.calculateCost('deepseek', model, data.usage),
-    };
-  }
-
-  private async callAnthropic(model: string, messages: any[], apiKey: string, request: ModelRequest) {
-    const systemMessage = messages.find(m => m.role === 'system');
-    const userMessages = messages.filter(m => m.role !== 'system');
-    
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: request.maxTokens || 4096,
-        messages: userMessages,
-        system: systemMessage?.content,
-        temperature: request.temperature || 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Anthropic API error: ${error.error?.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    return {
-      content: data.content[0].text,
-      model: data.model,
-      tokens: {
-        input: data.usage.input_tokens,
-        output: data.usage.output_tokens,
-        total: data.usage.input_tokens + data.usage.output_tokens,
-      },
-      cost: this.calculateCost('anthropic', model, data.usage),
-    };
-  }
-
-  private async callOpenRouter(model: string, messages: any[], apiKey: string, request: ModelRequest) {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'ModelHub',
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: request.temperature || 0.7,
-        max_tokens: request.maxTokens || 4096,
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`OpenRouter API error: ${error.error?.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    return {
-      content: data.choices[0].message.content,
-      model: data.model,
-      tokens: {
-        input: data.usage.prompt_tokens,
-        output: data.usage.completion_tokens,
-        total: data.usage.total_tokens,
-      },
-      cost: {
-        input: 0,
-        output: 0,
-        total: 0,
-      },
-    };
-  }
-
-  private getApiKey(provider: string): string | null {
-    const keyMap: Record<string, string> = {
-      'xai': 'XAI_API_KEY',
-      'deepseek': 'DEEPSEEK_API_KEY',
-      'anthropic': 'ANTHROPIC_API_KEY',
-      'openrouter': 'OPENROUTER_API_KEY',
-      'openai': 'OPENAI_API_KEY',
-    };
-    
-    const keyName = keyMap[provider];
-    if (!keyName) return null;
-    
-    return localStorage.getItem(keyName);
-  }
-
-  private calculateCost(provider: string, model: string, usage: any): { input: number; output: number; total: number } {
-    const pricing: Record<string, { input: number; output: number }> = {
-      'xai/grok-4-1-fast-reasoning': { input: 15, output: 30 },
-      'xai/grok-4-1-fast-non-reasoning': { input: 8, output: 16 },
-      'xai/grok-code-fast-1': { input: 12, output: 24 },
-      'deepseek/deepseek-chat': { input: 0.14, output: 0.28 },
-      'deepseek/deepseek-reasoner': { input: 0.55, output: 2.19 },
-      'anthropic/claude-opus-4-5': { input: 15, output: 75 },
-      'anthropic/claude-sonnet-4-5': { input: 3, output: 15 },
-    };
-    
-    const key = `${provider}/${model}`;
-    const price = pricing[key] || { input: 0, output: 0 };
-    
-    const inputCost = (usage.prompt_tokens || usage.input_tokens || 0) * price.input / 1_000_000;
-    const outputCost = (usage.completion_tokens || usage.output_tokens || 0) * price.output / 1_000_000;
-    
-    return {
-      input: inputCost,
-      output: outputCost,
-      total: inputCost + outputCost,
+      content: response.content,
+      model: response.model,
+      tokens: response.tokens,
+      cost: response.cost,
+      latency: response.latency,
     };
   }
 
   updateConfig(updates: Partial<ModelRouterConfig>) {
     this.config = { ...this.config, ...updates };
+  }
+
+  getConfig(): ModelRouterConfig {
+    return { ...this.config };
   }
 }
 
