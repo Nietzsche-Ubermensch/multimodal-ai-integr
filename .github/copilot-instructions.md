@@ -449,7 +449,7 @@ export function getModelById(id: string): AIModel | undefined {
 }
 
 export function getModelsByProvider(provider: AIProvider): AIModel[] {
-  return AI_MODELS.filter(model => model.model === provider);
+  return AI_MODELS.filter(model => model.provider === provider);
 }
 ```
 
