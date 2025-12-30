@@ -27,6 +27,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Required status checks for PR validation
   - Improved CI/CD pipeline reliability
 
+- **Supabase Wrappers Edge Function v2.0** - Unified AI Gateway for all providers
+  - Routes: `/wrappers/health`, `/wrappers/ai/:provider`, `/wrappers/rpc/:fn`
+  - 6 AI providers: OpenRouter, DeepSeek, XAI, Anthropic, Gemini, Perplexity
+  - JWT authentication with anonymous access support (anon key detection)
+  - Per-user rate limiting: 60 req/min (authenticated), 30 req/min (anonymous/IP)
+  - Token caps per provider to control costs (8k-16k depending on provider)
+  - RPC allowlist: `match_documents`, `search_rag_vectors`, `get_profile`, etc.
+  - CORS origin restrictions for security
+  - `/health/deps` endpoint for upstream availability monitoring
+  - `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `X-RateLimit-Type` headers
+
+- **Frontend AI Service Integration** - Unified client for wrappers Edge Function
+  - `src/lib/ai-service.ts`: Unified chat API with cost/latency tracking
+  - `src/lib/supabase.ts`: Supabase client initialization and auth helpers
+  - Updated `src/lib/modelRouter.ts` to route through wrappers (fixes CORS)
+
 #### Security & Code Quality
 - Enhanced security with rate limiting and JWT authentication
 - Implemented RPC allowlists for database security
@@ -64,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed - 2025-12-30
 
+- **CORS issues** - All AI requests now proxy through Supabase Edge Functions
 - Removed mock embedding generation that returned random numbers
 - Removed mock chat completion that returned fake responses
 - Created `match_documents` SQL function to fix frontend-database mismatch
