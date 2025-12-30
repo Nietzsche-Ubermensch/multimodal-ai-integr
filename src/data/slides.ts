@@ -35,6 +35,7 @@ export const slides: SlideData[] = [
       "Streaming Responses with Token Display (Interactive)",
       "Python Integration Patterns (LiteLLM)",
       "Best Practices: Security & Scale",
+      "Explainable AI (XAI) SDK - Transparency & Interpretability ⭐ NEW",
       "GitHub Repository Integration (Interactive)",
       "Deployment Guides (Interactive)",
       "Resources & Repositories"
@@ -1419,6 +1420,51 @@ const predictions = await imageClassifier('https://example.com/cat.jpg');
 # - Examples: https://github.com/huggingface/transformers.js/tree/main/examples`
   },
   {
+    id: "xai-explainability",
+    title: "Explainable AI (XAI) SDK",
+    subtitle: "Transparency & Interpretability for Neural Networks",
+    bullets: [
+      "Feature Importance: SHAP-style attribution showing which input features matter most for predictions",
+      "Attention Visualization: See which tokens or regions the model focuses on during inference",
+      "Gradient Analysis: Understand how input changes affect model outputs with gradient-based explanations",
+      "Integrated Gradients: Path-based attribution from baseline to input for stable explanations",
+      "Layer-wise Relevance Propagation (LRP): Trace relevance through all network layers",
+      "LIME: Local interpretable model-agnostic explanations for black-box models",
+      "Multi-Model Support: Compatible with text, vision, code, and multimodal AI models",
+      "Interactive Demo: Test explanations with real models via the XAI Explainer component"
+    ],
+    code: `// Quick XAI Integration Example
+import { explainAIResponse } from '@/lib/xai-service';
+
+// Generate explanation for any model prediction
+const explanation = await explainAIResponse(
+  "Is this email spam?",              // Input
+  "Yes, this appears to be spam",     // Model output
+  "gpt-4o",                            // Model ID
+  "openai"                             // Provider
+);
+
+// Display top contributing features
+console.log(explanation.summary.explanation);
+explanation.summary.topFeatures.forEach(f => {
+  console.log(\`\${f.feature}: \${(f.score * 100).toFixed(1)}%\`);
+});
+
+// Compare multiple explanation methods
+import { getXAIService } from '@/lib/xai-service';
+const service = getXAIService();
+
+const comparisons = await service.explainWithMultipleMethods(
+  { input, output, modelId: 'claude-3.5-sonnet', provider: 'anthropic' },
+  ['feature_importance', 'attention', 'gradient']
+);
+
+// Export explanation for analysis
+import { exportExplanation } from '@/lib/xai-service';
+const json = exportExplanation(explanation, 'json');
+const csv = exportExplanation(explanation, 'csv');`
+  },
+  {
     id: "summary",
     title: "Summary",
     subtitle: "The Future is Multimodal",
@@ -1427,7 +1473,8 @@ const predictions = await imageClassifier('https://example.com/cat.jpg');
       "Utilize DeepSeek for specialized reasoning tasks at 1/200th the cost of GPT-4",
       "Orchestrate with LiteLLM for stability, automatic retries, and multi-provider fallback",
       "Build with privacy and performance first—use secure API proxies, implement caching, monitor costs",
-      "Explore transformers.js for browser-based ML and hub integration for seamless model discovery"
+      "Explore transformers.js for browser-based ML and hub integration for seamless model discovery",
+      "Use XAI SDK for transparent, interpretable AI with multiple explanation methods"
     ],
     content: "Thank You"
   }
