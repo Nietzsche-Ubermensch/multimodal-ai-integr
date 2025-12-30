@@ -13,7 +13,8 @@ import {
   Lightning,
   Database,
   Flask,
-  DownloadSimple
+  DownloadSimple,
+  Eye
 } from "@phosphor-icons/react";
 import { APIKeyManager } from "./APIKeyManager";
 import { ModelExplorer } from "./ModelExplorer";
@@ -25,6 +26,7 @@ import { UnifiedModelCatalog } from "./UnifiedModelCatalog";
 import { BatchModelTester } from "./BatchModelTester";
 import { RAGPipelineDemo } from "./RAGPipelineDemo";
 import { ConfigurationExporter } from "./ConfigurationExporter";
+import { XAIExplainerDemo } from "@/components/XAIExplainerDemo";
 
 export function ModelHubApp() {
   const [activeTab, setActiveTab] = useState("catalog");
@@ -69,7 +71,7 @@ export function ModelHubApp() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-9 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
+          <TabsList className="grid grid-cols-10 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
             <TabsTrigger value="catalog" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Database size={18} />
               <span className="hidden sm:inline">Catalog</span>
@@ -101,6 +103,10 @@ export function ModelHubApp() {
             <TabsTrigger value="compare" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <SquaresFour size={18} />
               <span className="hidden sm:inline">Compare</span>
+            </TabsTrigger>
+            <TabsTrigger value="xai" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Eye size={18} />
+              <span className="hidden sm:inline">XAI</span>
             </TabsTrigger>
             <TabsTrigger value="saved" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <BookmarkSimple size={18} />
@@ -154,6 +160,12 @@ export function ModelHubApp() {
 
           <TabsContent value="compare">
             <ResponseComparison apiKeysConfigured={apiKeysConfigured} />
+          </TabsContent>
+
+          <TabsContent value="xai">
+            <Card className="p-8 border-border bg-card/50 backdrop-blur-sm">
+              <XAIExplainerDemo />
+            </Card>
           </TabsContent>
 
           <TabsContent value="saved">
