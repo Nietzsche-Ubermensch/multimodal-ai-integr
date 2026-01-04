@@ -1,0 +1,88 @@
+name: Dependabot auto-merge
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot-auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Wait for checks to pass
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const sha = context.payload.pull_request.head.sha;
+
+            const maxAttempts = 30;
+            const delayMs = 60000; // 1 minute
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+              core.info(`Attempt ${attempt}/${maxAttempts}: Checking status...`);
+
+              const { data: checkRuns } = await github.rest.checks.listForRef({
+                owner,
+                repo,
+                ref: sha,
+              });
+
+              const { data: statuses } = await github.rest.repos.getCombinedStatusForRef({
+                owner,
+                repo,
+                ref: sha,
+              });
+
+              const checksPending = checkRuns.check_runs.some(
+                (check) => check.status !== 'completed' && check.name !== 'dependabot-auto-merge'
+              );
+
+              const checksFailed = checkRuns.check_runs.some(
+                (check) => check.status === 'completed' && 
+                           check.conclusion !== 'success' && 
+                           check.conclusion !== 'skipped' &&
+                           check.conclusion !== 'neutral' &&
+                           check.name !== 'dependabot-auto-merge'
+              );
+
+              const statusPending = statuses.state === 'pending';
+              const statusFailed = statuses.state === 'failure' || statuses.state === 'error';
+
+              if (checksFailed || statusFailed) {
+                core.setFailed('Some checks have failed. Aborting auto-merge.');
+                return;
+              }
+
+              if (!checksPending && !statusPending) {
+                core.info('All checks have passed!');
+                return;
+              }
+
+              if (attempt < maxAttempts) {
+                core.info(`Checks still pending. Waiting ${delayMs / 1000} seconds...`);
+                await new Promise((resolve) => setTimeout(resolve, delayMs));
+              }
+            }
+
+            core.setFailed('Timed out waiting for checks to complete.');
+
+      - name: Enable auto-merge for Dependabot PRs
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
