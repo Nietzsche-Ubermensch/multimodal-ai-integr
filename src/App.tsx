@@ -10,7 +10,7 @@ import { AISearchPanel } from "@/components/AISearchPanel";
 import { LibreChatInterface } from "@/components/LibreChatInterface";
 import { GitHubModelsPlayground } from "@/components/GitHubModelsPlayground";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database, Brain, Scissors, Globe } from "lucide-react";
+import { Sparkles, Database, Brain, Scissors, Globe, Github, FlaskConical, MessageSquare, Search, Layers } from "lucide-react";
 
 function App() {
   return (
