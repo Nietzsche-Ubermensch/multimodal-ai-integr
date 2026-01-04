@@ -898,6 +898,10 @@ export class ModelCatalog {
   private byId: Map<string, UnifiedModel>;
   private byProvider: Map<ProviderType, UnifiedModel[]>;
   private byType: Map<ModelType, UnifiedModel[]>;
+  // Cached tags for O(1) access instead of recomputing on each call
+  private cachedTags: string[] | null = null;
+  // Cache for search optimization - stores lowercase versions
+  private searchIndex: Map<string, { name: string; description: string; tags: string[] }> | null = null;
 
   constructor() {
     this.catalog = UNIFIED_MODEL_CATALOG;
@@ -908,6 +912,8 @@ export class ModelCatalog {
   }
 
   private _buildIndexes() {
+    const tagsSet = new Set<string>();
+    
     for (const model of this.catalog) {
       this.byId.set(model.id, model);
 
@@ -920,6 +926,24 @@ export class ModelCatalog {
         this.byType.set(model.modelType, []);
       }
       this.byType.get(model.modelType)!.push(model);
+      
+      // Collect tags during index building for efficiency
+      for (const tag of model.tags) {
+        tagsSet.add(tag);
+      }
+    }
+    
+    // Pre-compute and cache sorted tags
+    this.cachedTags = Array.from(tagsSet).sort();
+    
+    // Build search index with pre-lowercased strings for faster searches
+    this.searchIndex = new Map();
+    for (const model of this.catalog) {
+      this.searchIndex.set(model.id, {
+        name: model.name.toLowerCase(),
+        description: model.description?.toLowerCase() || '',
+        tags: model.tags.map(t => t.toLowerCase())
+      });
     }
   }
 
@@ -936,17 +960,23 @@ export class ModelCatalog {
   }
 
   getByTags(tags: string[]): UnifiedModel[] {
-    return this.catalog.filter((m) => tags.some((tag) => m.tags.includes(tag)));
+    // Optimize by using a Set for O(1) tag lookups
+    const tagSet = new Set(tags);
+    return this.catalog.filter((m) => m.tags.some((tag) => tagSet.has(tag)));
   }
 
   search(query: string): UnifiedModel[] {
     const q = query.toLowerCase();
-    return this.catalog.filter(
-      (m) =>
-        m.name.toLowerCase().includes(q) ||
-        m.description?.toLowerCase().includes(q) ||
-        m.tags.some((tag) => tag.toLowerCase().includes(q))
-    );
+    // Use pre-computed search index for faster searches
+    return this.catalog.filter((m) => {
+      const indexed = this.searchIndex?.get(m.id);
+      if (!indexed) return false;
+      return (
+        indexed.name.includes(q) ||
+        indexed.description.includes(q) ||
+        indexed.tags.some((tag) => tag.includes(q))
+      );
+    });
   }
 
   getModel(modelId: string): UnifiedModel | undefined {
@@ -962,13 +992,9 @@ export class ModelCatalog {
   }
 
   getAllTags(): string[] {
-    const tags = new Set<string>();
-    for (const model of this.catalog) {
-      for (const tag of model.tags) {
-        tags.add(tag);
-      }
-    }
-    return Array.from(tags).sort();
+    // Return cached tags computed during index building
+    // This is O(1) instead of O(n*m) where n is models and m is tags per model
+    return this.cachedTags || [];
   }
 }
 

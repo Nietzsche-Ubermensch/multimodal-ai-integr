@@ -2,6 +2,25 @@
 
 A complete interactive reference guide for developers building AI applications with modern inference providers. Covers 19+ essential topics from basic concepts to advanced production deployment strategies, featuring live SDK demos, real-time API testing, and production-ready code examples for Anthropic Claude, DeepSeek, xAI Grok, OpenRouter, and more.
 
+## 🎉 Recent Updates (December 30, 2025)
+
+### New Features
+- **🧠 Explainable AI (XAI) SDK**: Added comprehensive XAI integration for neural network prediction transparency with 6 explanation methods (SHAP, attention, gradients, integrated gradients, LRP, LIME)
+- **🔍 Together AI BGE Embeddings**: Integrated Together AI's BGE (BAAI General Embedding) models via OpenRouter for enhanced RAG pipeline capabilities
+- **🤖 Trusted Bot Workflow**: Automated workflow for dependency updates and required status checks
+
+### Security Enhancements
+- **🔒 Rate Limiting & JWT Auth**: Added robust rate limiting and JWT authentication middleware
+- **🛡️ Input Validation**: Implemented comprehensive input validation to prevent SSRF, XSS, and DoS attacks
+- **🔐 RPC Allowlists**: Enhanced database security with Supabase RPC allowlists
+- **✅ API Gateway Pattern**: Enforced secure server-side API calls, removing unsafe mock implementations
+
+### Dependency Updates
+- **Major Updates**: `react-resizable-panels` (v4.1.0), `recharts` (v3.6.0) - [See migration guide](./DEPENDENCY_NOTES.md)
+- **Minor Updates**: `react` (v19.2.3), `eslint` (v9.39.2)
+
+📋 **Full Changelog**: See [CHANGELOG.md](./CHANGELOG.md) for complete release notes and breaking changes
+
 ## 🎯 What's Covered
 
 This guide provides comprehensive coverage of:
@@ -25,14 +44,17 @@ This guide provides comprehensive coverage of:
 17. **Providers** - In-depth coverage of Anthropic, DeepSeek, xAI, OpenRouter, NVIDIA, Microsoft
 18. **Hub API** - Becoming an inference provider, registration requirements
 19. **Resources & Documentation** - Essential repositories, learning paths, quick-starts
+20. **Explainable AI (XAI)** - Transparency and interpretability for neural network predictions
 
 📖 **Quick Reference**: See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for topic summaries and navigation guide  
 📚 **Complete Guide**: See [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md) for detailed documentation  
-📑 **Table of Contents**: See [TOC.md](./TOC.md) for complete documentation index
+📑 **Table of Contents**: See [TOC.md](./TOC.md) for complete documentation index  
+🧠 **XAI SDK Guide**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for explainable AI integration
 
 ## 🚀 Interactive Features
 
 - **4 Live SDK Demos**: Anthropic Claude, DeepSeek, xAI Grok, OpenRouter with real/simulated API calls
+- **XAI Explainer Demo**: Interactive explainable AI with 6 explanation methods (SHAP, attention, gradients, etc.)
 - **API Key Validation**: Real-time testing for 6 providers with latency metrics
 - **Live API Testing**: 10+ provider examples with editable JSON and temperature controls
 - **Embedding Generation**: Interactive vector testing with statistics and export
@@ -111,6 +133,59 @@ Navigate to the **"OpenRouter TypeScript SDK Integration"** slide in the present
 
 📖 **Full Documentation**: See [OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md) for complete integration guide.
 
+## ⭐ Featured: Explainable AI (XAI) SDK
+
+This platform now includes a **comprehensive XAI SDK** for transparent and interpretable AI predictions!
+
+### Quick XAI Integration
+
+```bash
+# No installation needed - integrated into the platform
+# Import and use directly
+```
+
+```typescript
+import { explainAIResponse } from '@/lib/xai-service';
+
+// Generate explanation for any model prediction
+const explanation = await explainAIResponse(
+  "Is this email spam?",              // Input
+  "Yes, this appears to be spam",     // Model output
+  "gpt-4o",                            // Model ID
+  "openai"                             // Provider
+);
+
+// Display top contributing features
+console.log(explanation.summary.explanation);
+explanation.summary.topFeatures.forEach(f => {
+  console.log(`${f.feature}: ${(f.score * 100).toFixed(1)}%`);
+});
+```
+
+### XAI Features
+
+- **6 Explanation Methods**: Feature importance, attention weights, gradients, integrated gradients, LRP, LIME
+- **Multi-Model Support**: Text, vision, code, and multimodal AI models
+- **Interactive Demo**: Test explanations with real models via the XAI Explainer component
+- **Visualization**: Heatmaps, bar charts, attention matrices, and gradient visualizations
+- **Export**: JSON and CSV export for further analysis
+- **Batch Processing**: Explain multiple predictions efficiently
+- **Model Comparison**: Compare explanations across different models
+
+### Interactive XAI Demo
+
+Navigate to the **"Explainable AI (XAI) SDK"** slide in the presentation to:
+- Select from multiple explanation methods (SHAP, attention, gradients, etc.)
+- Test with different AI models (GPT-4o, Claude, DeepSeek, Grok)
+- Compare explanations side-by-side
+- Visualize feature importance and attention weights
+- Export explanations for analysis
+- Understand why models make specific predictions
+
+**Slide Location**: Near the end - "Explainable AI (XAI) SDK"
+
+📖 **Full Documentation**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for complete XAI integration guide.
+
 ## 📋 Quick Start
 
 ### Environment Variables
@@ -176,15 +251,23 @@ See [ENV_SETUP.md](./ENV_SETUP.md) for complete security best practices.
 
 ## 📚 Documentation
 
+### Getting Started
 - **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick topic summaries and navigation guide
 - **[COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md)** - Complete guide to all 19 topics
+- **[PRESENTATION_README.md](./PRESENTATION_README.md)** - Presentation navigation guide
+
+### Project Information
+- **[CHANGELOG.md](./CHANGELOG.md)** - Version history and release notes
+- **[DEPENDENCY_NOTES.md](./DEPENDENCY_NOTES.md)** - Dependency versions and migration guides
 - **[COMPREHENSIVE_UPDATE_SUMMARY.md](./COMPREHENSIVE_UPDATE_SUMMARY.md)** - Detailed coverage matrix and feature status
+
+### Technical Guides
 - **[OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md)** - OpenRouter TypeScript SDK guide
+- **[XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md)** - Explainable AI SDK integration guide
 - **[ENV_SETUP.md](./ENV_SETUP.md)** - Environment variable setup for all platforms
-- **[PRD.md](./PRD.md)** - Product requirements and design specifications
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture documentation
 - **[SECURITY.md](./SECURITY.md)** - Security guidelines and best practices
-- **[PRESENTATION_README.md](./PRESENTATION_README.md)** - Presentation navigation guide
+- **[PRD.md](./PRD.md)** - Product requirements and design specifications
 
 ## 🎓 Learning Paths
 
@@ -379,6 +462,70 @@ The Spark Template files and resources from GitHub are licensed under the terms 
 - Redis/KV caching for performance and cost savings
 - Async processing (Celery/BullMQ) for long-running tasks
 - Monitoring: Track latency, tokens, errors per model
+
+## 🔧 Repository Maintenance
+
+### Recommended Settings
+
+To keep the repository clean and organized, we recommend the following GitHub settings:
+
+#### Branch Settings
+1. **Enable "Automatically delete head branches"**
+   - Go to Settings → General → Pull Requests
+   - Check "Automatically delete head branches"
+   - This keeps your branches list clean after PRs are merged
+
+#### Branch Protection Rules (for `main` branch)
+We recommend configuring the following branch protection rules:
+
+1. **Require pull request reviews before merging**
+   - Require at least 1 approval
+   - Dismiss stale pull request approvals when new commits are pushed
+
+2. **Require status checks to pass before merging**
+   - Require branches to be up to date before merging
+   - Required status checks:
+     - `build` - TypeScript compilation and Vite build
+     - `lint` - ESLint code quality checks
+     - `type-check` - TypeScript type checking
+
+3. **Require conversation resolution before merging**
+   - Ensures all review comments are addressed
+
+4. **Do not allow bypassing the above settings**
+   - Applies to administrators as well
+
+#### Repository Topics/Tags
+To improve discoverability, add these topics to your repository:
+- `ai` - Artificial Intelligence
+- `machine-learning` - ML/AI applications
+- `typescript` - Primary language
+- `react` - Frontend framework
+- `openrouter` - AI provider integration
+- `rag` - Retrieval-Augmented Generation
+- `xai` - Explainable AI
+- `embeddings` - Vector embeddings
+- `supabase` - Database and vector storage
+- `vite` - Build tool
+- `tailwindcss` - Styling framework
+- `ai-sdk` - AI SDK integration
+- `inference` - AI inference platform
+
+### Dependency Management
+
+- **Automated Updates**: The repository uses the trusted-bot workflow for dependency updates
+- **Security**: Dependabot alerts are enabled for security vulnerabilities
+- **Testing**: All dependency updates should be tested against the test suite before merging
+- **Major Updates**: See [DEPENDENCY_NOTES.md](./DEPENDENCY_NOTES.md) for migration guides
+
+### Release Process
+
+1. Update [CHANGELOG.md](./CHANGELOG.md) with new changes
+2. Run full test suite: `npm run build && npm run lint`
+3. Create a release branch if needed
+4. Merge to `main` via pull request
+5. Tag the release: `git tag -a v1.0.0 -m "Release v1.0.0"`
+6. Push tags: `git push origin --tags`
 
 ---
 

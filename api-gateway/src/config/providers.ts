@@ -150,7 +150,7 @@ export const PROVIDERS: Record<string, Provider> = {
     name: 'OpenRouter',
     baseUrl: 'https://openrouter.ai/api/v1',
     requiresAuth: true,
-    capabilities: ['chat', 'vision', 'streaming', 'function-calling'],
+    capabilities: ['chat', 'vision', 'streaming', 'function-calling', 'embeddings'],
     models: [
       {
         id: 'anthropic/claude-3.5-sonnet',
@@ -178,6 +178,15 @@ export const PROVIDERS: Record<string, Provider> = {
         supportsStreaming: true,
         supportsVision: false,
         supportsFunctionCalling: true,
+      },
+      {
+        id: 'together/baai/bge-large-en-v1.5',
+        name: 'BGE Large EN v1.5 (Together AI)',
+        contextWindow: 512,
+        maxTokens: 512,
+        supportsStreaming: false,
+        supportsVision: false,
+        supportsFunctionCalling: false,
       },
     ],
   },
