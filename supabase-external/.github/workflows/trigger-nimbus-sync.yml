@@ -1,0 +1,17 @@
+name: Trigger Nimbus Sync
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  trigger-nimbus-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sync in supabase-nimbus
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
+        with:
+          token: ${{ secrets.NIMBUS_SYNC_TOKEN }}
+          repository: supabase/supabase-nimbus
+          event-type: sync_from_upstream
