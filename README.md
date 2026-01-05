@@ -264,6 +264,7 @@ See [ENV_SETUP.md](./ENV_SETUP.md) for complete security best practices.
 ### Technical Guides
 - **[OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md)** - OpenRouter TypeScript SDK guide
 - **[XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md)** - Explainable AI SDK integration guide
+- **[GROK_CLI_GUIDE.md](./GROK_CLI_GUIDE.md)** - grok-cli terminal assistant integration guide
 - **[ENV_SETUP.md](./ENV_SETUP.md)** - Environment variable setup for all platforms
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture documentation
 - **[SECURITY.md](./SECURITY.md)** - Security guidelines and best practices
@@ -419,6 +420,7 @@ The Spark Template files and resources from GitHub are licensed under the terms 
 - [OpenRouterTeam/typescript-sdk](https://github.com/OpenRouterTeam/typescript-sdk) - Official TypeScript SDK
 - [vercel/ai](https://github.com/vercel/ai) - AI SDK for streaming applications
 - [xai-org/xai-cookbook](https://github.com/xai-org/xai-cookbook) - Advanced usage patterns
+- [superagent-ai/grok-cli](https://github.com/superagent-ai/grok-cli) - AI terminal assistant powered by Grok
 - [deepseek-ai/DeepSeek-V3](https://github.com/deepseek-ai/DeepSeek-V3) - 671B MoE model
 - [veniceai/api-docs](https://github.com/veniceai/api-docs) - Privacy-focused inference
 

@@ -996,6 +996,7 @@ Requests/min: 600 (grok-3), 480 (grok-3-mini)
 - **Status Page**: https://status.x.ai
 - **Pricing**: https://x.ai/api/pricing
 - **Model Cards**: https://x.ai/blog (announcements)
+- **grok-cli**: https://github.com/superagent-ai/grok-cli - AI terminal assistant powered by Grok
 
 ---
 
