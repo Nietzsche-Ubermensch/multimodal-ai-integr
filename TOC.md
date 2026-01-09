@@ -52,6 +52,9 @@
 - **[UPDATE_SUMMARY.md](./UPDATE_SUMMARY.md)** - Previous updates and changes
 - **[SDK_INTEGRATION_SUMMARY.md](./SDK_INTEGRATION_SUMMARY.md)** - SDK integration details
 
+### Workflow Analysis
+- **[DOCKER_MODEL_RUNNER_RELEASE_WORKFLOW_ANALYSIS.md](./DOCKER_MODEL_RUNNER_RELEASE_WORKFLOW_ANALYSIS.md)** - Detailed analysis of Docker's model-runner release automation workflow
+
 ## 🎓 Recommended Reading Order
 
 ### For Beginners (New to AI SDKs)
@@ -93,6 +96,7 @@
 | ARCHITECTURE.md | System design | Medium | Understanding structure |
 | PRESENTATION_README.md | Slide navigation | Short | Using the presentation |
 | COMPREHENSIVE_UPDATE_SUMMARY.md | Coverage status | Long | Feature tracking |
+| DOCKER_MODEL_RUNNER_RELEASE_WORKFLOW_ANALYSIS.md | Workflow analysis | Very Long | Understanding CI/CD patterns |
 
 ## 🔍 Find Information By Topic
 
@@ -128,6 +132,7 @@
 - Python: Slide 18 (Python Integration), [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md)
 - GitHub Actions: [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md) Topic 12
 - Docker: [ENV_SETUP.md](./ENV_SETUP.md) → Docker section
+- CI/CD Workflows: [DOCKER_MODEL_RUNNER_RELEASE_WORKFLOW_ANALYSIS.md](./DOCKER_MODEL_RUNNER_RELEASE_WORKFLOW_ANALYSIS.md)
 
 ## 🚀 Quick Links
 
@@ -186,7 +191,7 @@ A: See [README.md](./README.md) → Provider Selection and [COMPREHENSIVE_GUIDE.
 
 ---
 
-**Last Updated**: Current session  
-**Total Documents**: 14 files  
+**Last Updated**: January 9, 2026  
+**Total Documents**: 15 files  
 **Total Topics Covered**: 19+  
 **Interactive Slides**: 40+
