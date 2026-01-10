@@ -41,19 +41,23 @@ interface EmbeddingModel {
   provider: string;
   dimensions: number;
   cost_per_1m: number;
+  /** Which API endpoint to use: 'openrouter' or 'openai' */
+  endpoint: 'openrouter' | 'openai';
 }
 
 const EMBEDDING_MODELS: EmbeddingModel[] = [
-  { id: "text-embedding-3-small", name: "OpenAI Embeddings Small", provider: "OpenAI", dimensions: 1536, cost_per_1m: 0.02 },
-  { id: "text-embedding-3-large", name: "OpenAI Embeddings Large", provider: "OpenAI", dimensions: 3072, cost_per_1m: 0.13 },
-  { id: "text-embedding-ada-002", name: "OpenAI Ada 002", provider: "OpenAI", dimensions: 1536, cost_per_1m: 0.10 },
+  { id: "together/baai/bge-large-en-v1.5", name: "BGE Large EN (Together AI)", provider: "OpenRouter", dimensions: 1024, cost_per_1m: 0.01, endpoint: "openrouter" },
+  { id: "text-embedding-3-small", name: "OpenAI Embeddings Small", provider: "OpenAI", dimensions: 1536, cost_per_1m: 0.02, endpoint: "openai" },
+  { id: "text-embedding-3-large", name: "OpenAI Embeddings Large", provider: "OpenAI", dimensions: 3072, cost_per_1m: 0.13, endpoint: "openai" },
+  { id: "text-embedding-ada-002", name: "OpenAI Ada 002", provider: "OpenAI", dimensions: 1536, cost_per_1m: 0.10, endpoint: "openai" },
 ];
 
 export function SupabaseVectorRAG() {
   const [supabaseUrl, setSupabaseUrl] = useState("");
   const [supabaseKey, setSupabaseKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
-  const [selectedModel, setSelectedModel] = useState("text-embedding-3-small");
+  const [openrouterKey, setOpenrouterKey] = useState("");
+  const [selectedModel, setSelectedModel] = useState("together/baai/bge-large-en-v1.5");
   
   const [documentText, setDocumentText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,6 +74,36 @@ export function SupabaseVectorRAG() {
   const selectedModelInfo = EMBEDDING_MODELS.find(m => m.id === selectedModel);
 
   const generateEmbedding = async (text: string, model: string) => {
+    const modelInfo = EMBEDDING_MODELS.find(m => m.id === model);
+    
+    if (modelInfo?.endpoint === "openrouter") {
+      if (!openrouterKey) {
+        throw new Error("OpenRouter API key required for Together AI models");
+      }
+
+      const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openrouterKey}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "Supabase Vector RAG"
+        },
+        body: JSON.stringify({
+          model,
+          input: text
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate embedding via OpenRouter");
+      }
+
+      const data = await response.json();
+      return data.data[0].embedding;
+    }
+    
+    // Default to OpenAI
     if (!openaiKey) {
       throw new Error("OpenAI API key required");
     }
@@ -103,7 +137,13 @@ export function SupabaseVectorRAG() {
       toast.error("Please configure Supabase credentials");
       return;
     }
-    if (!openaiKey) {
+    
+    const modelInfo = EMBEDDING_MODELS.find(m => m.id === selectedModel);
+    if (modelInfo?.endpoint === "openrouter" && !openrouterKey) {
+      toast.error("Please enter OpenRouter API key for Together AI models");
+      return;
+    }
+    if (modelInfo?.endpoint === "openai" && !openaiKey) {
       toast.error("Please enter OpenAI API key");
       return;
     }
@@ -157,8 +197,18 @@ export function SupabaseVectorRAG() {
       toast.error("Please enter a search query");
       return;
     }
-    if (!supabaseUrl || !supabaseKey || !openaiKey) {
-      toast.error("Please configure all required credentials");
+    if (!supabaseUrl || !supabaseKey) {
+      toast.error("Please configure Supabase credentials");
+      return;
+    }
+    
+    const modelInfo = EMBEDDING_MODELS.find(m => m.id === selectedModel);
+    if (modelInfo?.endpoint === "openrouter" && !openrouterKey) {
+      toast.error("Please enter OpenRouter API key for Together AI models");
+      return;
+    }
+    if (modelInfo?.endpoint === "openai" && !openaiKey) {
+      toast.error("Please enter OpenAI API key");
       return;
     }
 
@@ -322,6 +372,16 @@ export function SupabaseVectorRAG() {
               </div>
 
               <div className="space-y-2">
+                <Label>OpenRouter API Key</Label>
+                <Input
+                  type="password"
+                  placeholder="sk-or-v1-..."
+                  value={openrouterKey}
+                  onChange={(e) => setOpenrouterKey(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label>OpenAI API Key</Label>
                 <Input
                   type="password"
@@ -331,7 +391,7 @@ export function SupabaseVectorRAG() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label>Embedding Model</Label>
                 <Select value={selectedModel} onValueChange={setSelectedModel}>
                   <SelectTrigger>

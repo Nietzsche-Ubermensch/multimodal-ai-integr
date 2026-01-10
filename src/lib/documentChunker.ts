@@ -555,21 +555,6 @@ export class DocumentChunker {
     return positions;
   }
 
-  // Kept for backward compatibility but marked as deprecated
-  /** @deprecated Use _computeChunkPositions for better performance */
-  private _calculateStartChar(fullText: string, chunk: string, _index: number): number {
-    const cleanChunk = chunk.trim();
-    const position = fullText.indexOf(cleanChunk);
-    return position !== -1 ? position : 0;
-  }
-
-  /** @deprecated Use _computeChunkPositions for better performance */
-  private _calculateEndChar(fullText: string, chunk: string, _index: number): number {
-    const cleanChunk = chunk.trim();
-    const position = fullText.indexOf(cleanChunk);
-    return position !== -1 ? position + cleanChunk.length : cleanChunk.length;
-  }
-
   /**
    * Get chunking statistics
    */
