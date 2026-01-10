@@ -1,0 +1,10 @@
+services:
+  src:
+    image: src
+    build:
+      context: src
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
