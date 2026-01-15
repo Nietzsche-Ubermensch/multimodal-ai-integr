@@ -21,7 +21,7 @@ Eval('Assistant', {
   data: () => dataset,
   task: async (input) => {
     const result = await generateAssistantResponse({
-      model: openai('gpt-5-mini'),
+      model: openai('gpt-4o-mini'),
       messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input }] }],
       tools: await getMockTools(),
     })
