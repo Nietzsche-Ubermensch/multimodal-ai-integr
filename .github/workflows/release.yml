@@ -1,0 +1,110 @@
+name: Release
+run-name: Release version ${{ inputs.releaseTag }}${{ inputs.pushLatest && ' and tag as latest' || '' }}
+
+# This workflow is adapted from Docker's model-runner release workflow
+# Original: https://github.com/docker/model-runner/blob/main/.github/workflows/release.yml
+#
+# Key differences from the original:
+# - This is a Node.js/TypeScript project (not Go)
+# - Uses npm for dependency management and testing
+# - Builds a single Docker image (vs multiple compute variants)
+# - Pushes to GitHub Container Registry (ghcr.io) instead of Docker Hub
+
+on:
+  workflow_dispatch:
+    inputs:
+      pushLatest:
+        description: "Tag images produced by this job as latest"
+        required: false
+        type: boolean
+        default: false
+      releaseTag:
+        description: "Release tag (e.g., v1.0.0)"
+        required: true
+        type: string
+      skipTests:
+        description: "Skip running tests before build"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    if: ${{ !inputs.skipTests }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api-gateway
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: api-gateway/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run build
+        run: npm run build
+
+  build:
+    needs: test
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Format tags
+        id: tags
+        shell: bash
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "tags<<EOF" >> "$GITHUB_OUTPUT"
+          echo "ghcr.io/${REPO_LOWER}:${{ inputs.releaseTag }}" >> "$GITHUB_OUTPUT"
+          if [ "${{ inputs.pushLatest }}" == "true" ]; then
+            echo "ghcr.io/${REPO_LOWER}:latest" >> "$GITHUB_OUTPUT"
+          fi
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./api-gateway
+          file: ./api-gateway/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Output image digest
+        run: |
+          echo "## Docker Image Published :whale:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.tags.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
