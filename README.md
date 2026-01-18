@@ -16,10 +16,10 @@ A complete interactive reference guide for developers building AI applications w
 - **✅ API Gateway Pattern**: Enforced secure server-side API calls, removing unsafe mock implementations
 
 ### Dependency Updates
-- **Major Updates**: `react-resizable-panels` (v4.1.0), `recharts` (v3.6.0) - [See migration guide](./DEPENDENCY_NOTES.md)
+- **Major Updates**: `react-resizable-panels` (v4.1.0), `recharts` (v3.6.0) - [See migration guide](./docs/DEPENDENCY_NOTES.md)
 - **Minor Updates**: `react` (v19.2.3), `eslint` (v9.39.2)
 
-📋 **Full Changelog**: See [CHANGELOG.md](./CHANGELOG.md) for complete release notes and breaking changes
+📋 **Full Changelog**: See [CHANGELOG.md](./docs/CHANGELOG.md) for complete release notes and breaking changes
 
 ## 🎯 What's Covered
 
@@ -46,10 +46,10 @@ This guide provides comprehensive coverage of:
 19. **Resources & Documentation** - Essential repositories, learning paths, quick-starts
 20. **Explainable AI (XAI)** - Transparency and interpretability for neural network predictions
 
-📖 **Quick Reference**: See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for topic summaries and navigation guide  
-📚 **Complete Guide**: See [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md) for detailed documentation  
-📑 **Table of Contents**: See [TOC.md](./TOC.md) for complete documentation index  
-🧠 **XAI SDK Guide**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for explainable AI integration
+📖 **Quick Reference**: See [QUICK_REFERENCE.md](./docs/QUICK_REFERENCE.md) for topic summaries and navigation guide
+📚 **Complete Guide**: See [COMPREHENSIVE_GUIDE.md](./docs/COMPREHENSIVE_GUIDE.md) for detailed documentation
+📑 **Table of Contents**: See [TOC.md](./docs/TOC.md) for complete documentation index
+🧠 **XAI SDK Guide**: See [XAI_SDK_GUIDE.md](./docs/XAI_SDK_GUIDE.md) for explainable AI integration
 
 ## 🚀 Interactive Features
 
@@ -131,7 +131,7 @@ Navigate to the **"OpenRouter TypeScript SDK Integration"** slide in the present
 
 **Slide Location**: Slide 7 - "OpenRouter TypeScript SDK Integration"
 
-📖 **Full Documentation**: See [OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md) for complete integration guide.
+📖 **Full Documentation**: See [OPENROUTER_SDK_INTEGRATION.md](./docs/OPENROUTER_SDK_INTEGRATION.md) for complete integration guide.
 
 ## ⭐ Featured: Explainable AI (XAI) SDK
 
@@ -184,13 +184,13 @@ Navigate to the **"Explainable AI (XAI) SDK"** slide in the presentation to:
 
 **Slide Location**: Near the end - "Explainable AI (XAI) SDK"
 
-📖 **Full Documentation**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for complete XAI integration guide.
+📖 **Full Documentation**: See [XAI_SDK_GUIDE.md](./docs/XAI_SDK_GUIDE.md) for complete XAI integration guide.
 
 ## 📋 Quick Start
 
 ### Environment Variables
 
-This platform requires API keys from various AI providers. See [ENV_SETUP.md](./ENV_SETUP.md) for comprehensive setup instructions.
+This platform requires API keys from various AI providers. See [ENV_SETUP.md](./docs/ENV_SETUP.md) for comprehensive setup instructions.
 
 **Required Keys:**
 ```bash
@@ -247,28 +247,28 @@ ANTHROPIC_API_KEY=sk-ant-...
 - Rotate keys every 90 days
 - Use separate keys for dev/staging/production
 
-See [ENV_SETUP.md](./ENV_SETUP.md) for complete security best practices.
+See [ENV_SETUP.md](./docs/ENV_SETUP.md) for complete security best practices.
 
 ## 📚 Documentation
 
 ### Getting Started
-- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick topic summaries and navigation guide
-- **[COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md)** - Complete guide to all 19 topics
-- **[PRESENTATION_README.md](./PRESENTATION_README.md)** - Presentation navigation guide
+- **[QUICK_REFERENCE.md](./docs/QUICK_REFERENCE.md)** - Quick topic summaries and navigation guide
+- **[COMPREHENSIVE_GUIDE.md](./docs/COMPREHENSIVE_GUIDE.md)** - Complete guide to all 19 topics
+- **[PRESENTATION_README.md](./docs/PRESENTATION_README.md)** - Presentation navigation guide
 
 ### Project Information
-- **[CHANGELOG.md](./CHANGELOG.md)** - Version history and release notes
-- **[DEPENDENCY_NOTES.md](./DEPENDENCY_NOTES.md)** - Dependency versions and migration guides
-- **[COMPREHENSIVE_UPDATE_SUMMARY.md](./COMPREHENSIVE_UPDATE_SUMMARY.md)** - Detailed coverage matrix and feature status
+- **[CHANGELOG.md](./docs/CHANGELOG.md)** - Version history and release notes
+- **[DEPENDENCY_NOTES.md](./docs/DEPENDENCY_NOTES.md)** - Dependency versions and migration guides
+- **[COMPREHENSIVE_UPDATE_SUMMARY.md](./docs/COMPREHENSIVE_UPDATE_SUMMARY.md)** - Detailed coverage matrix and feature status
 
 ### Technical Guides
-- **[OPENROUTER_SDK_INTEGRATION.md](./OPENROUTER_SDK_INTEGRATION.md)** - OpenRouter TypeScript SDK guide
-- **[XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md)** - Explainable AI SDK integration guide
-- **[GROK_CLI_GUIDE.md](./GROK_CLI_GUIDE.md)** - grok-cli terminal assistant integration guide
-- **[ENV_SETUP.md](./ENV_SETUP.md)** - Environment variable setup for all platforms
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture documentation
-- **[SECURITY.md](./SECURITY.md)** - Security guidelines and best practices
-- **[PRD.md](./PRD.md)** - Product requirements and design specifications
+- **[OPENROUTER_SDK_INTEGRATION.md](./docs/OPENROUTER_SDK_INTEGRATION.md)** - OpenRouter TypeScript SDK guide
+- **[XAI_SDK_GUIDE.md](./docs/XAI_SDK_GUIDE.md)** - Explainable AI SDK integration guide
+- **[GROK_CLI_GUIDE.md](./docs/GROK_CLI_GUIDE.md)** - grok-cli terminal assistant integration guide
+- **[ENV_SETUP.md](./docs/ENV_SETUP.md)** - Environment variable setup for all platforms
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture documentation
+- **[SECURITY.md](./docs/SECURITY.md)** - Security guidelines and best practices
+- **[PRD.md](./docs/PRD.md)** - Product requirements and design specifications
 
 ## 🎓 Learning Paths
 
@@ -363,9 +363,10 @@ See [ENV_SETUP.md](./ENV_SETUP.md) for complete security best practices.
 │   │   └── slides.ts               # TypeScript type definitions
 │   ├── App.tsx                     # Main application component
 │   └── index.css                   # Global styles and theme
-├── OPENROUTER_SDK_INTEGRATION.md   # OpenRouter SDK integration guide
-├── ENV_SETUP.md                    # Environment setup guide
-├── PRD.md                          # Product requirements
+├── docs/                           # Documentation
+│   ├── OPENROUTER_SDK_INTEGRATION.md
+│   ├── ENV_SETUP.md
+│   └── PRD.md
 └── package.json                    # Dependencies
 ```
 
@@ -391,7 +392,7 @@ docker build -t multimodal-ai-platform .
 docker run --env-file .env -p 3000:3000 multimodal-ai-platform
 ```
 
-See [ENV_SETUP.md](./ENV_SETUP.md) for platform-specific deployment instructions.
+See [ENV_SETUP.md](./docs/ENV_SETUP.md) for platform-specific deployment instructions.
 
 ## 🤝 Contributing
 
@@ -518,11 +519,11 @@ To improve discoverability, add these topics to your repository:
 - **Automated Updates**: The repository uses the trusted-bot workflow for dependency updates
 - **Security**: Dependabot alerts are enabled for security vulnerabilities
 - **Testing**: All dependency updates should be tested against the test suite before merging
-- **Major Updates**: See [DEPENDENCY_NOTES.md](./DEPENDENCY_NOTES.md) for migration guides
+- **Major Updates**: See [DEPENDENCY_NOTES.md](./docs/DEPENDENCY_NOTES.md) for migration guides
 
 ### Release Process
 
-1. Update [CHANGELOG.md](./CHANGELOG.md) with new changes
+1. Update [CHANGELOG.md](./docs/CHANGELOG.md) with new changes
 2. Run full test suite: `npm run build && npm run lint`
 3. Create a release branch if needed
 4. Merge to `main` via pull request

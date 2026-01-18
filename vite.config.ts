@@ -1,5 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import { defineConfig, PluginOption } from "vite";
 
 import sparkPlugin from "@github/spark/spark-vite-plugin";
@@ -9,14 +9,21 @@ import { resolve } from 'path'
 const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
 
 // https://vite.dev/config/
+const isTest = process.env.VITEST === 'true';
+
 export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './tests/setup.ts',
+  },
   plugins: [
     react(),
     tailwindcss(),
     // DO NOT REMOVE
-    createIconImportProxy() as PluginOption,
-    sparkPlugin() as PluginOption,
-  ],
+    !isTest && createIconImportProxy() as PluginOption,
+    !isTest && sparkPlugin() as PluginOption,
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': resolve(projectRoot, 'src')

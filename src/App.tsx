@@ -108,12 +108,28 @@ function App() {
           <ModelHubApp />
         </TabsContent>
 
-        <TabsContent value="prompt-studio" className="mt-0">
-          <PromptStudio />
+        <TabsContent value="dashboard" className="mt-0">
+          <ModelHubDashboard />
         </TabsContent>
 
-        <TabsContent value="modelhub" className="mt-0">
-          <ModelHubApp />
+        <TabsContent value="chat" className="mt-0">
+          <LibreChatInterface />
+        </TabsContent>
+
+        <TabsContent value="ai-search" className="mt-0">
+          <AISearchPanel />
+        </TabsContent>
+
+        <TabsContent value="rag-testing" className="mt-0">
+          <RAGTestingPanel />
+        </TabsContent>
+
+        <TabsContent value="scraping" className="mt-0">
+          <UnifiedScrapingLayer />
+        </TabsContent>
+
+        <TabsContent value="prompt-studio" className="mt-0">
+          <PromptStudio />
         </TabsContent>
 
         <TabsContent value="vector-rag" className="mt-0">
