@@ -1,5 +1,34 @@
 # GitHub Copilot Instructions for @Nietzsche-Ubermenschs/multimodal-ai-integr
 
+## Introduction
+
+Welcome to the onboarding guide for effectively utilizing GitHub Copilot within this repository. Context plays a critical role in generating high-quality responses from Copilot. By providing custom instructions, you can significantly enhance the performance of the coding agent, ensuring that its outputs are more aligned with your project requirements and coding standards.
+
+## Types of Custom Instructions
+
+### Personal Instructions
+These instructions apply across all interactions on the GitHub website. Users can set individual preferences for how Copilot responds, tailored to their specific coding styles and needs.
+
+### Repository Custom Instructions
+These are specific to this repository, shaping project-specific standards and coding frameworks. By defining these instructions in this file (`.github/copilot-instructions.md`), you can ensure that all contributions are consistent and adhere to the project's goals.
+
+### Organization Custom Instructions
+These instructions apply within the context of an organization, enforcing collective standards and guidelines. They help maintain consistency across multiple repositories within the same organization.
+
+## Non-Determinism Note
+
+While Copilot aims to follow the user-defined instructions, its outputs may not always be consistent. You may experience variations in responses based on different contexts or inputs. This is normal behavior for AI-powered tools, and developers should review generated code before committing.
+
+## Environments for Customization
+
+Custom instructions can be applied in various environments, notably within this repository and the command-line interface (CLI). This flexibility allows for a seamless coding experience across different platforms including:
+- GitHub.com web editor
+- GitHub Copilot CLI
+- VS Code with GitHub Copilot extension
+- JetBrains IDEs with GitHub Copilot plugin
+
+---
+
 ## Project Overview
 
 **AI Integration Platform** - A comprehensive, production-ready TypeScript platform that unifies testing, comparison, and integration of 70+ AI models from 7+ providers (OpenRouter, Anthropic, DeepSeek, xAI, OpenAI, HuggingFace, NVIDIA NIM) with real API integration, live model testing, streaming responses, RAG pipelines, and Supabase vector storage.
@@ -970,6 +999,26 @@ export default router;
 - **Supabase RAG**: See `SUPABASE_VECTOR_RAG_GUIDE.md`
 - **API Reference**: Check provider-specific docs in respective markdown files
 
+---
+
+## Trust the Instructions
+
+Rely on these detailed instructions to guide your contributions effectively. Only conduct searches if there are clear gaps or inaccuracies in the provided documentation. By following this guide, you will navigate and contribute to the project more efficiently.
+
+Key points to remember:
+- These instructions are specifically tailored for this repository
+- Focus on the key files that define the project structure
+- Use the documented scripts for building and testing the application
+- Leverage configuration attributes for effective development
+- When in doubt, refer to existing patterns in similar components
+
+---
+
 ## Version
 
-This Copilot instructions file is maintained for the AI Integration Platform codebase. Last updated: 2024-12-30
+This Copilot instructions file is maintained for the AI Integration Platform codebase. Last updated: 2026-01-14
+
+### Revision History
+- **2026-01-14**: Added Introduction, Types of Custom Instructions, Non-Determinism Note, Environments for Customization, and Trust the Instructions sections as per issue template requirements
+- **2026-01-04**: Verified all sections are current, validated against GitHub Copilot best practices
+- **2024-12-30**: Initial comprehensive documentation

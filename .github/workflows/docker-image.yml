@@ -1,0 +1,25 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Build Docker image
+        run: |
+          docker build . \
+            --file supabase-external/apps/studio/Dockerfile \
+            --target production \
+            --tag supabase-studio:${{ github.sha }}

@@ -77,10 +77,25 @@ const PROVIDER_ENDPOINTS: Record<string, { url: string; method: string; headers:
   }
 };
 
+/**
+ * ⚠️ SECURITY WARNING ⚠️
+ * This function performs client-side API key validation.
+ * In a production environment, API keys should NEVER be exposed to the client.
+ * This implementation is for DEMO and TESTING purposes only.
+ *
+ * Recommended Production Pattern:
+ * Client -> API Gateway (Server) -> AI Provider
+ */
 export async function validateApiKey(
   provider: string,
   apiKey: string
 ): Promise<ApiValidationResult> {
+  // Warn developer in console
+  console.warn(
+    `%c SECURITY WARNING: Validating ${provider} API key on client-side.`,
+    'background: #ff0000; color: #ffffff; font-size: 12px; font-weight: bold; padding: 4px;'
+  );
+
   const startTime = performance.now();
   
   const providerConfig = PROVIDER_ENDPOINTS[provider];

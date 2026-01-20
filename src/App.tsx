@@ -1,4 +1,5 @@
 import { ModelHubApp } from "@/components/ModelHub/ModelHubApp";
+import { AIModelHub2025 } from "@/components/AIModelHub";
 import PromptStudio from "@/components/PromptEngineering/PromptStudio";
 import { SupabaseVectorRAG } from "@/components/SupabaseVectorRAG";
 import { DocumentChunkingDemo } from "@/components/DocumentChunkingDemo";
@@ -9,17 +10,24 @@ import { AISearchPanel } from "@/components/AISearchPanel";
 import { LibreChatInterface } from "@/components/LibreChatInterface";
 import { GitHubModelsPlayground } from "@/components/GitHubModelsPlayground";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search, MessageSquare, Github } from "lucide-react";
+import { Sparkles, Database, Brain, Scissors, Globe, Github, FlaskConical, MessageSquare, Search, Layers } from "lucide-react";
 
 function App() {
   return (
     <div className="min-h-screen bg-background">
-      <Tabs defaultValue="github-models" className="w-full">
+      <Tabs defaultValue="modelhub2025" className="w-full">
         <div className="border-b bg-card sticky top-0 z-50">
           <div className="container mx-auto">
             <TabsList className="h-14 w-full justify-start rounded-none bg-transparent border-b-0 overflow-x-auto">
               <TabsTrigger
-                value="github-models"
+                value="modelhub2025"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Globe className="w-4 h-4" />
+                AI Model Hub 2025
+              </TabsTrigger>
+              <TabsTrigger
+                value="modelhub"
                 className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
               >
                 <Github className="w-4 h-4" />
@@ -92,10 +100,12 @@ function App() {
           </div>
         </div>
 
-        <TabsContent value="github-models" className="mt-0">
-          <div className="container mx-auto py-8 max-w-7xl">
-            <GitHubModelsPlayground />
-          </div>
+        <TabsContent value="modelhub2025" className="mt-0">
+          <AIModelHub2025 />
+        </TabsContent>
+
+        <TabsContent value="modelhub" className="mt-0">
+          <ModelHubApp />
         </TabsContent>
 
         <TabsContent value="dashboard" className="mt-0">
@@ -107,29 +117,19 @@ function App() {
         </TabsContent>
 
         <TabsContent value="ai-search" className="mt-0">
-          <div className="container mx-auto py-8 max-w-4xl">
-            <AISearchPanel />
-          </div>
+          <AISearchPanel />
         </TabsContent>
 
         <TabsContent value="rag-testing" className="mt-0">
-          <div className="container mx-auto py-8 max-w-7xl">
-            <RAGTestingPanel />
-          </div>
+          <RAGTestingPanel />
         </TabsContent>
 
         <TabsContent value="scraping" className="mt-0">
-          <div className="container mx-auto py-8 max-w-6xl">
-            <UnifiedScrapingLayer />
-          </div>
+          <UnifiedScrapingLayer />
         </TabsContent>
 
         <TabsContent value="prompt-studio" className="mt-0">
           <PromptStudio />
-        </TabsContent>
-
-        <TabsContent value="modelhub" className="mt-0">
-          <ModelHubApp />
         </TabsContent>
 
         <TabsContent value="vector-rag" className="mt-0">
