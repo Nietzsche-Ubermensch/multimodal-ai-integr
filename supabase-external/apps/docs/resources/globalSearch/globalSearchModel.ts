@@ -10,7 +10,10 @@ import {
   DB_METADATA_TAG_PLATFORM_CLI,
   ReferenceCLICommandModel,
 } from '../reference/referenceCLIModel'
-import { ReferenceManagementApiModel } from '../reference/referenceManagementApiModel'
+import {
+  DB_METADATA_TAG_PLATFORM_API,
+  ReferenceManagementApiModel,
+} from '../reference/referenceManagementApiModel'
 import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
 import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
 import { SearchResultInterface } from './globalSearchInterface'
@@ -118,8 +121,7 @@ function createModelFromMatch({
           content,
           subsections,
         })
-        // TODO [Charis 2025-06-09] replace with less hacky check
-      } else if (metadata.subtitle?.startsWith('Management API Reference')) {
+      } else if (metadata.platform === DB_METADATA_TAG_PLATFORM_API) {
         return new ReferenceManagementApiModel({
           title: page_title,
           href,

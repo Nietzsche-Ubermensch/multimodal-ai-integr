@@ -36,7 +36,7 @@ export async function fetchOpenApiReferenceSource() {
   return new OpenApiReferenceLoader(
     'api',
     '/reference/api',
-    { title: 'Management API Reference' },
+    { title: 'Management API Reference', platform: 'api' },
     'spec/transforms/api_v1_openapi_deparsed.json',
     'spec/common-api-sections.json'
   ).load()
