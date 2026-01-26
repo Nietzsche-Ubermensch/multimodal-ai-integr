@@ -90,12 +90,16 @@ type Provider = "openrouter" | "deepseek" | "xai" | "anthropic" | "gemini" | "pe
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(identifier: string, isAnonymous: boolean): { allowed: boolean; remaining: number; resetIn: number } {
+  cleanupRateLimits();
+
   const now = Date.now();
   const maxReqs = isAnonymous ? RATE_LIMIT.maxAnonRequests : RATE_LIMIT.maxRequests;
   const key = isAnonymous ? `anon:${identifier}` : `user:${identifier}`;
   const entry = rateLimitStore.get(key);
 
   if (!entry || now >= entry.resetAt) {
+    // Delete and re-set to move the key to the end of the Map, maintaining strict time ordering
+    if (entry) rateLimitStore.delete(key);
     rateLimitStore.set(key, { count: 1, resetAt: now + RATE_LIMIT.windowMs });
     return { allowed: true, remaining: maxReqs - 1, resetIn: RATE_LIMIT.windowMs };
   }
@@ -108,13 +112,21 @@ function checkRateLimit(identifier: string, isAnonymous: boolean): { allowed: bo
   return { allowed: true, remaining: maxReqs - entry.count, resetIn: entry.resetAt - now };
 }
 
-// Cleanup old entries periodically
-setInterval(() => {
+// Cleanup old entries incrementally
+function cleanupRateLimits() {
   const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
-    if (now >= entry.resetAt) rateLimitStore.delete(key);
+  let checked = 0;
+  // Map iterates in insertion order. Since we re-insert on window reset,
+  // keys are roughly sorted by expiration time. Checking the head is efficient.
+  for (const [key, entry] of rateLimitStore) {
+    if (now >= entry.resetAt) {
+      rateLimitStore.delete(key);
+    } else {
+      break; // Head is not expired, so subsequent entries are likely valid
+    }
+    if (++checked >= 10) break; // Limit cleanup work per request
   }
-}, 60_000);
+}
 
 // =============================================================================
 // SUPABASE CLIENTS (Cached)
