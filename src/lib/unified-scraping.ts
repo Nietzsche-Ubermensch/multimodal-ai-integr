@@ -66,7 +66,7 @@ export interface ScrapingResult {
   error?: string;
 }
 
-export interface ProviderCapabilities {
+interface ProviderCapabilities {
   scrape: boolean;
   crawl: boolean;
   search: boolean;
@@ -591,12 +591,12 @@ export interface RouterDecision {
 }
 
 export class ScrapingRouter {
-  private scrapers: Map<ScraperProvider, BaseScraper>;
+  private scrapers: Map<ScraperProvider, any>;
   private config: ScrapingConfig;
 
   constructor(config: ScrapingConfig) {
     this.config = config;
-    this.scrapers = new Map([
+    this.scrapers = new Map<ScraperProvider, BaseScraper>([
       ['oxylabs', new OxylabsScraper(config.oxylabs)],
       ['firecrawl', new FirecrawlScraper(config.firecrawl)],
       ['langchain', new LangChainScraper(config.langchain)],
