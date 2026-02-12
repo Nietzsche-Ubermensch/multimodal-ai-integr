@@ -25,10 +25,12 @@ Provides background knowledge and guidelines consumed as contextual reference ma
 
 **Installed Instructions:**
 - **reactjs.instructions.md** - React 19+ development standards, hooks, TypeScript, testing, accessibility
+- **typescript.instructions.md** - TypeScript 5.7+ development with strict type safety and modern patterns
 - **nodejs-javascript-vitest.instructions.md** - Node.js/JavaScript coding standards with Vitest testing
 - **playwright-typescript.instructions.md** - Playwright TypeScript test generation guidelines
 - **security-and-owasp.instructions.md** - OWASP Top 10 secure coding practices
 - **a11y.instructions.md** - WCAG 2.2 Level AA accessibility guidelines
+- **context-engineering.instructions.md** - Maximize Copilot effectiveness through better context management
 
 ### Prompts (`prompts/*.prompt.md`)
 
@@ -56,13 +58,14 @@ For prompts and agents that require explicit installation, use the install butto
 
 Current instructions cover:
 
-- ✅ React 19+ (functional components, hooks, TypeScript)
-- ✅ Node.js/JavaScript (ES2022+, Vitest)
-- ✅ TypeScript (strict mode, type safety)
-- ✅ Testing (Vitest, Playwright, React Testing Library)
-- ✅ Security (OWASP Top 10, secure coding)
-- ✅ Accessibility (WCAG 2.2 Level AA)
-- ✅ Frontend (Vite, Tailwind CSS, Radix UI)
+- ✅ React 19+ (functional components, hooks, TypeScript, testing)
+- ✅ TypeScript 5.7+ (strict type safety, generics, discriminated unions)
+- ✅ Node.js/JavaScript (ES2022+, Vitest, async/await)
+- ✅ Testing (Vitest unit tests, Playwright e2e, React Testing Library)
+- ✅ Security (OWASP Top 10, secure coding, XSS/injection prevention)
+- ✅ Accessibility (WCAG 2.2 Level AA, semantic HTML, ARIA)
+- ✅ Context Engineering (project structure, multi-file changes)
+- ✅ Frontend (Vite, Tailwind CSS, Radix UI, shadcn/ui)
 
 ## Customization
 
@@ -117,5 +120,17 @@ Instructions should be:
 - Updated when major framework/library versions change
 - Extended when new technologies are adopted
 - Removed when technologies are deprecated
+
+## Summary
+
+This repository now has 7 comprehensive instruction files covering:
+- Frontend development (React 19+, TypeScript 5.7+)
+- Backend development (Node.js, Express.js)
+- Testing strategies (Vitest, Playwright)
+- Security best practices (OWASP Top 10)
+- Accessibility compliance (WCAG 2.2 AA)
+- Context engineering for better AI assistance
+
+All instructions are automatically consumed by GitHub Copilot based on file patterns.
 
 Last updated: 2026-02-12
