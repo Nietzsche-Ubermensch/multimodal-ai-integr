@@ -37,23 +37,9 @@ jobs:
               return;
             }
 
-            // Defaults mirror the current branch protection required contexts.
+            // Defaults mirror the CI workflow job/step names in build.yml.
             const defaultChecks = [
-              "format",
-              "runner / misspell",
-              "supa-mdx-lint",
-              "test",
-              "typecheck",
-              "validate-pr",
-              "Vercel – cms",
-              "Vercel – docs",
-              "Vercel – studio",
-              "Vercel – studio-self-hosted",
-              "Vercel – studio-staging",
-              "Vercel – ui-library",
-              "Vercel – zone-www-dot-com",
-              "Vercel – design-system",
-              "code/snyk (Supabase)",
+              "build",
             ];
 
             // REQUIRED_CHECKS should be provided as a newline-separated list.
