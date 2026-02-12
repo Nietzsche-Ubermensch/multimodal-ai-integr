@@ -12,11 +12,6 @@ const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
 const isTest = process.env.VITEST === 'true';
 
 export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './tests/setup.ts',
-  },
   plugins: [
     react(),
     tailwindcss(),
@@ -28,5 +23,10 @@ export default defineConfig({
     alias: {
       '@': resolve(projectRoot, 'src')
     }
+  },
+  server: {
+    host: '0.0.0.0',
+    port: 5000,
+    allowedHosts: true,
   },
 });

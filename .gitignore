@@ -25,6 +25,10 @@ dist-ssr
 *.sw?
 
 .env
+.env.local
+.env.*.local
+.mcp.json
+.claude/settings.local.json
 **/agent-eval-report*
 packages
 pids
