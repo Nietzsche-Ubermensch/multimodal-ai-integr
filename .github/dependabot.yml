@@ -1,11 +1,22 @@
 version: 2
+
 updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
+    # We want fast feedback on app and tooling dependencies at the root.
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+      include: "scope"
 
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
       interval: "weekly"
+    # Devcontainer template changes are less urgent but still tracked.
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps-devcontainer"
+      include: "scope"
