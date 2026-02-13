@@ -8,6 +8,7 @@ A complete interactive reference guide for developers building AI applications w
 - **🧠 Explainable AI (XAI) SDK**: Added comprehensive XAI integration for neural network prediction transparency with 6 explanation methods (SHAP, attention, gradients, integrated gradients, LRP, LIME)
 - **🔍 Together AI BGE Embeddings**: Integrated Together AI's BGE (BAAI General Embedding) models via OpenRouter for enhanced RAG pipeline capabilities
 - **🤖 Trusted Bot Workflow**: Automated workflow for dependency updates and required status checks
+- **👥 Multi-Agent Execution Planner**: Comprehensive framework for coordinating AI agent teams with task breakdown, dependency mapping, orchestration, and recovery strategies
 
 ### Security Enhancements
 - **🔒 Rate Limiting & JWT Auth**: Added robust rate limiting and JWT authentication middleware
@@ -45,16 +46,19 @@ This guide provides comprehensive coverage of:
 18. **Hub API** - Becoming an inference provider, registration requirements
 19. **Resources & Documentation** - Essential repositories, learning paths, quick-starts
 20. **Explainable AI (XAI)** - Transparency and interpretability for neural network predictions
+21. **Multi-Agent Execution Planning** - Coordinate AI agent teams for complex project delivery
 
 📖 **Quick Reference**: See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for topic summaries and navigation guide  
 📚 **Complete Guide**: See [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md) for detailed documentation  
 📑 **Table of Contents**: See [TOC.md](./TOC.md) for complete documentation index  
 🧠 **XAI SDK Guide**: See [XAI_SDK_GUIDE.md](./XAI_SDK_GUIDE.md) for explainable AI integration
+👥 **Multi-Agent Guide**: See [MULTI_AGENT_EXECUTION_GUIDE.md](./MULTI_AGENT_EXECUTION_GUIDE.md) for agent coordination
 
 ## 🚀 Interactive Features
 
 - **4 Live SDK Demos**: Anthropic Claude, DeepSeek, xAI Grok, OpenRouter with real/simulated API calls
 - **XAI Explainer Demo**: Interactive explainable AI with 6 explanation methods (SHAP, attention, gradients, etc.)
+- **Multi-Agent Execution Planner**: Visual interface for creating and managing multi-agent coordination plans
 - **API Key Validation**: Real-time testing for 6 providers with latency metrics
 - **Live API Testing**: 10+ provider examples with editable JSON and temperature controls
 - **Embedding Generation**: Interactive vector testing with statistics and export
