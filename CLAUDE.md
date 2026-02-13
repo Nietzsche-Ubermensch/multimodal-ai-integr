@@ -45,6 +45,7 @@ supabase/          # Supabase config and migrations
 supabase-external/ # External Supabase functions
 tests/             # Test files
 docs/              # Documentation
+.github/agents/    # Claude Code custom skills
 ```
 
 ## Testing
@@ -66,3 +67,8 @@ docs/              # Documentation
 - `.env` for local secrets (gitignored)
 - `.env.example` for template
 - Supabase project ID: `ccjdctnmgrweserduxhi`
+
+## Claude Code Skills
+
+Custom skills are defined in `.github/agents/`:
+- **prompt-engineering-expert**: Expertise in prompt engineering, optimization, and custom instructions design
