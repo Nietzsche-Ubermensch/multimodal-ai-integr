@@ -14,7 +14,6 @@ vi.mock('@/components/RAGTestingPanel', () => ({ RAGTestingPanel: () => <div dat
 vi.mock('@/components/ModelHubDashboard', () => ({ ModelHubDashboard: () => <div data-testid="dashboard">Dashboard Content</div> }));
 vi.mock('@/components/AISearchPanel', () => ({ AISearchPanel: () => <div data-testid="ai-search">AI Search Content</div> }));
 vi.mock('@/components/LibreChatInterface', () => ({ LibreChatInterface: () => <div data-testid="chat-interface">Chat Interface Content</div> }));
-vi.mock('@/components/GitHubModelsPlayground', () => ({ GitHubModelsPlayground: () => <div data-testid="github-playground">GitHub Playground Content</div> }));
 
 describe('App Navigation', () => {
   test('renders all tabs and switches content correctly', async () => {
@@ -22,7 +21,7 @@ describe('App Navigation', () => {
     render(<App />);
 
     // Check default tab
-    expect(screen.getByTestId('model-hub-2025')).toBeInTheDocument();
+    expect(await screen.findByTestId('model-hub-2025')).toBeInTheDocument();
 
     // Check Dashboard Tab
     const dashboardTab = screen.getByRole('tab', { name: /Dashboard/i });
