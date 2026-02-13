@@ -76,14 +76,48 @@ export interface ChatRequest {
 ## Rules
 
 ### Do
-- Follow established patterns in the codebase
-- Use TypeScript for type safety
-- Keep files focused and modular
+- Use functional components with hooks
+- Destructure props in function signature
+- Define Props interfaces with clear names ({ComponentName}Props)
+- Use TypeScript for all components
+- Keep components focused on single responsibility
+- Extract complex logic into custom hooks
+- Use React.memo for expensive components
+- Implement error boundaries for component trees
+- Add prop validation with TypeScript interfaces
+- Name event handlers with 'handle' prefix (handleClick, handleSubmit)
+- Use explicit types for function parameters and return values
+- Enable strict mode in tsconfig.json
+- Use const for variables that won't be reassigned
+- Prefer interfaces for object shapes
+- Use type aliases for unions and intersections
+- Implement proper error handling with try/catch
+- Use async/await over raw promises
+- Add JSDoc comments for public APIs
+- Use path aliases (@/) for imports
+- Keep functions small and focused (under 50 lines)
 
 ### Don't
-- Mix multiple concerns in a single file
-- Ignore type definitions
-- Include secrets or credentials
+- Use class components (unless required for error boundaries)
+- Prop drill more than 2 levels deep (use context or state management)
+- Perform side effects directly in render
+- Ignore key prop warnings in lists
+- Mutate props or state directly
+- Mix business logic with presentation logic
+- Create components over 200 lines (split into smaller components)
+- Use index as key in dynamic lists
+- Forget cleanup in useEffect hooks
+- Use inline function definitions in JSX (causes re-renders)
+- Use `any` type (use `unknown` with type guards instead)
+- Ignore TypeScript errors with @ts-ignore without explanation
+- Use `var` (use `const` or `let`)
+- Create large monolithic files (keep under 300 lines)
+- Mix multiple concerns in a single module
+- Use default exports (prefer named exports)
+- Ignore null/undefined checks
+- Use non-null assertions (!) without verification
+- Create deep import paths (use barrel exports)
+- Include console.log in production code
 
 ## File Location
 
@@ -97,6 +131,7 @@ Sources:
 - src/lib/ai-search-service.ts
 - src/lib/ai-service.ts
 - src/lib/api-client.ts
-
+- .ruler/react-guidelines.md
+- .ruler/typescript-standards.md
 Last updated: 2026-02-13
 -->

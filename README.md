@@ -62,6 +62,43 @@ This guide provides comprehensive coverage of:
 - **GitHub Integration**: 7 essential repositories with quick-start code and clone commands
 - **Deployment Guides**: Step-by-step instructions for 4 platforms
 - **API Documentation**: Complete reference with cURL and Python examples
+- **🤖 Skill Master**: Auto-generate SKILL files from codebase patterns for Claude Code (NEW!)
+
+## 🤖 Skill Master - Auto-Generate SKILL Files
+
+Skill Master analyzes your codebase to discover architectural patterns and automatically generates SKILL files that help Claude Code understand your project better.
+
+### Quick Start
+
+```bash
+# Discover patterns in your codebase
+npm run skill-master:discover
+
+# Generate SKILL files with real examples
+npm run skill-master:generate
+```
+
+### What It Does
+
+- 🔍 **Pattern Discovery**: Automatically detects React hooks, service layers, UI components, and TypeScript patterns
+- 📝 **SKILL Generation**: Creates `.claude/skills/` files with real code examples from your project
+- 🎯 **Smart Triggers**: Includes keywords that activate skills when mentioned to Claude
+- 🔄 **Rule Integration**: Extracts best practices from your `.ruler/*.md` files
+- 📊 **Multi-Platform**: Supports React, Node.js, TypeScript, Python, Go, Rust, and more
+
+### Example Output
+
+```
+Detected Patterns: 4
+| Pattern | Files Found | Example Location |
+|---------|-------------|------------------|
+| custom-hooks | 3 | src/hooks/useAIModels.ts |
+| service-layer | 15 | src/lib/ai-service.ts |
+| ui-components | 51 | src/components/ui/button.tsx |
+| type-definitions | 8 | src/types/modelhub.ts |
+```
+
+📖 **Full Documentation**: See [SKILL_MASTER.md](./docs/SKILL_MASTER.md) and [SKILL_MASTER_QUICKSTART.md](./SKILL_MASTER_QUICKSTART.md)
 
 ## ⭐ Featured: OpenRouter TypeScript SDK
 
