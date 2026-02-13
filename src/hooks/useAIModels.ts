@@ -55,57 +55,56 @@ export function useAIModels(): UseAIModelsReturn {
   const models = useMemo(() => modelCatalog2025.getAllModels(), []);
 
   const filteredModels = useMemo(() => {
-    let result = [...models];
+    const searchLower = filter.search ? filter.search.toLowerCase() : '';
 
-    // Search filter
-    if (filter.search) {
-      const searchLower = filter.search.toLowerCase();
-      result = result.filter(m =>
-        m.name.toLowerCase().includes(searchLower) ||
-        m.description.toLowerCase().includes(searchLower) ||
-        m.tags.some(t => t.toLowerCase().includes(searchLower)) ||
-        m.provider.toLowerCase().includes(searchLower)
-      );
-    }
+    return models.filter(m => {
+      // Search filter
+      if (filter.search) {
+        const matchesSearch =
+          m.name.toLowerCase().includes(searchLower) ||
+          m.description.toLowerCase().includes(searchLower) ||
+          m.tags.some(t => t.toLowerCase().includes(searchLower)) ||
+          m.provider.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
 
-    // Provider filter
-    if (filter.provider !== 'all') {
-      result = result.filter(m => m.provider === filter.provider);
-    }
+      // Provider filter
+      if (filter.provider !== 'all' && m.provider !== filter.provider) {
+        return false;
+      }
 
-    // Language filter
-    if (filter.language !== 'all') {
-      result = result.filter(m => 
-        m.languageOptimization === filter.language ||
-        (filter.language !== 'multilingual' && m.languageOptimization === 'multilingual')
-      );
-    }
+      // Language filter
+      if (filter.language !== 'all') {
+        const matchesLang =
+          m.languageOptimization === filter.language ||
+          (filter.language !== 'multilingual' && m.languageOptimization === 'multilingual');
+        if (!matchesLang) return false;
+      }
 
-    // Capability filter
-    if (filter.capability !== 'all') {
-      result = result.filter(m =>
-        m.capabilities.some(c => c.type === filter.capability && c.supported)
-      );
-    }
+      // Capability filter
+      if (filter.capability !== 'all') {
+        const matchesCap = m.capabilities.some(c => c.type === filter.capability && c.supported);
+        if (!matchesCap) return false;
+      }
 
-    // Deployment filter
-    if (filter.deployment !== 'all') {
-      result = result.filter(m =>
-        m.deploymentOptions.some(d => d.method === filter.deployment && d.available)
-      );
-    }
+      // Deployment filter
+      if (filter.deployment !== 'all') {
+        const matchesDep = m.deploymentOptions.some(d => d.method === filter.deployment && d.available);
+        if (!matchesDep) return false;
+      }
 
-    // Free tier filter
-    if (filter.showFreeOnly) {
-      result = result.filter(m => m.freeTier);
-    }
+      // Free tier filter
+      if (filter.showFreeOnly && !m.freeTier) {
+        return false;
+      }
 
-    // New models filter
-    if (filter.showNewOnly) {
-      result = result.filter(m => m.isNew);
-    }
+      // New models filter
+      if (filter.showNewOnly && !m.isNew) {
+        return false;
+      }
 
-    return result;
+      return true;
+    });
   }, [models, filter]);
 
   const stats = useMemo(() => {
