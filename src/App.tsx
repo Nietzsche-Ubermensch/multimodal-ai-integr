@@ -8,8 +8,9 @@ import { ModelHubDashboard } from "@/components/ModelHubDashboard";
 import { AISearchPanel } from "@/components/AISearchPanel";
 import { LibreChatInterface } from "@/components/LibreChatInterface";
 import { GitHubModelsPlayground } from "@/components/GitHubModelsPlayground";
+import { MultiAgentPlanner } from "@/components/MultiAgentPlanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search, MessageSquare, Github } from "lucide-react";
+import { Sparkles, Database, Brain, Scissors, Globe, Layers, FlaskConical, Search, MessageSquare, Github, Users } from "lucide-react";
 
 function App() {
   return (
@@ -88,6 +89,13 @@ function App() {
                 <Scissors className="w-4 h-4" />
                 Chunking
               </TabsTrigger>
+              <TabsTrigger
+                value="multi-agent"
+                className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+              >
+                <Users className="w-4 h-4" />
+                Multi-Agent
+              </TabsTrigger>
             </TabsList>
           </div>
         </div>
@@ -142,6 +150,10 @@ function App() {
           <div className="container mx-auto py-8 max-w-6xl">
             <DocumentChunkingDemo />
           </div>
+        </TabsContent>
+
+        <TabsContent value="multi-agent" className="mt-0">
+          <MultiAgentPlanner />
         </TabsContent>
       </Tabs>
     </div>
