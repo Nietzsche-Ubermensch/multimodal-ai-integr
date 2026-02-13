@@ -216,8 +216,8 @@ ${lines.join('\n')}
     if (fs.existsSync(fullPath)) {
       const content = fs.readFileSync(fullPath, 'utf-8');
       // Simple extraction - look for Do/Don't sections
-      const doMatch = content.match(/## Do\n([\s\S]*?)(?=\n##|\n---|\z)/);
-      const dontMatch = content.match(/## Don't\n([\s\S]*?)(?=\n##|\n---|\z)/);
+      const doMatch = content.match(/## Do\n([\s\S]*?)(?=\n##|\n---|$)/);
+      const dontMatch = content.match(/## Don't\n([\s\S]*?)(?=\n##|\n---|$)/);
       
       if (doMatch) {
         rules.do.push(...doMatch[1].trim().split('\n').filter(l => l.trim()));
