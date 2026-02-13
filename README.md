@@ -265,6 +265,7 @@ See [ENV_SETUP.md](./docs/ENV_SETUP.md) for complete security best practices.
 - **[OPENROUTER_SDK_INTEGRATION.md](./docs/OPENROUTER_SDK_INTEGRATION.md)** - OpenRouter TypeScript SDK guide
 - **[XAI_SDK_GUIDE.md](./docs/XAI_SDK_GUIDE.md)** - Explainable AI SDK integration guide
 - **[GROK_CLI_GUIDE.md](./docs/GROK_CLI_GUIDE.md)** - grok-cli terminal assistant integration guide
+- **[PROMPT_ENGINEERING_SKILL.md](./docs/PROMPT_ENGINEERING_SKILL.md)** - Claude Code prompt engineering expert skill guide
 - **[ENV_SETUP.md](./docs/ENV_SETUP.md)** - Environment variable setup for all platforms
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture documentation
 - **[SECURITY.md](./docs/SECURITY.md)** - Security guidelines and best practices
