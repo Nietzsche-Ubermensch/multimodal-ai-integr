@@ -42,7 +42,8 @@ const rpcSpy = vi.fn().mockImplementation((funcName, params) => {
         content: params?.include_full_content ? 'Creates a new SSO provider for a project' : null,
         metadata: {
           title: 'Create a SSO provider',
-          subtitle: 'Management API Reference: Create a SSO provider',
+          subtitle: 'Create a SSO provider',
+          platform: 'api',
         },
       },
     ]
