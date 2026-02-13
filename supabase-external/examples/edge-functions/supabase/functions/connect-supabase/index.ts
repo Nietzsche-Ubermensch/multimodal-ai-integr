@@ -2,6 +2,7 @@ import { Application, Router } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
 import { CookieStore, Session } from 'https://deno.land/x/oak_sessions@v4.1.9/mod.ts'
 import { OAuth2Client } from 'https://deno.land/x/oauth2_client@v1.0.2/mod.ts'
 import { SupabaseManagementAPI } from 'https://esm.sh/supabase-management-js@0.1.2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const config = {
   clientId: Deno.env.get('SUPA_CONNECT_CLIENT_ID')!,
@@ -55,7 +56,33 @@ router.get('/connect-supabase/oauth2/callback', async (ctx) => {
     }),
   }).then((res) => res.json())
   console.log('tokens', tokens)
-  // TODO: Make sure to store the tokens in your DB for future use.
+
+  // Store the tokens in your DB for future use.
+  if (tokens.access_token) {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+    if (supabaseUrl && supabaseServiceRoleKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
+      const userId = ctx.state.session.get('user_id') as string | undefined
+      const expiresAt = tokens.expires_in ? Math.floor(Date.now() / 1000) + tokens.expires_in : null
+
+      const { error } = await supabase.from('oauth_tokens').insert({
+        user_id: userId ?? null,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expires_at: expiresAt,
+      })
+
+      if (error) {
+        console.error('Error storing tokens:', error)
+      } else {
+        console.log('Tokens stored successfully')
+      }
+    } else {
+      console.warn('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set, skipping token storage')
+    }
+  }
 
   // Use the access token to make an authenticated API request.
   const supaManagementClient = new SupabaseManagementAPI({
