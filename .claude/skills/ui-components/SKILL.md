@@ -76,6 +76,10 @@ function AlertDialogTrigger({
 ## Rules
 
 ### Do
+- Positive rule 1
+- Positive rule 2
+- Best practice 1
+- Recommended approach 1
 - Use functional components with hooks
 - Destructure props in function signature
 - Define Props interfaces with clear names ({ComponentName}Props)
@@ -98,6 +102,10 @@ function AlertDialogTrigger({
 - Keep functions small and focused (under 50 lines)
 
 ### Don't
+- Negative rule 1
+- Anti-pattern 1
+- What to avoid 1
+- Discouraged practice 1
 - Use class components (unless required for error boundaries)
 - Prop drill more than 2 levels deep (use context or state management)
 - Perform side effects directly in render
@@ -131,6 +139,7 @@ Sources:
 - src/components/ui/accordion.tsx
 - src/components/ui/alert-dialog.tsx
 - src/components/ui/alert.tsx
+- .ruler/README.md
 - .ruler/react-guidelines.md
 - .ruler/typescript-standards.md
 Last updated: 2026-02-13
