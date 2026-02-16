@@ -119,12 +119,12 @@ function cleanupRateLimits() {
   // Map iterates in insertion order. Since we re-insert on window reset,
   // keys are roughly sorted by expiration time. Checking the head is efficient.
   for (const [key, entry] of rateLimitStore) {
+    if (++checked >= 10) break; // Limit cleanup work per request
     if (now >= entry.resetAt) {
       rateLimitStore.delete(key);
     } else {
       break; // Head is not expired, so subsequent entries are likely valid
     }
-    if (++checked >= 10) break; // Limit cleanup work per request
   }
 }
 
