@@ -36,3 +36,6 @@ pids
 .devcontainer/
 
 .spark-workbench-id
+
+# Claude local data
+.claude/
