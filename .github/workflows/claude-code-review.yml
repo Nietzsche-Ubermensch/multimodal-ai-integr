@@ -6,6 +6,10 @@ on:
 
 jobs:
   claude-review:
+    # Skip draft PRs and dependabot (no API key access)
+    if: |
+      github.event.pull_request.draft == false &&
+      github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,8 +28,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            Review this pull request for code quality, bugs, performance, and security.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          direct_prompt: |
+            Review this pull request for code quality, bugs, performance, and security issues.
             Use the repository's CLAUDE.md for style and convention guidance.
-            Be constructive and specific in your feedback.
-
+            Be constructive and specific. Post your review as a PR comment.
