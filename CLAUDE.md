@@ -1,171 +1,253 @@
-# CLAUDE.md
+# CLAUDE.md — Nietzsche-Ubermensch Master Config
+# Auto-loaded by Claude Code on every session start
+# Last updated: 2026-02-21
 
-Project instructions for Claude Code when working on this repository.
+---
 
-## Project Overview
+## Identity & GitHub Context
+Owner: Nietzsche-Ubermensch | https://github.com/Nietzsche-Ubermensch
+Email: peterbilt5018@gmail.com
+Plan: Claude Pro
+Platform: WINDOWS — always use PowerShell syntax, never bash/linux commands.
 
-**multimodal-ai-integr** — Multimodal AI integration platform with 70+ models from 7+ providers. Features live model testing, RAG pipelines, prompt engineering studio, web scraping, and an Express.js API gateway.
+Repos:
+- Nietzsche-Ubermensch/multimodal-ai-integr (TypeScript, public) ← primary workspace
+- Nietzsche-Ubermensch/nexus-chat (HTML, public)
+- Nietzsche-Ubermensch/card-scanner-pro (HTML, private)
+- Nietzsche-Ubermensch/batcheditor (Python, private)
+- Nietzsche-Ubermensch/KILOMAIN (Python, private)
+- Nietzsche-Ubermensch/Google (TypeScript, private)
+- Nietzsche-Ubermensch/nextjs-firebase (TypeScript, private)
+- Nietzsche-Ubermensch/nextjs-boilerplate (TypeScript, private)
+- Nietzsche-Ubermensch/ubiquitous-computing-machine (public)
 
-## Stack
+---
 
-- **Frontend:** React 19, TypeScript 5.7, Vite 7, Tailwind CSS 4
-- **UI:** Radix UI / shadcn/ui (51 primitives), Lucide + Phosphor icons, Framer Motion
-- **State:** TanStack React Query 5
-- **AI SDKs:** OpenAI 6.x, OpenRouter AI SDK, Anthropic SDK, xAI SDK
-- **Backend:** Express.js API gateway (`api-gateway/`), Supabase edge functions
-- **Database:** Supabase (auth, postgres, pgvector for RAG)
-- **Charts:** Recharts, D3, Three.js
-- **Testing:** Vitest 4, Testing Library (React, jest-dom, user-event)
-- **Linting:** ESLint 9 with TypeScript ESLint
-- **Build:** Vite 7 + SWC, GitHub Spark plugin, PostCSS
+## Model Registry (exact Anthropic API strings)
 
-## Commands
+| Alias    | Model String               | Use For                                        |
+|----------|----------------------------|------------------------------------------------|
+| sonnet46 | claude-sonnet-4-6          | Default — best value, daily driver             |
+| opus46   | claude-opus-4-6            | Hard bugs, architecture, 1M ctx, 128k output   |
+| sonnet45 | claude-sonnet-4-5-20250929 | Previous Sonnet fallback                       |
+| opus45   | claude-opus-4-5            | Previous Opus fallback                         |
+| haiku45  | claude-haiku-4-5           | Subagents, fast tasks, cheap token usage       |
 
-```bash
-# Root (frontend)
-npm run dev        # Vite dev server on :5000
-npm run build      # tsc --noCheck + vite build
-npm run test       # Vitest
-npm run lint       # ESLint
-npm run preview    # Preview production build
+Default model: claude-sonnet-4-6
+Subagent model: claude-haiku-4-5 (use Haiku for all subagents unless task requires reasoning)
+Architecture / hard bug model: claude-opus-4-6
 
-# API Gateway (backend)
-cd api-gateway
-npm run dev        # Express dev server (tsx watch)
-npm run build      # tsc + tsc-alias
-npm run lint       # ESLint
-npm test           # Vitest
+---
+
+## Session Startup Protocol (run EVERY session, no exceptions)
+1. gh auth status — fix if broken: gh auth login --web
+2. git config --global user.name "Nietzsche-Ubermensch"
+3. git config --global push.autoSetupRemote true
+4. git config --global init.defaultBranch main
+5. git remote -v — identify active repo
+6. git status && git log --oneline -10
+7. gh issue list --limit 10 && gh pr list
+8. If .claude\handoff_latest.md exists: read and absorb all state
+9. Scan all files for errors (Phase 3 below)
+10. Fix ALL errors before proceeding
+11. Print full status dashboard (Phase 5 below)
+
+---
+
+## Primitive Architecture
+
+### Subagents (isolated context windows)
+Spawn subagents for:
+- Parallel independent work streams
+- Tasks with verbose output that would pollute main context
+- Tool-restricted operations (read-only audits, git-only agents)
+- Context isolation as a safety requirement
+
+Role definitions:
+- git-agent      (Haiku):     commit, push, branch, PR only — no file writes
+- error-agent    (Haiku):     continuous lint/type-check/fix loop
+- code-agent     (Sonnet 4.6): feature implementation, refactoring, tests
+- security-agent (Sonnet 4.6): PQC signing, audit, vulnerability scan — read-only by default
+- github-agent   (Haiku):     GitHub API — issues, PRs, releases, webhooks
+- arch-agent     (Opus 4.6):  complex architectural decisions, system design
+
+Use orchestrator MCP tools: spawn_agent, parallel_tasks
+
+### Skills (personal, cross-project)
+Skills follow the user across all projects. Stored at: ~/.claude/skills/
+Active skills:
+- pqc_signer_mcp.py — ML-DSA / SPHINCS+ signing + SHA3-512 hash signing
+- orchestrator_mcp.py — spawn/manage parallel subagents
+- statusline.py — live status bar inside Claude sessions
+
+### Hooks (deterministic shell triggers)
+Wire in .claude/hooks.json:
+```json
+{
+  "post_file_edit": ["python -m py_compile {{file}}"],
+  "post_bash": ["git add -A"],
+  "post_task_complete": [
+    "git status",
+    "python C:\\Users\\peter\\.claude\\skills\\save_handoff.py"
+  ],
+  "pre_commit": ["python -m pylint --errors-only {{staged_files}}"]
+}
 ```
 
-## Architecture
+### MCP Servers (active)
+| Server              | Purpose                                           |
+|---------------------|---------------------------------------------------|
+| github              | GitHub API — repos, issues, PRs, commits          |
+| filesystem          | Read/write local files                            |
+| context7            | Up-to-date library docs                           |
+| memory              | Persistent cross-session memory                   |
+| sequential-thinking | Step-by-step reasoning chains                     |
+| fetch               | Raw HTTP requests                                 |
+| playwright          | Browser automation + E2E testing                  |
+| pqc-signer          | ML-DSA / SPHINCS+ signing + SHA3-512 hash signing |
+| orchestrator        | Spawn/manage parallel subagents                   |
 
-```
-src/                          # React frontend
-  App.tsx                     # Tab-based navigation (11 tabs)
-  components/
-    ui/                       # 51 shadcn/ui primitives (DO NOT modify unless needed)
-    ModelHub/                 # GitHub Models integration (14 files)
-    AIModelHub/               # Main model catalog + RAG + chat (10 files)
-    PromptEngineering/        # Prompt studio, optimizer, A/B testing (3 files)
-    slides/                   # Presentation slides (9 files)
-    [40+ feature components]  # Standalone feature panels
-  hooks/                      # useAIModels, useSupabaseAI, use-mobile
-  lib/                        # Service layer (20 files)
-    ai-service.ts             # Core AI inference
-    modelhub-service.ts       # Model registry + cost calculation
-    ai-search-service.ts      # AI-powered search
-    xai-sdk.ts                # Explainable AI SDK
-    unified-scraping.ts       # Multi-provider web scraping
-    documentChunker.ts        # RAG document chunking
-    supabase.ts               # Supabase client init
-    supabase-proxy.ts         # Supabase edge function proxy
-    input-validation.ts       # Input validation utilities
-  types/                      # TypeScript interfaces (modelhub, slides, supabase-vector)
-  data/                       # Static data (models, slides, catalog)
-  styles/                     # Theme CSS
+---
 
-api-gateway/                  # Express.js backend
-  src/
-    index.ts                  # Express app entry
-    config/                   # env.ts, providers.ts
-    middleware/               # auth, errorHandler, rateLimit, validation
-    routes/                   # auth, chat, embeddings, health, providers, rerank, vectorSearch
-    services/providers/       # anthropic, deepseek, nvidia, openrouter, xai
-    utils/                    # logger
-  routes/                     # Additional routes (optimize-prompt)
-  Dockerfile                  # Docker containerization
-  docker-compose.yml          # Docker compose config
+## Auto-Fix Error Loop
+- On ANY error: read full trace → identify root cause → fix inline → verify → commit
+- Python scan (Windows): Get-ChildItem -Recurse -Filter '*.py' | ForEach-Object { python -m py_compile $_.FullName 2>&1 }
+- TypeScript scan: npx tsc --noEmit 2>&1
+- Commit format: fix(auto): <error type> in <filename>
+- Push after every fix batch: git push origin HEAD
+- Re-run to confirm exit code 0
+- Never ask permission to fix errors
 
-supabase/                     # Supabase config
-  functions/                  # Edge functions (generate-embedding, wrappers)
-  migrations/                 # SQL migrations (pgvector)
-
-supabase-external/            # Supabase monorepo fork (apps, packages, etc.)
-tests/                        # Frontend tests (Vitest + Testing Library)
-docs/                         # 50+ markdown guides
-```
-
-## App Tabs (src/App.tsx)
-
-| Tab | Component | Purpose |
-|-----|-----------|---------|
-| AI Model Hub 2025 | `AIModelHub2025` | Main model catalog with 70+ models |
-| GitHub Models | `ModelHubApp` | GitHub-hosted model testing |
-| Dashboard | `ModelHubDashboard` | Analytics and metrics |
-| Chat | `LibreChatInterface` | Multi-provider chat UI |
-| AI Search | `AISearchPanel` | AI-powered search |
-| RAG Testing | `RAGTestingPanel` | RAG pipeline testing |
-| Scraping | `UnifiedScrapingLayer` | Web scraping tools |
-| Prompts | `PromptStudio` | Prompt engineering studio |
-| Legacy Hub | `ModelHubApp` | Original model hub |
-| Vector DB | `SupabaseVectorRAG` | pgvector integration |
-| Chunking | `DocumentChunkingDemo` | Document chunking demo |
-
-## AI Providers
-
-OpenRouter, Anthropic, DeepSeek, xAI/Grok, OpenAI, HuggingFace, NVIDIA NIM, GitHub Models, Gemini, Perplexity, Together AI
-
-## Code Conventions
-
-- TypeScript with `strictNullChecks` enabled
-- Path alias: `@/*` maps to `./src/*`
-- 2-space indentation
-- JSDoc comments for public APIs
-- Async/await over raw promises
-- Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `ci:`
-- Union types over enums
-- Functional components with typed props interfaces
-- Event handlers prefixed with `handle`
-- Custom hooks in `src/hooks/` with `use` prefix
-- Services as classes in `src/lib/`
-
-## Testing
-
-- Tests in `tests/` directory
-- Vitest globals configured in `tsconfig.json`
-- Testing Library for React component tests
-- Run `npm test -- --run` for single pass
-- Write tests for all new code
+---
 
 ## Git Workflow
+- Branch strategy: feature branches off main
+- Commit format: conventional commits — type(scope): description
+- Always push after fixes: git push origin HEAD
+- Auto-create PR if on feature branch: gh pr create --fill
 
-- Branch naming: `feature/`, `bugfix/`, `hotfix/`
-- Always create PRs, never push directly to main
-- PRs trigger automatic Claude Code review (`claude-code-review.yml`)
-- Mention `@claude` in issues or PR comments for AI assistance (`claude.yml`)
-- CI runs: lint, type check, test, build (`build.yml`)
-- Dependabot auto-merges patch/minor updates
+PowerShell git shortcuts (from profile):
+- gc  <type> <msg> → git add -A && git commit -m "type: msg"
+- gcp <type> <msg> → gc + git push origin HEAD
+- gsync            → git pull --rebase origin <current-branch>
+- gnew  <branch>   → git checkout -b <branch> && push --set-upstream
+- gback            → git checkout main && git pull --rebase
+- gundo            → git reset --soft HEAD~1
+- gtag  <tag>      → git tag <tag> && git push origin <tag>
+- gdiff            → git diff --stat
+- gstash / gpop    → git stash / git stash pop
 
-## GitHub Workflows
+---
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `build.yml` | push/PR to main | Lint + typecheck + test + build |
-| `claude.yml` | `@claude` mentions | AI code assistance |
-| `claude-code-review.yml` | PR events | Automatic code review |
-| `release.yml` | manual dispatch | Docker multi-arch build + GHCR push |
-| `dependabot-auto-merge.yml` | Dependabot PRs | Auto-merge patches |
-| `satisfy-required-checks.yml` | PR from trusted bots | Bypass checks for Copilot/Dependabot |
-| `docker-image.yml` | push/PR to main | Build supabase-studio image |
+## PQC Signing Protocol
+For any artifact, commit hash, or API payload requiring quantum-resistant signing:
+1. Call pqc_keygen with algorithm: ml-dsa-65 and a key_id
+2. Call pqc_hash_sign — SHA3-512 hashes payload first, then signs hash
+3. Attach signed_hash + sha3_512_hash + algorithm to artifact metadata
+4. Default algorithm: ML-DSA-65 (NIST FIPS 204)
+5. Fallback algorithm: SPHINCS+-SHAKE-256s
+6. Keys stored at: ~/.claude/pqc_keys/
 
-## Environment
+---
 
-- `.env` for local secrets (gitignored) -- see `.env.example`
-- Supabase project ID: `ccjdctnmgrweserduxhi`
-- Vite exposes env vars with `VITE_` prefix
-- API gateway env vars: provider API keys, JWT secret, Redis URL
+## Statusline
+Active status bar inside every Claude Code session.
+Script: ~/.claude/statusline.py
+Settings: ~/.claude/settings.json
 
-## Key Dependencies to Know
+Displays: Model | Project | Branch | ~modified +staged !untracked | A:api%
+Example:  Sonnet 4.6  multimodal-ai-integr  main  ~2 +1  A:12%
 
-- `@github/spark` — GitHub Spark web components (DO NOT REMOVE spark plugin from vite.config.ts)
-- `@openrouter/ai-sdk-provider` — OpenRouter integration
-- `cmdk` — Command palette (Cmd+K)
-- `sonner` — Toast notifications
-- `vaul` — Drawer component
-- `zod` — Schema validation
-- `react-hook-form` + `@hookform/resolvers` — Forms
+A:% ratio = API time / total time. Low % = Claude thinking locally. High % = waiting on API.
+Use to decide when to switch to faster/cheaper model mid-session.
 
-## Secrets (GitHub)
+---
 
-- `ANTHROPIC_API_KEY` — Claude Code workflows
-- `CLAUDE_CODE_OAUTH_TOKEN` — Claude Code OAuth
+## Orchestration Framework Library
+Installed at: C:\Users\peter\.claude\frameworks\
+
+| Repo                                        | Stars | Use For                                          |
+|---------------------------------------------|-------|--------------------------------------------------|
+| wshobson/agents                             | 29K   | Reference implementation — skills, plugins, hooks|
+| avivl/claude-007-agents                     | 237   | 14-category agent roster, drop-in .claude/agents/|
+| aannoo/hcom                                 | 83    | Cross-terminal agent messaging + spawn           |
+| rokoss21/swarm-iosm                         | 2     | IOSM parallel dispatch + quality gates           |
+| darkmatter/orchestra                        | 2     | Hook-triggered agent spawning patterns           |
+| CodeZero3/op-mode                           | 0     | PowerShell-native GSD+RLM+subagent protocol      |
+| leolech14/PROJECT_claude-subagents          | 0     | 25 specialized drop-in agents                    |
+
+On complex tasks: reference wshobson/agents patterns first.
+For parallel batch work: use swarm-iosm IOSM dispatch model.
+For hook-triggered automation: use orchestra patterns.
+For PowerShell-native orchestration: use op-mode.
+
+Clone command:
+```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\.claude\frameworks"
+Set-Location "$HOME\.claude\frameworks"
+gh repo clone wshobson/agents
+gh repo clone avivl/claude-007-agents
+gh repo clone aannoo/hcom
+gh repo clone rokoss21/swarm-iosm
+gh repo clone darkmatter/orchestra
+gh repo clone CodeZero3/op-mode
+gh repo clone leolech14/PROJECT_claude-subagents
+```
+
+---
+
+## Context Management Protocol
+- Quality degrades at 20-40% context capacity — act before full
+- Every 45 min OR after any major feature/fix: generate handoff summary
+- Handoff format: PROJECT_STATE | DECISIONS | CURRENT_BRANCH | OPEN_ISSUES | NEXT_STEPS
+- Save to: .claude\handoff_latest.md and commit it
+- On session start: read .claude\handoff_latest.md before anything else
+- Use /compact to preserve continuity within same project
+- Use /clear + paste handoff when switching tasks entirely
+- One session per task
+
+---
+
+## Status Dashboard (print after every startup)
+```
+┌─────────────────────────────────────────┐
+│ AGENT READY — Nietzsche-Ubermensch       │
+├─────────────────────────────────────────┤
+│ ✅ Auth       : <ok/fixed>              │
+│ 📁 Repo       : <name> on <branch>      │
+│ 🤖 Model      : <active model string>   │
+│ 🐛 Errors     : <n> fixed in <files>    │
+│ 🔴 Issues     : <n> open                │
+│ 🟡 PRs        : <n> open                │
+│ 🧠 MCPs       : <list active>           │
+│ 📄 Handoff    : <loaded/none>           │
+│ 🚀 Subagents  : <spawned/ready>         │
+│ 💡 Recommend  : <next action>           │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Behavior Rules
+| Action                 | Permission   |
+|------------------------|--------------|
+| Error fixes            | ✅ Auto      |
+| Read ops               | ✅ Auto      |
+| Branch creation        | ✅ Auto      |
+| File edits             | ✅ Auto      |
+| Commit + push          | ✅ Auto      |
+| Spawn subagents        | ✅ Auto      |
+| Install MCP/plugins    | ✅ Auto      |
+| Merge to main          | ⛔ Ask first |
+| Force push             | ⛔ Ask first |
+| File deletion          | ⛔ Ask first |
+| New repo creation      | ⛔ Ask first |
+| Rotate/delete API keys | ⛔ Ask first |
+
+---
+
+## Session Kickoff Triggers
+When user says: "start", "go", "jump in", "init", "cgo", "what's up"
+→ Execute full Startup Protocol immediately
+→ Do NOT ask what to work on until after status dashboard is printed
+→ Then ask: "What are we building?" and begin WITHOUT further clarification
