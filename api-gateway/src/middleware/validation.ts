@@ -54,7 +54,7 @@ export const rerankRequestSchema = z.object({
   return_documents: z.boolean().optional().default(true),
 });
 
-export const validateRequest = (schema: z.ZodSchema) => {
+export const validateRequest = (schema: z.ZodType) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       req.body = schema.parse(req.body);
