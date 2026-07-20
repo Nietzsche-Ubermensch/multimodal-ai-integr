@@ -11,6 +11,7 @@ jobs:
       github.event.pull_request.draft == false &&
       github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       pull-requests: write
@@ -25,7 +26,7 @@ jobs:
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@v1.0.5
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -33,3 +34,16 @@ jobs:
             Review this pull request for code quality, bugs, performance, and security issues.
             Use the repository's CLAUDE.md for style and convention guidance.
             Be constructive and specific. Post your review as a PR comment.
+
+      - name: Post fallback comment on failure
+        if: failure() || steps.claude-review.outputs.execution_file == ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: prNumber,
+              body: '⚠️ Claude Code Review failed to produce output. The review step may have timed out or encountered an error. Please review the workflow logs for details.'
+            });
