@@ -40,6 +40,9 @@ jobs:
             // Defaults mirror the CI workflow job/step names in build.yml.
             const defaultChecks = [
               "build",
+              "lint",
+              "typecheck",
+              "test",
             ];
 
             // REQUIRED_CHECKS should be provided as a newline-separated list.
