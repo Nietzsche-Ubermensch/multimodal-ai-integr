@@ -14,7 +14,8 @@ import {
   Database,
   Flask,
   DownloadSimple,
-  Eye
+  Eye,
+  MagnifyingGlass
 } from "@phosphor-icons/react";
 import { APIKeyManager } from "./APIKeyManager";
 import { ModelExplorer } from "./ModelExplorer";
@@ -71,7 +72,7 @@ export function ModelHubApp() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-10 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
+          <TabsList className="grid grid-cols-11 w-full mb-8 bg-card/50 backdrop-blur-sm border border-border">
             <TabsTrigger value="catalog" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Database size={18} />
               <span className="hidden sm:inline">Catalog</span>
@@ -111,6 +112,10 @@ export function ModelHubApp() {
             <TabsTrigger value="saved" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <BookmarkSimple size={18} />
               <span className="hidden sm:inline">Saved</span>
+            </TabsTrigger>
+            <TabsTrigger value="rag" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <MagnifyingGlass size={18} />
+              <span className="hidden sm:inline">RAG</span>
             </TabsTrigger>
           </TabsList>
 
@@ -171,12 +176,11 @@ export function ModelHubApp() {
           <TabsContent value="saved">
             <SavedPrompts />
           </TabsContent>
-        </Tabs>
 
-        {/* RAG Pipeline Section */}
-        <div className="mt-12">
-          <RAGPipelineDemo />
-        </div>
+          <TabsContent value="rag">
+            <RAGPipelineDemo />
+          </TabsContent>
+        </Tabs>
       </main>
 
       <footer className="border-t border-border mt-16 py-8 bg-card/30 backdrop-blur-sm">
