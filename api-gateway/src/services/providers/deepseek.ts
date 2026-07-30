@@ -30,19 +30,22 @@ export class DeepSeekService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
+            Authorization: `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       return response.data;
     } catch (error: any) {
-      logger.error({ error: error.response?.data || error }, 'DeepSeek API error');
+      logger.error(
+        { error: error.response?.data || error },
+        'DeepSeek API error',
+      );
       throw new ProviderError(
         error.response?.data?.error?.message || 'DeepSeek API request failed',
         'deepseek',
-        error.response?.data
+        error.response?.data,
       );
     }
   }
@@ -65,21 +68,28 @@ export class DeepSeekService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
+            Authorization: `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json',
           },
           responseType: 'stream',
-        }
+        },
       );
 
+      let buffer = '';
       for await (const chunk of response.data) {
-        const lines = chunk.toString().split('\n').filter((line: string) => line.trim() !== '');
-        
-        for (const line of lines) {
+        buffer += chunk.toString();
+
+        let newlineIndex;
+        while ((newlineIndex = buffer.indexOf('\n')) >= 0) {
+          const line = buffer.slice(0, newlineIndex).trim();
+          buffer = buffer.slice(newlineIndex + 1);
+
+          if (line === '') continue;
+
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
             if (data === '[DONE]') continue;
-            
+
             try {
               const parsed = JSON.parse(data);
               yield parsed;
@@ -90,11 +100,14 @@ export class DeepSeekService {
         }
       }
     } catch (error: any) {
-      logger.error({ error: error.response?.data || error }, 'DeepSeek streaming error');
+      logger.error(
+        { error: error.response?.data || error },
+        'DeepSeek streaming error',
+      );
       throw new ProviderError(
         error.response?.data?.error?.message || 'DeepSeek streaming failed',
         'deepseek',
-        error.response?.data
+        error.response?.data,
       );
     }
   }
