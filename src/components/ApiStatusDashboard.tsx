@@ -136,9 +136,7 @@ export function ApiStatusDashboard() {
   const checkAllStatuses = async () => {
     setIsRefreshing(true);
     
-    for (const provider of providers) {
-      await checkProviderStatus(provider);
-    }
+    await Promise.all(providers.map((provider) => checkProviderStatus(provider)));
     
     setIsRefreshing(false);
   };
