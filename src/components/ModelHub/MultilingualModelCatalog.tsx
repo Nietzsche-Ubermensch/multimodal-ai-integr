@@ -45,11 +45,13 @@ export function MultilingualModelCatalog() {
   const models = UNIFIED_MODEL_CATALOG;
 
   const languageStats = useMemo(() => {
-    return {
-      german: models.filter(m => m.tags?.includes('german') || m.tags?.includes('multilingual')).length,
-      japanese: models.filter(m => m.tags?.includes('japanese') || m.tags?.includes('multilingual')).length,
-      multilingual: models.filter(m => m.tags?.includes('multilingual')).length,
-    };
+    return models.reduce((acc, m) => {
+      const isMultilingual = m.tags?.includes('multilingual');
+      if (m.tags?.includes('german') || isMultilingual) acc.german++;
+      if (m.tags?.includes('japanese') || isMultilingual) acc.japanese++;
+      if (isMultilingual) acc.multilingual++;
+      return acc;
+    }, { german: 0, japanese: 0, multilingual: 0 });
   }, [models]);
 
   const filtered = useMemo(() => {
